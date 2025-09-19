@@ -75,6 +75,13 @@
       width: 90%;
       height: 9mm;        /* ارتفاع ثابت على الشاشة */
     }
+    
+    /* دعم النص العربي في الباركود */
+    .sticker-barcode svg text{
+      font-family: 'Cairo', Arial, sans-serif !important;
+      direction: rtl;
+      unicode-bidi: bidi-override;
+    }
 
     /* تفاصيل الجهاز في الأسفل */
     .sticker-card{
@@ -146,6 +153,7 @@
       /* تحسين النصوص للطباعة */
       .shop { font-size: 2.2mm; margin-bottom: 0.2mm; }
       .sticker-barcode svg { height: 8mm !important; }  /* ارتفاع أدق للطباعة */
+      .sticker-barcode svg text { font-size: 6px !important; } /* نص عربي للطباعة */
       .info-item { font-size: 1.6mm; }                  /* تكبير طفيف ليسهل ظهورها */
       .sticker-card { padding: 0.2mm; min-height: 8mm; }/* يمنع انكماش التفاصيل */
       .device-info { gap: 0.3mm; }
@@ -266,16 +274,26 @@
     svg.style.height = '8mm'; // يجب أن يتطابق مع @media print (أو قريبًا منها)
   }
 
-  // توليد الباركود
+  // توليد الباركود مع دعم العربية
   function generateBarcode(phoneNumber) {
     try {
       // استخدام رقم متسلسل يبدأ من 1
       const barcodeNumber = getSequentialNumber(phoneNumber);
+      
+      // إضافة نص عربي تحت الباركود
+      const arabicText = `رقم الجهاز: ${barcodeNumber}`;
+      
       JsBarcode("#barcode", barcodeNumber, {
         format: "CODE128",
         width: 1.5,
         height: 30,          // لا يهم كثيرًا الآن؛ سنثبّت بالحجم عبر normalizeSvgSize
-        displayValue: false,
+        displayValue: true,  // إظهار النص
+        text: arabicText,    // النص العربي
+        textAlign: "center",
+        textPosition: "bottom",
+        textMargin: 2,
+        fontSize: 8,
+        font: "Arial, sans-serif",
         background: "#ffffff",
         lineColor: "#000000",
         margin: 0
@@ -355,9 +373,13 @@
           // إضافة الباركود إلى PDF
           const imgData = canvas.toDataURL('image/png');
           doc.addImage(imgData, 'PNG', 2, 6, 36, 8);
+          
+          // إضافة النص العربي تحت الباركود في PDF
+          const phoneNumber = document.getElementById('phone-number').textContent;
+          doc.setFontSize(4);
+          doc.text(`رقم الجهاز: ${phoneNumber}`, 20, 15, { align: 'center' });
 
           // إضافة تفاصيل الجهاز (أفقياً)
-          const phoneNumber = document.getElementById('phone-number').textContent;
           const batteryLevel = document.getElementById('battery-level').textContent;
           const phoneMemory = document.getElementById('phone-memory').textContent;
 
