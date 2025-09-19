@@ -193,25 +193,40 @@
           const urlParams = new URLSearchParams(window.location.search);
           const phoneNumber = urlParams.get('phone_number');
           
+          console.log('🔍 البحث عن الهاتف برقم:', phoneNumber);
+          
           if (phoneNumber && window.storage) {
             // البحث عن الهاتف في Firebase
             const phones = await window.storage.getPhones();
+            console.log('📱 جميع الهواتف:', phones);
+            
             const phone = phones.find(p => p.phone_number === phoneNumber);
+            console.log('✅ الهاتف الموجود:', phone);
             
             if (phone) {
-              // تحديث البيانات في الواجهة
+              // تحديث البيانات في الواجهة من بيانات الجوال المدخل
               document.getElementById('phone-number').textContent = phone.phone_number || '-';
               document.getElementById('battery-level').textContent = phone.battery_level || '100';
               document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
               
-              // توليد الباركود
+              console.log('📊 بيانات الجوال المحدثة:', {
+                phone_number: phone.phone_number,
+                battery_level: phone.battery_level,
+                phone_memory: phone.phone_memory
+              });
+              
+              // توليد الباركود برقم الجوال المدخل
               generateBarcode(phone.phone_number || '1');
               return;
+            } else {
+              console.warn('❌ لم يتم العثور على الهاتف برقم:', phoneNumber);
             }
           }
           
           // إذا لم يتم العثور على البيانات، استخدم القيم الافتراضية
           const defaultNumber = phoneNumber || '1';
+          console.log('⚠️ استخدام القيم الافتراضية:', defaultNumber);
+          
           document.getElementById('phone-number').textContent = defaultNumber;
           document.getElementById('battery-level').textContent = '100';
           document.getElementById('phone-memory').textContent = '32GB';
@@ -220,7 +235,7 @@
           generateBarcode(defaultNumber);
           
         } catch (error) {
-          console.error('خطأ في جلب بيانات الهاتف:', error);
+          console.error('❌ خطأ في جلب بيانات الهاتف:', error);
           // استخدام القيم الافتراضية في حالة الخطأ
           document.getElementById('phone-number').textContent = '1';
           document.getElementById('battery-level').textContent = '100';
@@ -234,6 +249,8 @@
         try {
           const canvas = document.getElementById('barcode-canvas');
           if (canvas && window.JsBarcode) {
+            console.log('🔢 توليد الباركود برقم:', phoneNumber);
+            
             JsBarcode(canvas, phoneNumber, {
               format: "CODE128",
               width: 3, /* زيادة عرض الخطوط أكثر */
@@ -242,9 +259,13 @@
               background: "#ffffff",
               lineColor: "#000000"
             });
+            
+            console.log('✅ تم توليد الباركود بنجاح');
+          } else {
+            console.error('❌ Canvas أو JsBarcode غير متاح');
           }
         } catch (error) {
-          console.error('خطأ في توليد الباركود:', error);
+          console.error('❌ خطأ في توليد الباركود:', error);
         }
       }
 
