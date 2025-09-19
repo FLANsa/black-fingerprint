@@ -83,22 +83,15 @@ async function addArabicFontToPDF(doc) {
     }
 }
 
-// Function to test if Arabic text rendering is working
-function testArabicFont(doc) {
+// Function to check if Arabic text rendering is available
+function isArabicTextAvailable() {
     try {
-        // Test Canvas rendering
-        const testText = 'اختبار';
-        const imageData = renderArabicTextToCanvas(testText, 12, 100, 20);
-        
-        if (imageData) {
-            console.log('✅ اختبار النص العربي نجح (Canvas)');
-            return true;
-        } else {
-            console.log('❌ فشل اختبار النص العربي (Canvas)');
-            return false;
-        }
+        // Check if Canvas is available
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        return ctx !== null;
     } catch (error) {
-        console.error('❌ فشل اختبار النص العربي:', error);
+        console.error('❌ Canvas غير متاح:', error);
         return false;
     }
 }
@@ -107,7 +100,7 @@ function testArabicFont(doc) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         addArabicFontToPDF,
-        testArabicFont,
+        isArabicTextAvailable,
         convertArabicToEnglish,
         addArabicTextAsImage,
         renderArabicTextToCanvas
@@ -115,7 +108,7 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     // Make functions available globally
     window.addArabicFontToPDF = addArabicFontToPDF;
-    window.testArabicFont = testArabicFont;
+    window.isArabicTextAvailable = isArabicTextAvailable;
     window.convertArabicToEnglish = convertArabicToEnglish;
     window.addArabicTextAsImage = addArabicTextAsImage;
     window.renderArabicTextToCanvas = renderArabicTextToCanvas;

@@ -138,9 +138,6 @@
             <button class="btn btn-primary" onclick="generatePDF()">
               <i class="fas fa-file-pdf"></i> تحميل PDF
             </button>
-            <button class="btn btn-info" onclick="testArabicFont()">
-              <i class="fas fa-font"></i> اختبار الخط العربي
-            </button>
             <a href="dashboard.html" class="btn btn-secondary">
               <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
             </a>
@@ -258,47 +255,6 @@
     }
   }
 
-  // دالة لاختبار دعم العربية في الخط (محسنة لـ macOS)
-  function testArabicSupport(doc, fontName) {
-    try {
-      doc.setFont(fontName, 'normal');
-      // اختبار كتابة نص عربي بسيط
-      const testText = 'ا';
-      doc.text(testText, 0, 0, { isInputRtl: true });
-      console.log(`✅ خط ${fontName} يدعم العربية على macOS`);
-      return true;
-    } catch (e) {
-      console.log(`❌ خط ${fontName} لا يدعم العربية على macOS`);
-      return false;
-    }
-  }
-
-  // دالة مساعدة لاختبار الخطوط المتاحة (محسنة لـ macOS)
-  function testAvailableFonts(doc) {
-    console.log('🔍 اختبار الخطوط المتاحة في jsPDF على macOS...');
-    const testFonts = ['helvetica', 'arial', 'times', 'courier', 'verdana', 'tahoma'];
-    const availableFonts = [];
-    const arabicSupportFonts = [];
-    
-    for (const font of testFonts) {
-      try {
-        doc.setFont(font, 'normal');
-        availableFonts.push(font);
-        console.log(`✅ خط ${font} متاح على macOS`);
-        
-        // اختبار دعم العربية
-        if (testArabicSupport(doc, font)) {
-          arabicSupportFonts.push(font);
-        }
-      } catch (e) {
-        console.log(`❌ خط ${font} غير متاح على macOS`);
-      }
-    }
-    
-    console.log(`📋 الخطوط المتاحة على macOS: ${availableFonts.join(', ')}`);
-    console.log(`🔤 الخطوط التي تدعم العربية على macOS: ${arabicSupportFonts.join(', ')}`);
-    return { available: availableFonts, arabic: arabicSupportFonts };
-  }
 
   // دالة لتحويل النص العربي إلى تنسيق يعمل مع PDF
   function formatArabicText(text, useRtl) {
@@ -450,62 +406,6 @@
     }
   }
 
-  // اختبار تحميل الخط العربي
-  async function testArabicFont() {
-    const button = event.target;
-    const originalText = button.innerHTML;
-    
-    try {
-      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري اختبار الخط...';
-      button.disabled = true;
-
-      if (!window.jspdf || !window.jspdf.jsPDF) {
-        throw new Error('jsPDF غير محمل');
-      }
-
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-      // اختبار الخطوط المتاحة أولاً
-      testAvailableFonts(doc);
-
-      try {
-        const fontSource = await embedArabicFont(doc);
-        console.log(`✅ تم إعداد الخط: ${fontSource}`);
-        
-        doc.setFontSize(16);
-        const useRtl = fontSource.startsWith('arabic-') || fontSource === 'custom-arabic';
-        
-        // اختبار النص العربي
-        doc.text(formatArabicText('اختبار الخط العربي', useRtl), 105, 50, { align: 'center', isInputRtl: useRtl });
-        doc.text(formatArabicText('الصقري للإتصالات', useRtl), 105, 70, { align: 'center', isInputRtl: useRtl });
-        doc.text(formatArabicText('رقم الجهاز: 463115', useRtl), 105, 90, { align: 'center', isInputRtl: useRtl });
-        doc.text(formatArabicText('نسبة البطارية: 100%', useRtl), 105, 110, { align: 'center', isInputRtl: useRtl });
-        doc.text(formatArabicText('الذاكرة: 32GB', useRtl), 105, 130, { align: 'center', isInputRtl: useRtl });
-
-        doc.save('test_arabic_font.pdf');
-        const message = fontSource === 'helvetica-fallback' 
-          ? '✅ تم اختبار الخط باستخدام Helvetica! تم حفظ ملف test_arabic_font.pdf'
-          : `✅ تم اختبار الخط العربي بنجاح باستخدام ${fontSource}! تم حفظ ملف test_arabic_font.pdf`;
-        alert(message);
-        console.log('✅ اختبار الخط نجح!');
-      } catch (fontErr) {
-        console.warn('❌ فشل تحميل الخط العربي:', fontErr);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(16);
-        doc.text('Arabic Font Test Failed', 105, 50, { align: 'center' });
-        doc.text('Using fallback font (helvetica)', 105, 70, { align: 'center' });
-        doc.save('test_fallback_font.pdf');
-        alert('❌ فشل تحميل الخط العربي. تم استخدام الخط الافتراضي. راجع Console للتفاصيل.');
-      }
-    } catch (error) {
-      console.error('خطأ في اختبار الخط:', error);
-      alert('حدث خطأ في اختبار الخط. راجع Console للتفاصيل.');
-    } finally {
-      button.innerHTML = originalText;
-      button.disabled = false;
-    }
-  }
 
   // جلب بيانات الهاتف من URL أو Firebase
   async function loadPhoneData() {
