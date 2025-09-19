@@ -2,13 +2,13 @@
 // استبدل هذه القيم بقيم مشروعك من Firebase Console
 
 const firebaseConfig = {
-  // TODO: استبدل هذه القيم بقيم مشروعك
-  apiKey: "your-api-key-here",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id"
+  apiKey: "AIzaSyB_MvtG7xnY5c18GybVF_SYJfxOa8mxgc8",
+  authDomain: "alsaqri-dc3ca.firebaseapp.com",
+  projectId: "alsaqri-dc3ca",
+  storageBucket: "alsaqri-dc3ca.firebasestorage.app",
+  messagingSenderId: "325709838350",
+  appId: "1:325709838350:web:c3c5dfadc079ce825ae45f",
+  measurementId: "G-Q8E93ZR4FZ"
 };
 
 // تهيئة Firebase

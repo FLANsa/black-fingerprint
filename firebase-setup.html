@@ -319,16 +319,26 @@ service cloud.firestore {
 
         // تحميل الإعدادات المحفوظة
         document.addEventListener('DOMContentLoaded', function() {
-            const savedConfig = localStorage.getItem('firebase_config');
-            if (savedConfig) {
-                const config = JSON.parse(savedConfig);
-                document.getElementById('apiKey').value = config.apiKey || '';
-                document.getElementById('authDomain').value = config.authDomain || '';
-                document.getElementById('projectId').value = config.projectId || '';
-                document.getElementById('storageBucket').value = config.storageBucket || '';
-                document.getElementById('messagingSenderId').value = config.messagingSenderId || '';
-                document.getElementById('appId').value = config.appId || '';
-            }
+            // إعدادات Firebase الحقيقية
+            const realConfig = {
+                apiKey: "AIzaSyB_MvtG7xnY5c18GybVF_SYJfxOa8mxgc8",
+                authDomain: "alsaqri-dc3ca.firebaseapp.com",
+                projectId: "alsaqri-dc3ca",
+                storageBucket: "alsaqri-dc3ca.firebasestorage.app",
+                messagingSenderId: "325709838350",
+                appId: "1:325709838350:web:c3c5dfadc079ce825ae45f"
+            };
+
+            // ملء الحقول بالإعدادات الحقيقية
+            document.getElementById('apiKey').value = realConfig.apiKey;
+            document.getElementById('authDomain').value = realConfig.authDomain;
+            document.getElementById('projectId').value = realConfig.projectId;
+            document.getElementById('storageBucket').value = realConfig.storageBucket;
+            document.getElementById('messagingSenderId').value = realConfig.messagingSenderId;
+            document.getElementById('appId').value = realConfig.appId;
+
+            // حفظ الإعدادات في localStorage
+            localStorage.setItem('firebase_config', JSON.stringify(realConfig));
         });
     </script>
 </body>
