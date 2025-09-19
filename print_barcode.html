@@ -11,6 +11,8 @@
   
   <!-- Barcode generation library -->
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <!-- PDF generation library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -220,6 +222,9 @@
             <button class="btn btn-success" onclick="printBarcode()">
               <i class="fas fa-print"></i> طباعة الباركود
             </button>
+            <button class="btn btn-primary" onclick="generatePDF()">
+              <i class="fas fa-file-pdf"></i> تحميل PDF
+            </button>
             <a href="dashboard.html" class="btn btn-secondary">
               <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
             </a>
@@ -310,6 +315,72 @@
   // طباعة الباركود
   function printBarcode() {
     window.print();
+  }
+
+  // توليد PDF للباركود
+  function generatePDF() {
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: [40, 25] // 40mm x 25mm
+      });
+
+      // إعداد الخط العربي
+      doc.setFont('helvetica');
+
+      // إضافة اسم الشركة
+      doc.setFontSize(6);
+      doc.text('الصقري للإتصالات', 20, 4, { align: 'center' });
+
+      // الحصول على الباركود كصورة
+      const svg = document.getElementById('barcode');
+      if (svg) {
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+
+        // تحويل SVG إلى صورة
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const svgUrl = URL.createObjectURL(svgBlob);
+
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          // إضافة الباركود إلى PDF
+          const imgData = canvas.toDataURL('image/png');
+          doc.addImage(imgData, 'PNG', 2, 6, 36, 8);
+
+          // إضافة تفاصيل الجهاز
+          const phoneNumber = document.getElementById('phone-number').textContent;
+          const batteryLevel = document.getElementById('battery-level').textContent;
+          const phoneMemory = document.getElementById('phone-memory').textContent;
+
+          doc.setFontSize(3);
+          doc.text(`رقم الجهاز: ${phoneNumber}`, 2, 16);
+          doc.text(`نسبة البطارية: ${batteryLevel}`, 2, 19);
+          doc.text(`الذاكرة: ${phoneMemory}`, 2, 22);
+
+          // حفظ PDF
+          const fileName = `barcode_${phoneNumber || 'phone'}.pdf`;
+          doc.save(fileName);
+
+          // تنظيف
+          URL.revokeObjectURL(svgUrl);
+        };
+
+        img.src = svgUrl;
+      } else {
+        alert('لم يتم العثور على الباركود');
+      }
+    } catch (error) {
+      console.error('خطأ في توليد PDF:', error);
+      alert('حدث خطأ في توليد PDF. تأكد من أن المكتبة محملة بشكل صحيح.');
+    }
   }
 
   // جلب بيانات الهاتف من URL أو Firebase
