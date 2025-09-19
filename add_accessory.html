@@ -113,10 +113,10 @@
                         <option value="">اختر الفئة</option>
                         <!-- اتركها فارغة الآن؛ ستملؤها بجافاسكربت لاحقًا -->
                       </select>
-                      <button class="btn btn-outline-success" type="button" onclick="demoAddCategory()">
+                      <button class="btn btn-outline-success" type="button" onclick="addCategory()">
                         <i class="fas fa-plus"></i> إضافة
                       </button>
-                      <button class="btn btn-outline-danger" type="button" onclick="demoDeleteCategory()">
+                      <button class="btn btn-outline-danger" type="button" onclick="deleteCategory()">
                         <i class="fas fa-trash"></i> حذف
                       </button>
                     </div>
@@ -299,7 +299,7 @@
     }
 
 
-    async function demoAddCategory() {
+    async function addCategory() {
       const name = prompt('أدخل اسم الفئة الجديدة:');
       if (!name || !name.trim()) return;
       
@@ -347,7 +347,7 @@
       }
     }
 
-    async function demoDeleteCategory() {
+    async function deleteCategory() {
       const sel = document.getElementById('category');
       if (!sel.value) { 
         showAlert('warning', 'يرجى اختيار فئة أولاً');

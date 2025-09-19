@@ -53,7 +53,7 @@ class BarcodeGenerator {
      * @returns {string} Binary pattern
      */
     generateBarcodePattern(phoneNumber) {
-        // Simple pattern generation (not a real barcode standard, just for demo)
+        // Simple pattern generation for internal use
         const digits = phoneNumber.padEnd(12, '0').slice(0, 12).split('').map(d => parseInt(d, 10));
         let pattern = '11010010'; // Start pattern
         

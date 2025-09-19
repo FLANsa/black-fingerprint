@@ -237,19 +237,47 @@
 
   <!-- جافاسكربت واجهة فقط (بدل متغيرات Jinja وبدل fetch للخادم) -->
   <script>
-    // استبدال: let products = {{ phones|tojson }}; let accessories = {{ accessories|tojson }};
-    // ببيانات تجريبية محلية (واجهة فقط). عدّلها لاحقاً من API حقيقي.
-    const demoPhones = [
-      { id: "p1", brand: "Apple", model: "iPhone 14", serial_number: "SN123", selling_price: 3450.00, description: "128GB Blue" },
-      { id: "p2", brand: "Samsung", model: "S23", serial_number: "SN456", selling_price: 2899.00, description: "256GB Black" }
-    ];
-    const demoAccessories = [
-      { id: "a1", name: "غطاء شفاف", category: "case", selling_price: 55.00, quantity_in_stock: 20, description: "سيليكون" },
-      { id: "a2", name: "شاحن 20W", category: "charger", selling_price: 65.00, quantity_in_stock: 15, description: "USB-C" },
-      { id: "a3", name: "حماية شاشة", category: "screen_protector", selling_price: 35.00, quantity_in_stock: 50, description: "" }
-    ];
-
+    // بيانات المنتجات من Firebase
+    let phones = [];
+    let accessories = [];
     let cart = [];
+
+    // تهيئة Firebase عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', async () => {
+      // انتظار تهيئة Firebase
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        console.log('✅ Firebase متاح في صفحة المبيعات');
+        await loadDataFromFirebase();
+      } else {
+        console.log('⚠️ Firebase غير متاح، استخدام البيانات المحلية');
+        await loadDataFromLocalStorage();
+      }
+    });
+
+    // تحميل البيانات من Firebase
+    async function loadDataFromFirebase() {
+      try {
+        phones = await window.storage.getPhones();
+        accessories = await window.storage.getAccessories();
+        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length });
+      } catch (error) {
+        console.error('❌ خطأ في تحميل البيانات من Firebase:', error);
+        await loadDataFromLocalStorage();
+      }
+    }
+
+    // تحميل البيانات من localStorage
+    async function loadDataFromLocalStorage() {
+      try {
+        phones = JSON.parse(localStorage.getItem('phones') || '[]');
+        accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        console.log('💾 تم تحميل البيانات من localStorage:', { phones: phones.length, accessories: accessories.length });
+      } catch (error) {
+        console.error('❌ خطأ في تحميل البيانات من localStorage:', error);
+      }
+    }
 
     function loadProducts() {
       const productType = document.getElementById('product_type').value;
@@ -259,7 +287,7 @@
       productSelect.innerHTML = '<option value="">اختر المنتج</option>';
 
       if (productType === 'phone') {
-        demoPhones.forEach(phone => {
+        phones.forEach(phone => {
           const option = document.createElement('option');
           option.value = phone.id;
           option.textContent = `${phone.brand} ${phone.model} - ${phone.serial_number}`;
@@ -272,7 +300,7 @@
         const map = { accessory: 'accessory', charger: 'charger', case: 'case', screen_protector: 'screen_protector' };
         const target = map[productType];
         if (target) {
-          demoAccessories.forEach(acc => {
+          accessories.forEach(acc => {
             if (acc.category === target && acc.quantity_in_stock > 0) {
               const option = document.createElement('option');
               option.value = acc.id;
