@@ -151,15 +151,15 @@
             <div class="rows">
               <div class="row2">
                 <div class="label">رقم الجهاز</div>
-                <div class="value" id="phone-number">-</div>
+                <div class="value" id="phone-number">جاري التحميل...</div>
               </div>
               <div class="row2">
                 <div class="label">نسبة البطارية</div>
-                <div class="value" id="battery-level">-</div>
+                <div class="value" id="battery-level">جاري التحميل...</div>
               </div>
               <div class="row2">
                 <div class="label">الذاكرة</div>
-                <div class="value" id="phone-memory">-</div>
+                <div class="value" id="phone-memory">جاري التحميل...</div>
               </div>
             </div>
           </div><!-- /sticker -->
@@ -204,10 +204,10 @@
             console.log('✅ الهاتف الموجود:', phone);
             
             if (phone) {
-              // تحديث البيانات في الواجهة من بيانات الجوال المدخل
+              // تحديث البيانات في الواجهة من بيانات الجوال المدخل فقط
               document.getElementById('phone-number').textContent = phone.phone_number || '-';
-              document.getElementById('battery-level').textContent = phone.battery_level || '100';
-              document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
+              document.getElementById('battery-level').textContent = phone.battery_level || '-';
+              document.getElementById('phone-memory').textContent = phone.phone_memory || '-';
               
               console.log('📊 بيانات الجوال المحدثة:', {
                 phone_number: phone.phone_number,
@@ -215,38 +215,35 @@
                 phone_memory: phone.phone_memory
               });
               
-              // توليد الباركود برقم الجوال المدخل
-              generateBarcode(phone.phone_number || '1');
+              // توليد الباركود برقم الجوال المدخل فقط
+              generateBarcode(phone.phone_number);
               return;
             } else {
               console.warn('❌ لم يتم العثور على الهاتف برقم:', phoneNumber);
+              alert('لم يتم العثور على الهاتف برقم: ' + phoneNumber);
             }
+          } else {
+            // إذا لم يتم العثور على رقم الهاتف في URL
+            console.error('❌ لم يتم العثور على رقم الهاتف في URL');
+            alert('يرجى إدخال رقم الهاتف في URL');
+            return;
           }
-          
-          // إذا لم يتم العثور على البيانات، استخدم القيم الافتراضية
-          const defaultNumber = phoneNumber || '1';
-          console.log('⚠️ استخدام القيم الافتراضية:', defaultNumber);
-          
-          document.getElementById('phone-number').textContent = defaultNumber;
-          document.getElementById('battery-level').textContent = '100';
-          document.getElementById('phone-memory').textContent = '32GB';
-          
-          // توليد الباركود
-          generateBarcode(defaultNumber);
           
         } catch (error) {
           console.error('❌ خطأ في جلب بيانات الهاتف:', error);
-          // استخدام القيم الافتراضية في حالة الخطأ
-          document.getElementById('phone-number').textContent = '1';
-          document.getElementById('battery-level').textContent = '100';
-          document.getElementById('phone-memory').textContent = '32GB';
-          generateBarcode('1');
+          alert('حدث خطأ في جلب بيانات الهاتف: ' + error.message);
         }
       }
 
       // توليد الباركود
       function generateBarcode(phoneNumber) {
         try {
+          // التحقق من وجود رقم الهاتف
+          if (!phoneNumber || phoneNumber === '-') {
+            console.error('❌ رقم الهاتف غير صحيح:', phoneNumber);
+            return;
+          }
+          
           const canvas = document.getElementById('barcode-canvas');
           if (canvas && window.JsBarcode) {
             console.log('🔢 توليد الباركود برقم:', phoneNumber);
