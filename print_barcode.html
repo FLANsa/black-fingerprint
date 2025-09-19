@@ -86,16 +86,18 @@
 
     .device-info{
       display:flex;
-      flex-direction:column;
-      gap:0.2mm;
+      flex-direction:row;
+      justify-content:space-between;
+      gap:0.5mm;
     }
 
-    .info-row{
+    .info-item{
       display:flex;
-      justify-content:space-between;
+      flex-direction:column;
       align-items:center;
-      font-size:1.8mm;
+      font-size:1.6mm;
       line-height:1.1;
+      flex:1;
     }
     .label{ color:#222; font-weight:600; text-align:center; }
     .value{ color:#000; font-weight:700; text-align:center; }
@@ -142,9 +144,9 @@
       /* تحسين النصوص للطباعة */
       .shop { font-size: 2.2mm; margin-bottom: 0.2mm; }
       .sticker-barcode svg { max-height: 5mm; }
-      .info-row { font-size: 1.5mm; gap: 0.1mm; }
+      .info-item { font-size: 1.3mm; }
       .sticker-card { padding: 0.2mm; }
-      .device-info { gap: 0.1mm; }
+      .device-info { gap: 0.3mm; }
     }
   </style>
 </head>
@@ -197,19 +199,19 @@
               <!-- تفاصيل الجهاز في الأسفل -->
               <div class="sticker-card">
                 <div class="device-info">
-                  <div class="info-row">
-                    <span class="label">رقم الجهاز</span>
-                    <span class="value" id="phone-number">463115</span>
+                  <div class="info-item">
+                    <div class="label">رقم الجهاز</div>
+                    <div class="value" id="phone-number">463115</div>
                   </div>
-                  <div class="info-row">
-                    <span class="label">نسبة البطارية</span>
-                    <span class="value" id="battery-level">100</span>
-              </div>
-                  <div class="info-row">
-                    <span class="label">الذاكرة</span>
-                    <span class="value" id="phone-memory">32GB</span>
-              </div>
-              </div>
+                  <div class="info-item">
+                    <div class="label">نسبة البطارية</div>
+                    <div class="value" id="battery-level">100</div>
+                  </div>
+                  <div class="info-item">
+                    <div class="label">الذاكرة</div>
+                    <div class="value" id="phone-memory">32GB</div>
+                  </div>
+                </div>
               </div>
 
             </div>
