@@ -75,13 +75,6 @@
       width: 90%;
       height: 9mm;        /* ارتفاع ثابت على الشاشة */
     }
-    
-    /* دعم النص العربي في الباركود */
-    .sticker-barcode svg text{
-      font-family: 'Cairo', Arial, sans-serif !important;
-      direction: rtl;
-      unicode-bidi: bidi-override;
-    }
 
     /* تفاصيل الجهاز في الأسفل */
     .sticker-card{
@@ -153,7 +146,6 @@
       /* تحسين النصوص للطباعة */
       .shop { font-size: 2.2mm; margin-bottom: 0.2mm; }
       .sticker-barcode svg { height: 8mm !important; }  /* ارتفاع أدق للطباعة */
-      .sticker-barcode svg text { font-size: 6px !important; } /* نص عربي للطباعة */
       .info-item { font-size: 1.6mm; }                  /* تكبير طفيف ليسهل ظهورها */
       .sticker-card { padding: 0.2mm; min-height: 8mm; }/* يمنع انكماش التفاصيل */
       .device-info { gap: 0.3mm; }
@@ -216,12 +208,12 @@
                   <div class="info-item">
                     <div class="label">نسبة البطارية</div>
                     <div class="value" id="battery-level">100</div>
-                  </div>
+              </div>
                   <div class="info-item">
                     <div class="label">الذاكرة</div>
                     <div class="value" id="phone-memory">32GB</div>
-                  </div>
-                </div>
+              </div>
+              </div>
               </div>
 
             </div>
@@ -274,26 +266,17 @@
     svg.style.height = '8mm'; // يجب أن يتطابق مع @media print (أو قريبًا منها)
   }
 
-  // توليد الباركود مع دعم العربية
+  // توليد الباركود
   function generateBarcode(phoneNumber) {
     try {
       // استخدام رقم متسلسل يبدأ من 1
       const barcodeNumber = getSequentialNumber(phoneNumber);
       
-      // إضافة نص عربي تحت الباركود
-      const arabicText = `رقم الجهاز: ${barcodeNumber}`;
-      
       JsBarcode("#barcode", barcodeNumber, {
         format: "CODE128",
         width: 1.5,
         height: 30,          // لا يهم كثيرًا الآن؛ سنثبّت بالحجم عبر normalizeSvgSize
-        displayValue: true,  // إظهار النص
-        text: arabicText,    // النص العربي
-        textAlign: "center",
-        textPosition: "bottom",
-        textMargin: 2,
-        fontSize: 8,
-        font: "Arial, sans-serif",
+        displayValue: false, // إخفاء النص لتجنب مشاكل العربية
         background: "#ffffff",
         lineColor: "#000000",
         margin: 0
@@ -346,12 +329,12 @@
         format: [40, 25] // 40mm x 25mm
       });
 
-      // إعداد الخط العربي
+      // إعداد الخط
       doc.setFont('helvetica');
 
-      // إضافة اسم الشركة
+      // إضافة اسم الشركة (بدون نص عربي في PDF)
       doc.setFontSize(6);
-      doc.text('الصقري للإتصالات', 20, 4, { align: 'center' });
+      doc.text('Al-Saqri Communications', 20, 4, { align: 'center' });
 
       // الحصول على الباركود كصورة
       const svg = document.getElementById('barcode');
@@ -374,20 +357,20 @@
           const imgData = canvas.toDataURL('image/png');
           doc.addImage(imgData, 'PNG', 2, 6, 36, 8);
           
-          // إضافة النص العربي تحت الباركود في PDF
+          // إضافة النص تحت الباركود في PDF (بالإنجليزية لتجنب مشاكل الخط)
           const phoneNumber = document.getElementById('phone-number').textContent;
           doc.setFontSize(4);
-          doc.text(`رقم الجهاز: ${phoneNumber}`, 20, 15, { align: 'center' });
+          doc.text(`Device: ${phoneNumber}`, 20, 15, { align: 'center' });
 
           // إضافة تفاصيل الجهاز (أفقياً)
           const batteryLevel = document.getElementById('battery-level').textContent;
           const phoneMemory = document.getElementById('phone-memory').textContent;
 
           doc.setFontSize(2.5);
-          // ترتيب البيانات أفقياً
-          doc.text(`رقم: ${phoneNumber}`, 2, 16);
-          doc.text(`بطارية: ${batteryLevel}`, 14, 16);
-          doc.text(`ذاكرة: ${phoneMemory}`, 26, 16);
+          // ترتيب البيانات أفقياً (بالإنجليزية)
+          doc.text(`ID: ${phoneNumber}`, 2, 18);
+          doc.text(`Battery: ${batteryLevel}`, 14, 18);
+          doc.text(`Memory: ${phoneMemory}`, 26, 18);
 
           // حفظ PDF
           const fileName = `barcode_${phoneNumber || 'phone'}.pdf`;
