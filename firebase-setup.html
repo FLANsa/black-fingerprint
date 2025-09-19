@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعداد Firebase - الصقري للاتصالات</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .setup-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+        .btn-firebase {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-firebase:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+            color: white;
+        }
+        .alert-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-4">
+                    <h1 class="text-white mb-3">
+                        <i class="fas fa-fire"></i> إعداد Firebase Firestore
+                    </h1>
+                    <p class="text-white-50">ربط نظام الصقري للاتصالات مع قاعدة بيانات Firebase</p>
+                </div>
+
+                <!-- الخطوة 1: إنشاء مشروع Firebase -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">1</div>
+                        <h4 class="mb-0">إنشاء مشروع Firebase</h4>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>ملاحظة:</strong> ستحتاج إلى حساب Google لإنشاء مشروع Firebase
+                    </div>
+                    <ol>
+                        <li>اذهب إلى <a href="https://console.firebase.google.com" target="_blank" class="text-decoration-none">Firebase Console</a></li>
+                        <li>اضغط على "إضافة مشروع" (Add Project)</li>
+                        <li>أدخل اسم المشروع: <code>alsaqri-phones</code></li>
+                        <li>اختر "تمكين Google Analytics" (اختياري)</li>
+                        <li>اضغط "إنشاء المشروع"</li>
+                    </ol>
+                </div>
+
+                <!-- الخطوة 2: إضافة تطبيق ويب -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">2</div>
+                        <h4 class="mb-0">إضافة تطبيق ويب</h4>
+                    </div>
+                    <ol>
+                        <li>في لوحة تحكم المشروع، اضغط على أيقونة الويب <i class="fas fa-globe"></i></li>
+                        <li>أدخل اسم التطبيق: <code>alsaqri-phones-web</code></li>
+                        <li>اختر "إعداد Firebase Hosting" (اختياري)</li>
+                        <li>اضغط "تسجيل التطبيق"</li>
+                    </ol>
+                </div>
+
+                <!-- الخطوة 3: الحصول على إعدادات Firebase -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">3</div>
+                        <h4 class="mb-0">الحصول على إعدادات Firebase</h4>
+                    </div>
+                    <p>انسخ إعدادات Firebase من لوحة التحكم:</p>
+                    <div class="code-block">
+const firebaseConfig = {
+  apiKey: "your-api-key-here",
+  authDomain: "your-project-id.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project-id.appspot.com",
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id"
+};
+                    </div>
+                </div>
+
+                <!-- الخطوة 4: تحديث ملف الإعدادات -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">4</div>
+                        <h4 class="mb-0">تحديث ملف الإعدادات</h4>
+                    </div>
+                    <p>أدخل إعدادات Firebase في الملفات التالية:</p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">API Key:</label>
+                        <input type="text" class="form-control" id="apiKey" placeholder="your-api-key-here">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Auth Domain:</label>
+                        <input type="text" class="form-control" id="authDomain" placeholder="your-project-id.firebaseapp.com">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Project ID:</label>
+                        <input type="text" class="form-control" id="projectId" placeholder="your-project-id">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Storage Bucket:</label>
+                        <input type="text" class="form-control" id="storageBucket" placeholder="your-project-id.appspot.com">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Messaging Sender ID:</label>
+                        <input type="text" class="form-control" id="messagingSenderId" placeholder="your-sender-id">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">App ID:</label>
+                        <input type="text" class="form-control" id="appId" placeholder="your-app-id">
+                    </div>
+                    
+                    <button class="btn btn-firebase" onclick="updateFirebaseConfig()">
+                        <i class="fas fa-save"></i> تحديث إعدادات Firebase
+                    </button>
+                </div>
+
+                <!-- الخطوة 5: تفعيل Firestore Database -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">5</div>
+                        <h4 class="mb-0">تفعيل Firestore Database</h4>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>مهم:</strong> يجب تفعيل Firestore Database لحفظ البيانات
+                    </div>
+                    
+                    <ol>
+                        <li>في لوحة تحكم Firebase، اذهب إلى "Firestore Database"</li>
+                        <li>اضغط "إنشاء قاعدة بيانات"</li>
+                        <li>اختر "بدء في وضع الإنتاج"</li>
+                        <li>اختر موقع قاعدة البيانات (الأقرب للسعودية)</li>
+                        <li>اضغط "تم"</li>
+                    </ol>
+                </div>
+
+                <!-- الخطوة 6: إعداد قواعد الأمان -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">6</div>
+                        <h4 class="mb-0">إعداد قواعد الأمان</h4>
+                    </div>
+                    
+                    <p>في Firestore Database، اذهب إلى "Rules" واكتب القواعد التالية:</p>
+                    <div class="code-block">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // قواعد للهواتف
+    match /phones/{phoneId} {
+      allow read, write: if true;
+    }
+    
+    // قواعد للأكسسوارات
+    match /accessories/{accessoryId} {
+      allow read, write: if true;
+    }
+    
+    // قواعد للمبيعات
+    match /sales/{saleId} {
+      allow read, write: if true;
+    }
+    
+    // قواعد لأنواع الهواتف
+    match /phone_types/{typeId} {
+      allow read, write: if true;
+    }
+    
+    // قواعد لفئات الأكسسوارات
+    match /accessory_categories/{categoryId} {
+      allow read, write: if true;
+    }
+  }
+}
+                    </div>
+                    
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>تحذير:</strong> هذه القواعد تسمح بالوصول للجميع. للاستخدام الإنتاجي، يجب إضافة المصادقة.
+                    </div>
+                </div>
+
+                <!-- الخطوة 7: اختبار الاتصال -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">7</div>
+                        <h4 class="mb-0">اختبار الاتصال</h4>
+                    </div>
+                    
+                    <button class="btn btn-firebase" onclick="testFirebaseConnection()">
+                        <i class="fas fa-plug"></i> اختبار الاتصال مع Firebase
+                    </button>
+                    
+                    <div id="testResult" class="mt-3"></div>
+                </div>
+
+                <!-- الخطوة 8: تشغيل النظام -->
+                <div class="setup-card">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-number">8</div>
+                        <h4 class="mb-0">تشغيل النظام</h4>
+                    </div>
+                    
+                    <p>بعد إكمال جميع الخطوات، يمكنك تشغيل النظام:</p>
+                    
+                    <a href="index.html" class="btn btn-firebase btn-lg">
+                        <i class="fas fa-rocket"></i> تشغيل النظام
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateFirebaseConfig() {
+            const config = {
+                apiKey: document.getElementById('apiKey').value,
+                authDomain: document.getElementById('authDomain').value,
+                projectId: document.getElementById('projectId').value,
+                storageBucket: document.getElementById('storageBucket').value,
+                messagingSenderId: document.getElementById('messagingSenderId').value,
+                appId: document.getElementById('appId').value
+            };
+
+            // التحقق من صحة البيانات
+            if (!config.apiKey || !config.authDomain || !config.projectId) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+
+            // حفظ الإعدادات في localStorage
+            localStorage.setItem('firebase_config', JSON.stringify(config));
+            
+            alert('تم حفظ إعدادات Firebase بنجاح!');
+        }
+
+        function testFirebaseConnection() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<div class="alert alert-info">جاري اختبار الاتصال...</div>';
+
+            // محاولة تحميل Firebase
+            const script = document.createElement('script');
+            script.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+            script.onload = function() {
+                resultDiv.innerHTML = '<div class="alert alert-success">تم تحميل Firebase بنجاح!</div>';
+            };
+            script.onerror = function() {
+                resultDiv.innerHTML = '<div class="alert alert-danger">فشل في تحميل Firebase. تحقق من اتصالك بالإنترنت.</div>';
+            };
+            document.head.appendChild(script);
+        }
+
+        // تحميل الإعدادات المحفوظة
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedConfig = localStorage.getItem('firebase_config');
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                document.getElementById('apiKey').value = config.apiKey || '';
+                document.getElementById('authDomain').value = config.authDomain || '';
+                document.getElementById('projectId').value = config.projectId || '';
+                document.getElementById('storageBucket').value = config.storageBucket || '';
+                document.getElementById('messagingSenderId').value = config.messagingSenderId || '';
+                document.getElementById('appId').value = config.appId || '';
+            }
+        });
+    </script>
+</body>
+</html>
