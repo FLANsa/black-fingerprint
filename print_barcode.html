@@ -30,85 +30,36 @@
     .btn-primary:hover { background-color: #1a252f; border-color: #1a252f; }
 
     /* ============ شاشة ============ */
-    .sticker-preview{
-      border:2px dashed #cfcfcf;
-      padding:20px;
-      background:#f9f9f9;
-      border-radius:10px;
-      display:flex;
-      justify-content:center;
+    .device-info-display {
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
     }
 
-    /* حجم الملصق الفعلي: عمودي مثل الصورة */
-    .sticker{
-      width:4cm;
-      height:2.5cm;
-      background:#fff;
-      border:1px solid #ddd;
-      box-sizing:border-box;
-
-      /* تخطيط عمودي: اسم الشركة، باركود، تفاصيل */
-      display:flex;
-      flex-direction:column;
-      padding:0.1cm;
-      gap:0.08cm;
+    .info-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      text-align: center;
     }
 
-    /* اسم الشركة في الأعلى */
-    .shop{
-      text-align:center;
-      font-weight:700;
-      font-size:3mm;
-      line-height:1.1;
-      margin-bottom:0.05cm;
+    .info-card h6 {
+      color: #6c757d;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
 
-    /* الباركود في الوسط */
-    .sticker-barcode{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin:0.05cm 0;
+    .info-card p {
+      color: #2c3e50;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
     }
-    .sticker-barcode svg{
-      width: 90%;
-      height: 9mm;        /* ارتفاع ثابت على الشاشة */
-    }
-
-    /* تفاصيل الجهاز في الأسفل */
-    .sticker-card{
-      border:1px solid #d9d9d9;
-      border-radius:1px;
-      padding:0.3mm;
-      display:flex;
-      flex-direction:column;
-    }
-
-    .device-info{
-      display:flex;
-      flex-direction:row;
-      justify-content:space-between;
-      gap:0.5mm;
-    }
-
-    .info-item{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      font-size:1.4mm;
-      line-height:1.1;
-      flex:1;
-      text-align:center;
-    }
-    .label{ color:#222; font-weight:600; text-align:center; }
-    .value{ color:#000; font-weight:700; text-align:center; }
 
     /* ============ طباعة ============ */
-    @page{
-      size: 40mm 25mm;      /* حجم الصفحة بالضبط 40mm × 25mm */
-      margin: 0;            /* بدون هوامش */
-    }
     @media print{
       body{ 
         -webkit-print-color-adjust: exact; 
@@ -116,39 +67,13 @@
         margin: 0;
         padding: 0;
       }
-      .navbar, .btn, .card-header, .container > .row:first-child .col-12 .alert { display:none !important; }
-      .card, .card-body, .sticker-preview{ 
+      .navbar, .btn, .card-header, .device-info-display { display:none !important; }
+      .card, .card-body{ 
         border:none !important; 
         background:#fff !important; 
         padding:0 !important; 
         margin: 0 !important;
       }
-
-      /* الملصق بالحجم المحدد بالضبط */
-      .sticker{ 
-        border:none; 
-        width:40mm;
-        height:25mm;
-        margin: 0;
-        padding: 0.5mm;
-        gap: 0.3mm;
-      }
-
-      /* إخفاء كل شيء عدا الملصق */
-      html,body{ 
-        width: 40mm; 
-        height: 25mm; 
-        margin: 0; 
-        padding: 0; 
-        overflow: visible; /* بدل hidden */
-      }
-      
-      /* تحسين النصوص للطباعة */
-      .shop { font-size: 2.2mm; margin-bottom: 0.2mm; }
-      .sticker-barcode svg { height: 8mm !important; }  /* ارتفاع أدق للطباعة */
-      .info-item { font-size: 1.6mm; }                  /* تكبير طفيف ليسهل ظهورها */
-      .sticker-card { padding: 0.2mm; min-height: 8mm; }/* يمنع انكماش التفاصيل */
-      .device-info { gap: 0.3mm; }
     }
   </style>
 </head>
@@ -185,44 +110,31 @@
         <div class="card-header text-center"><h4 class="m-0">طباعة باركود الهاتف</h4></div>
         <div class="card-body text-center">
           
-          <!-- معاينة ضمن إطار منقط -->
-          <div class="sticker-preview mb-4">
-            <!-- الملصق الحقيقي بالحجم النهائي -->
-            <div class="sticker">
-              
-              <!-- اسم الشركة في الأعلى -->
-              <div class="shop">الصقري للإتصالات</div>
-              
-              <!-- الباركود في الوسط -->
-              <div class="sticker-barcode">
-                <svg id="barcode"></svg>
+          <!-- عرض بيانات الجهاز -->
+          <div class="device-info-display mb-4">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="info-card">
+                  <h6>رقم الجهاز</h6>
+                  <p id="phone-number">000001</p>
+                </div>
               </div>
-
-              <!-- تفاصيل الجهاز في الأسفل -->
-              <div class="sticker-card">
-                <div class="device-info">
-                  <div class="info-item">
-                    <div class="label">رقم الجهاز</div>
-                    <div class="value" id="phone-number">000001</div>
-                  </div>
-                  <div class="info-item">
-                    <div class="label">نسبة البطارية</div>
-                    <div class="value" id="battery-level">100</div>
+              <div class="col-md-4">
+                <div class="info-card">
+                  <h6>نسبة البطارية</h6>
+                  <p id="battery-level">100</p>
+                </div>
               </div>
-                  <div class="info-item">
-                    <div class="label">الذاكرة</div>
-                    <div class="value" id="phone-memory">32GB</div>
+              <div class="col-md-4">
+                <div class="info-card">
+                  <h6>الذاكرة</h6>
+                  <p id="phone-memory">32GB</p>
+                </div>
               </div>
-              </div>
-              </div>
-
             </div>
           </div>
 
           <div class="d-grid gap-2">
-            <button class="btn btn-success" onclick="printBarcode()">
-              <i class="fas fa-print"></i> طباعة الباركود
-            </button>
             <button class="btn btn-primary" onclick="generatePDF()">
               <i class="fas fa-file-pdf"></i> تحميل PDF
             </button>
@@ -249,42 +161,31 @@
 <script>
   let currentPhone = null;
 
-  // ثبّت حجم الـSVG بعد التوليد
-  function normalizeSvgSize(){
-    const svg = document.getElementById('barcode');
-    if(!svg) return;
-
-    // أزل الأبعاد الداخلية التي يضعها JsBarcode
-    svg.removeAttribute('width');
-    svg.removeAttribute('height');
-
-    // حافظ على نسبة العرض/الارتفاع
-    svg.setAttribute('preserveAspectRatio','xMidYMid meet');
-
-    // ثبّت الأبعاد بنظام CSS بوحدات ملم لضمان الملاءمة داخل 25mm
-    svg.style.width = '90%';
-    svg.style.height = '8mm'; // يجب أن يتطابق مع @media print (أو قريبًا منها)
-  }
-
-  // توليد الباركود
-  function generateBarcode(phoneNumber) {
+  // توليد الباركود كـ SVG مخفي للـ PDF
+  function generateBarcodeSVG(phoneNumber) {
     try {
-      // استخدام رقم متسلسل يبدأ من 1
       const barcodeNumber = getSequentialNumber(phoneNumber);
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.style.position = 'absolute';
+      svg.style.left = '-9999px';
+      svg.style.top = '-9999px';
+      svg.id = 'hidden-barcode';
+      document.body.appendChild(svg);
       
-      JsBarcode("#barcode", barcodeNumber, {
+      JsBarcode("#hidden-barcode", barcodeNumber, {
         format: "CODE128",
         width: 1.5,
-        height: 30,          // لا يهم كثيرًا الآن؛ سنثبّت بالحجم عبر normalizeSvgSize
-        displayValue: false, // إخفاء النص لتجنب مشاكل العربية
+        height: 30,
+        displayValue: false,
         background: "#ffffff",
         lineColor: "#000000",
         margin: 0
       });
-      // مهم جدًا: ثبّت حجم الـSVG بعد التوليد
-      normalizeSvgSize();
+      
+      return svg;
     } catch (error) {
       console.error('خطأ في توليد الباركود:', error);
+      return null;
     }
   }
 
@@ -309,14 +210,6 @@
     document.getElementById('phone-number').textContent = sequentialNumber;
     document.getElementById('battery-level').textContent = phone.condition === 'used' ? (phone.battery_level || '85') : '100';
     document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
-    
-    // توليد الباركود
-    generateBarcode(phoneNumber);
-  }
-
-  // طباعة الباركود
-  function printBarcode() {
-    window.print();
   }
 
   // تضمين خط عربي (Cairo) مع مسار احتياطي من CDN
@@ -374,9 +267,10 @@
       const useRtl = fontSource !== 'fallback';
       doc.text(title, 20, 4, { align: 'center', isInputRtl: useRtl });
 
-      // تحويل الـSVG إلى صورة PNG
-      const svg = document.getElementById('barcode');
-      if (!svg) throw new Error('SVG للباركود غير موجود');
+      // توليد الباركود كـ SVG مخفي
+      const phoneNumber = document.getElementById('phone-number')?.textContent || '1';
+      const svg = generateBarcodeSVG(phoneNumber);
+      if (!svg) throw new Error('فشل في توليد الباركود');
       const svgData = new XMLSerializer().serializeToString(svg);
       const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
       const svgUrl = URL.createObjectURL(svgBlob);
@@ -392,7 +286,6 @@
           const imgData = canvas.toDataURL('image/png');
           doc.addImage(imgData, 'PNG', 2, 6, 36, 8);
 
-          const phoneNumber = document.getElementById('phone-number')?.textContent || '—';
           const batteryLevel = document.getElementById('battery-level')?.textContent || '—';
           const phoneMemory  = document.getElementById('phone-memory')?.textContent  || '—';
 
@@ -401,7 +294,7 @@
           doc.text(deviceLabel, 20, 15, { align: 'center', isInputRtl: useRtl });
 
           doc.setFontSize(3);
-          const idLabel = useRtl ? `المعرف: ${phoneNumber}` : `ID: ${phoneNumber}`;
+          const idLabel = useRtl ? `المعرف: ${phoneNumber}` : `رقم الجهاز: ${phoneNumber}`;
           const batLabel = useRtl ? `البطارية: ${batteryLevel}` : `Battery: ${batteryLevel}`;
           const memLabel = useRtl ? `الذاكرة: ${phoneMemory}` : `Memory: ${phoneMemory}`;
           doc.text(idLabel, 38, 18, { align: 'right', isInputRtl: useRtl });
@@ -415,10 +308,16 @@
           alert('تعذر إكمال إنشاء PDF (مرحلة الرسم). راجع Console.');
         } finally {
           URL.revokeObjectURL(svgUrl);
+          // إزالة الـ SVG المخفي
+          const hiddenSvg = document.getElementById('hidden-barcode');
+          if (hiddenSvg) hiddenSvg.remove();
         }
       };
       img.onerror = function (e) {
         URL.revokeObjectURL(svgUrl);
+        // إزالة الـ SVG المخفي
+        const hiddenSvg = document.getElementById('hidden-barcode');
+        if (hiddenSvg) hiddenSvg.remove();
         console.error('فشل تحميل صورة الباركود من SVG:', e);
         alert('تعذر تحويل الباركود إلى صورة.');
       };
