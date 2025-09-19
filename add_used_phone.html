@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إضافة هاتف مستعمل — الصقري للاتصالات</title>
+
+  <!-- نفس الخطوط والمكتبات المستخدمة في القالب -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
+    .navbar { 
+      background-color: #2c3e50; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1030; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar-brand, .nav-link { color: white !important; }
+    .card { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-primary { background-color: #2c3e50; border-color: #2c3e50; }
+    .btn-primary:hover { background-color: #1a252f; border-color: #1a252f; }
+  </style>
+</head>
+<body>
+
+  <!-- شريط التنقل -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">الصقري للاتصالات</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-boxes"></i> إدارة المخزون
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="inventory_summary.html"><i class="fas fa-chart-bar"></i> ملخص المخزون</a></li>
+              <li><a class="dropdown-item" href="search.html"><i class="fas fa-search"></i> البحث في المخزون</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="add_accessory.html"><i class="fas fa-plus"></i> إضافة أكسسوار</a></li>
+              <li><a class="dropdown-item" href="list_accessories_simple.html"><i class="fas fa-box"></i> مخزون الأكسسوارات</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-shopping-cart"></i> إدارة المبيعات
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="list_sales.html"><i class="fas fa-list"></i> قائمة المبيعات</a></li>
+              <li><a class="dropdown-item" href="create_sale.html"><i class="fas fa-plus-circle"></i> إنشاء عملية بيع جديدة</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="phoneDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-mobile-alt"></i> إدارة الهواتف
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="add_new_phone.html"><i class="fas fa-mobile"></i> هاتف جديد</a></li>
+              <li><a class="dropdown-item active" href="add_used_phone.html"><i class="fas fa-mobile-alt"></i> هاتف مستعمل</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <h2 class="text-center mb-4">إضافة هاتف مستعمل</h2>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-body">
+
+            <!-- واجهة فقط: لا إرسال للخادم -->
+            <form method="POST" action="#" onsubmit="return false;">
+              <div class="mb-3">
+                <label for="barcode_input" class="form-label">الباركود (اختياري)</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="barcode_input" name="barcode_input"
+                         placeholder="أدخل الباركود الموجود أو اتركه فارغاً لتوليد باركود جديد" value="">
+                  <button class="btn btn-outline-secondary" type="button" onclick="clearBarcode()">مسح</button>
+                </div>
+                <div class="form-text">أدخل الباركود الموجود على الهاتف أو اتركه فارغاً لتوليد باركود جديد</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="brand" class="form-label">الشركة المصنعة</label>
+                <div class="input-group">
+                  <select class="form-select" id="brand" name="brand" required onchange="updateModelOptions()">
+                    <option value="">اختر الشركة المصنعة</option>
+                    <!-- ستُملأ من brandsData لاحقًا -->
+                    <option value="other">أخرى</option>
+                  </select>
+                  <button class="btn btn-outline-success" type="button" onclick="addPhoneType()">
+                    <i class="fas fa-plus"></i> إضافة
+                  </button>
+                  <button class="btn btn-outline-danger" type="button" onclick="deletePhoneType()">
+                    <i class="fas fa-trash"></i> حذف
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="model" class="form-label">الموديل</label>
+                <select class="form-select" id="model" name="model" required>
+                  <option value="">اختر الموديل</option>
+                </select>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="purchase_price" class="form-label">سعر الشراء (بعد الضريبة)</label>
+                    <div class="input-group">
+                      <input type="number" class="form-control" id="purchase_price" name="purchase_price" step="0.01" required>
+                      <span class="input-group-text">ريال</span>
+                    </div>
+                    <small class="form-text text-muted">سيتم حساب السعر قبل الضريبة تلقائياً</small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="selling_price" class="form-label">سعر البيع (بعد الضريبة)</label>
+                    <div class="input-group">
+                      <input type="number" class="form-control" id="selling_price" name="selling_price" step="0.01" required>
+                      <span class="input-group-text">ريال</span>
+                    </div>
+                    <small class="form-text text-muted">سيتم حساب السعر قبل الضريبة تلقائياً</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">السعر قبل الضريبة</label>
+                    <input type="text" class="form-control" id="purchase_price_before_vat" readonly>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label">السعر قبل الضريبة</label>
+                    <input type="text" class="form-control" id="selling_price_before_vat" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="serial_number" class="form-label">الرقم التسلسلي</label>
+                <input type="text" class="form-control" id="serial_number" name="serial_number" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="phone_condition" class="form-label">حالة الهاتف</label>
+                <select class="form-select" id="phone_condition" name="phone_condition" required>
+                  <option value="excellent">ممتازة</option>
+                  <option value="very_good">جيدة جداً</option>
+                  <option value="good">جيدة</option>
+                  <option value="fair">متوسطة</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="age" class="form-label">عمر البطارية (بالأشهر)</label>
+                <input type="number" class="form-control" id="age" name="age" required>
+              </div>
+
+              <h5 class="mt-4 mb-3">معلومات العميل</h5>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="customer_name" class="form-label">اسم العميل</label>
+                    <input type="text" class="form-control" id="customer_name" name="customer_name">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="customer_id" class="form-label">رقم الهوية / الإقامة</label>
+                    <input type="text" class="form-control" id="customer_id" name="customer_id">
+                  </div>
+                </div>
+              </div>
+
+              <h5 class="mt-4 mb-3">مواصفات الهاتف</h5>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="phone_color" class="form-label">لون الجوال</label>
+                    <select class="form-select" id="phone_color" name="phone_color">
+                      <option value="">اختر اللون</option>
+                      <option value="أسود">أسود</option>
+                      <option value="أبيض">أبيض</option>
+                      <option value="أزرق">أزرق</option>
+                      <option value="أحمر">أحمر</option>
+                      <option value="أخضر">أخضر</option>
+                      <option value="أصفر">أصفر</option>
+                      <option value="رمادي">رمادي</option>
+                      <option value="ذهبي">ذهبي</option>
+                      <option value="فضي">فضي</option>
+                      <option value="وردي">وردي</option>
+                      <option value="بنفسجي">بنفسجي</option>
+                      <option value="برتقالي">برتقالي</option>
+                      <option value="أخرى">أخرى</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="phone_memory" class="form-label">الذاكرة</label>
+                    <select class="form-select" id="phone_memory" name="phone_memory">
+                      <option value="">اختر الذاكرة</option>
+                      <option value="32GB">32GB</option>
+                      <option value="64GB">64GB</option>
+                      <option value="128GB">128GB</option>
+                      <option value="256GB">256GB</option>
+                      <option value="512GB">512GB</option>
+                      <option value="1TB">1TB</option>
+                      <option value="أخرى">أخرى</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="buyer_name" class="form-label">اسم المشتري</label>
+                <input type="text" class="form-control" id="buyer_name" name="buyer_name">
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label">الوصف</label>
+                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">إضافة الهاتف المستعمل</button>
+                <a href="dashboard.html" class="btn btn-secondary">عودة للوحة التحكم</a>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- مكتبات JS نفسها -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- سكربتات واجهة فقط (بدل استدعاءات Flask) -->
+  <script>
+    function clearBarcode() {
+      document.getElementById('barcode_input').value = '';
+    }
+
+    // تركيز تلقائي على الباركود لو فاضي
+    if (document.getElementById('barcode_input') && !document.getElementById('barcode_input').value) {
+      document.getElementById('barcode_input').focus();
+    }
+
+    // VAT: تحويل من سعر "بعد" الضريبة إلى "قبل" الضريبة (قسمة على 1.15)
+    function calculatePriceWithoutVAT(priceWithVAT) { return priceWithVAT / 1.15; }
+
+    function updateVATCalculations() {
+      const pFinal = parseFloat(document.getElementById('purchase_price').value) || 0;
+      const sFinal = parseFloat(document.getElementById('selling_price').value) || 0;
+
+      document.getElementById('purchase_price_before_vat').value =
+        (pFinal ? calculatePriceWithoutVAT(pFinal) : 0).toFixed(2) + ' ريال';
+
+      document.getElementById('selling_price_before_vat').value =
+        (sFinal ? calculatePriceWithoutVAT(sFinal) : 0).toFixed(2) + ' ريال';
+    }
+
+    document.getElementById('purchase_price').addEventListener('input', updateVATCalculations);
+    document.getElementById('selling_price').addEventListener('input', updateVATCalculations);
+    document.addEventListener('DOMContentLoaded', updateVATCalculations);
+
+    // بدل Jinja: بيانات محلية للعلامات/الموديلات (واجهة فقط)
+    let brandsData = {
+      "Apple": ["iPhone 11", "iPhone 12", "iPhone 13", "iPhone 14"],
+      "Samsung": ["S20", "S21", "S22", "S23"],
+      "Xiaomi": ["Mi 10", "Mi 11", "Redmi Note 12"]
+    };
+
+    function populateBrands() {
+      const brandSelect = document.getElementById('brand');
+      const keep = Array.from(brandSelect.options).filter(o => o.value === "" || o.value === "other");
+      brandSelect.innerHTML = '';
+      keep.forEach(o => brandSelect.appendChild(o));
+      Object.keys(brandsData).forEach(brand => {
+        const opt = document.createElement('option');
+        opt.value = brand;
+        opt.textContent = brand;
+        brandSelect.insertBefore(opt, brandSelect.querySelector('option[value="other"]'));
+      });
+    }
+
+    function updateModelOptions() {
+      const brandSelect = document.getElementById('brand');
+      const modelSelect = document.getElementById('model');
+      const selectedBrand = brandSelect.value;
+
+      modelSelect.innerHTML = '<option value="">اختر الموديل</option>';
+
+      if (selectedBrand && selectedBrand !== 'other' && brandsData[selectedBrand]) {
+        brandsData[selectedBrand].forEach(model => {
+          const option = document.createElement('option');
+          option.value = model;
+          option.textContent = model;
+          modelSelect.appendChild(option);
+        });
+      }
+    }
+
+    function addPhoneType() {
+      const brandSelect = document.getElementById('brand');
+      const selectedBrand = brandSelect.value;
+
+      let brand = (selectedBrand && selectedBrand !== 'other') ? selectedBrand : prompt('أدخل اسم العلامة التجارية:');
+      if (!brand || !brand.trim()) return;
+      brand = brand.trim();
+
+      const model = prompt('أدخل اسم الموديل:');
+      if (!model || !model.trim()) return;
+
+      brandsData[brand] = brandsData[brand] || [];
+      if (!brandsData[brand].includes(model.trim())) {
+        brandsData[brand].push(model.trim());
+      }
+      populateBrands();
+      document.getElementById('brand').value = brand;
+      updateModelOptions();
+      document.getElementById('model').value = model.trim();
+      alert('تمت إضافة النوع (واجهة فقط).');
+    }
+
+    function deletePhoneType() {
+      const brandSelect = document.getElementById('brand');
+      const modelSelect = document.getElementById('model');
+      const selectedBrand = brandSelect.value;
+      const selectedModel = modelSelect.value;
+
+      if (!selectedBrand || selectedBrand === 'other') { alert('يرجى اختيار علامة تجارية'); return; }
+      if (!selectedModel) { alert('يرجى اختيار موديل'); return; }
+
+      if (!confirm(`هل أنت متأكد من حذف:\n\nالعلامة التجارية: ${selectedBrand}\nالموديل: ${selectedModel}\n\nهذا الإجراء لا يمكن التراجع عنه!`)) return;
+
+      brandsData[selectedBrand] = (brandsData[selectedBrand] || []).filter(m => m !== selectedModel);
+      if (brandsData[selectedBrand].length === 0) delete brandsData[selectedBrand];
+
+      populateBrands();
+      updateModelOptions();
+      alert('تم الحذف (واجهة فقط).');
+    }
+
+    // تسجيل الخروج
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        localStorage.removeItem('current_user');
+        alert('تم تسجيل الخروج بنجاح');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // تهيئة العلامات عند التحميل
+    document.addEventListener('DOMContentLoaded', populateBrands);
+  </script>
+</body>
+</html>

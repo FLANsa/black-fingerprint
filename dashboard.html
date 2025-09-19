@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لوحة التحكم — الصقري للاتصالات</title>
+
+  <!-- نفس الخط/المكتبات المستخدمة في القالب -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
+    .navbar { 
+      background-color: #2c3e50; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1030; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar-brand, .nav-link { color: white !important; }
+    /* نفس التنسيقات المخصصة في الملف الأصلي */
+    .card { border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+    .card-body { padding: 1.25rem; }
+    .card-header { border-radius: 8px 8px 0 0 !important; font-weight: 600; }
+    .card.bg-primary, .card.bg-success, .card.bg-info, .card.bg-warning {
+      border: none; box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+    }
+    .card.bg-primary:hover, .card.bg-success:hover, .card.bg-info:hover, .card.bg-warning:hover {
+      transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+    @media (max-width: 768px) {
+      .card-body { padding: 1rem; }
+      h3 { font-size: 1.5rem; }
+      .fa-2x { font-size: 1.5em; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- شريط التنقل -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">الصقري للاتصالات</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-boxes"></i> إدارة المخزون
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="inventory_summary.html"><i class="fas fa-chart-bar"></i> ملخص المخزون</a></li>
+              <li><a class="dropdown-item" href="search.html"><i class="fas fa-search"></i> البحث في المخزون</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="add_accessory.html"><i class="fas fa-plus"></i> إضافة أكسسوار</a></li>
+              <li><a class="dropdown-item" href="list_accessories_simple.html"><i class="fas fa-box"></i> مخزون الأكسسوارات</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-shopping-cart"></i> إدارة المبيعات
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="list_sales.html"><i class="fas fa-list"></i> قائمة المبيعات</a></li>
+              <li><a class="dropdown-item" href="create_sale.html"><i class="fas fa-plus-circle"></i> إنشاء عملية بيع جديدة</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="phoneDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-mobile-alt"></i> إدارة الهواتف
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="add_new_phone.html"><i class="fas fa-mobile"></i> هاتف جديد</a></li>
+              <li><a class="dropdown-item" href="add_used_phone.html"><i class="fas fa-mobile-alt"></i> هاتف مستعمل</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<div class="container-fluid mt-4">
+  <!-- Main Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="text-center mb-3">
+        <i class="fas fa-tachometer-alt text-primary"></i> لوحة التحكم
+      </h2>
+    </div>
+  </div>
+
+  <!-- Inventory Overview Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-mobile-alt fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">إجمالي الهواتف</h6>
+          <h3 class="mb-0" id="total_phones">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-cash-register fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">عدد المبيعات</h6>
+          <h3 class="mb-0" id="total_sales_count">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-money-bill-wave fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">إجمالي المبيعات</h6>
+          <h3 class="mb-0" id="total_sales_amount">0</h3>
+          <small>ريال</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-coins fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">الربح الفعلي</h6>
+          <h3 class="mb-0" id="total_actual_profit">0</h3>
+          <small>ريال</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Financial Details Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> القيم الشرائية</h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-primary" id="total_purchase_value">0.00 ريال</h3>
+          <p class="text-muted">إجمالي قيمة شراء المخزون</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-tags"></i> القيم البيعية</h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-success" id="total_selling_value">0.00 ريال</h3>
+          <p class="text-muted">إجمالي قيمة بيع المخزون</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-warning text-white">
+          <h5 class="mb-0"><i class="fas fa-chart-line"></i> الربح المتوقع</h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-warning" id="total_expected_profit">0.00 ريال</h3>
+          <p class="text-muted">الربح المتوقع من المخزون</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sales Performance Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-receipt"></i> المبيعات قبل الضريبة</h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-success" id="total_sales_subtotal">0.00 ريال</h3>
+          <p class="text-muted">إجمالي المبيعات قبل الضريبة</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0"><i class="fas fa-percentage"></i> إجمالي الضريبة</h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-danger" id="total_vat_amount">0.00 ريال</h3>
+          <p class="text-muted">إجمالي ضريبة القيمة المضافة</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-light h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-chart-pie"></i> نسبة الربح</h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-info" id="profit_ratio">0%</h3>
+          <p class="text-muted">نسبة الربح من المبيعات</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-bolt"></i> إجراءات سريعة</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-2">
+              <a href="create_sale.html" class="btn btn-success btn-lg w-100">
+                <i class="fas fa-plus-circle"></i><br>إنشاء عملية بيع
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="add_new_phone.html" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-mobile"></i><br>إضافة هاتف جديد
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="add_accessory.html" class="btn btn-info btn-lg w-100">
+                <i class="fas fa-box"></i><br>إضافة أكسسوار
+              </a>
+            </div>
+            <div class="col-md-3 mb-2">
+              <a href="search.html" class="btn btn-warning btn-lg w-100">
+                <i class="fas fa-search"></i><br>البحث في المخزون
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Sales -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-history"></i> آخر المبيعات</h5>
+        </div>
+        <div class="card-body" id="recent_sales_wrap">
+          <!-- واجهة فقط: اعرض رسالة فارغة. يمكنك لاحقًا ملؤها عبر JS من API -->
+          <div class="text-center py-4">
+            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">لا توجد مبيعات حديثة</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- مكتبات JS نفسها -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- نظام لوحة التحكم مع التحقق من تسجيل الدخول -->
+<script>
+  // التحقق من تسجيل الدخول
+  function checkLogin() {
+    const currentUser = localStorage.getItem('current_user');
+    if (!currentUser) {
+      // إعادة توجيه لصفحة تسجيل الدخول
+      alert('يجب تسجيل الدخول أولاً');
+      window.location.href = 'login.html';
+      return false;
+    }
+    return true;
+  }
+
+  // تسجيل الخروج
+  function logout() {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+      localStorage.removeItem('current_user');
+      alert('تم تسجيل الخروج بنجاح');
+      window.location.href = 'index.html';
+    }
+  }
+
+  // تحديث لوحة التحكم بالبيانات الحقيقية
+  function updateDashboard() {
+    try {
+      // جلب البيانات من التخزين المحلي
+      const phones = JSON.parse(localStorage.getItem('phones') || '[]');
+      const accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+      const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+
+      // تحديث إحصائيات الهواتف
+      const totalPhones = phones.length;
+      const totalPurchaseValue = phones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
+      const totalSellingValue = phones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
+      const totalExpectedProfit = totalSellingValue - totalPurchaseValue;
+
+      document.getElementById('total_phones').textContent = totalPhones;
+      document.getElementById('total_purchase_value').textContent = totalPurchaseValue.toFixed(2) + ' ريال';
+      document.getElementById('total_selling_value').textContent = totalSellingValue.toFixed(2) + ' ريال';
+      document.getElementById('total_expected_profit').textContent = totalExpectedProfit.toFixed(2) + ' ريال';
+
+      // تحديث إحصائيات المبيعات
+      const totalSales = sales.length;
+      const totalSalesAmount = sales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+      const totalSalesSubtotal = sales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
+      const totalVatAmount = sales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
+
+      document.getElementById('total_sales_count').textContent = totalSales;
+      document.getElementById('total_sales_amount').textContent = totalSalesAmount.toFixed(0);
+      document.getElementById('total_sales_subtotal').textContent = totalSalesSubtotal.toFixed(2) + ' ريال';
+      document.getElementById('total_vat_amount').textContent = totalVatAmount.toFixed(2) + ' ريال';
+      document.getElementById('total_actual_profit').textContent = (totalSalesSubtotal * 0.2).toFixed(2) + ' ريال'; // تقدير 20% ربح
+
+      // حساب نسبة الربح
+      const profitRatio = totalSalesSubtotal > 0 ? 20 : 0; // نسبة تقديرية
+      document.getElementById('profit_ratio').textContent = profitRatio.toFixed(1) + '%';
+
+    } catch (error) {
+      console.error('خطأ في تحديث لوحة التحكم:', error);
+    }
+  }
+
+  // تهيئة الصفحة
+  document.addEventListener('DOMContentLoaded', function() {
+    // التحقق من تسجيل الدخول أولاً
+    if (!checkLogin()) return;
+
+    // تحديث لوحة التحكم
+    updateDashboard();
+
+    // تحديث البيانات كل 10 ثوانِ
+    setInterval(updateDashboard, 10000);
+  });
+</script>
+</body>
+</html>

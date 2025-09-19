@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>قائمة المبيعات — الصقري للاتصالات</title>
+
+  <!-- نفس الخط/المكتبات -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
+    .navbar { 
+      background-color: #2c3e50; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1030; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar-brand, .nav-link { color: white !important; }
+    .card { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+    .card-header { font-weight: 600; }
+    .table thead.table-dark th { vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+  <!-- شريط التنقل -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">الصقري للاتصالات</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-boxes"></i> إدارة المخزون
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="inventory_summary.html"><i class="fas fa-chart-bar"></i> ملخص المخزون</a></li>
+              <li><a class="dropdown-item" href="search.html"><i class="fas fa-search"></i> البحث في المخزون</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="add_accessory.html"><i class="fas fa-plus"></i> إضافة أكسسوار</a></li>
+              <li><a class="dropdown-item" href="list_accessories_simple.html"><i class="fas fa-box"></i> مخزون الأكسسوارات</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-shopping-cart"></i> إدارة المبيعات
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item active" href="list_sales.html"><i class="fas fa-list"></i> قائمة المبيعات</a></li>
+              <li><a class="dropdown-item" href="create_sale.html"><i class="fas fa-plus-circle"></i> إنشاء عملية بيع جديدة</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="phoneDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-mobile-alt"></i> إدارة الهواتف
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="add_new_phone.html"><i class="fas fa-mobile"></i> هاتف جديد</a></li>
+              <li><a class="dropdown-item" href="add_used_phone.html"><i class="fas fa-mobile-alt"></i> هاتف مستعمل</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-shopping-cart"></i> قائمة المبيعات</h2>
+    <div>
+      <a href="create_sale.html" class="btn btn-success me-2">
+        <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
+      </a>
+      <a href="dashboard.html" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> العودة للوحة التحكم
+      </a>
+    </div>
+  </div>
+
+  <!-- منطقة التصفية -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0"><i class="fas fa-filter"></i> تصفية المبيعات</h5>
+    </div>
+    <div class="card-body">
+      <form id="filterForm" class="row g-3" action="#" onsubmit="applyFilter(); return false;">
+        <div class="col-md-3">
+          <label for="filter_type" class="form-label">نوع التصفية</label>
+          <select class="form-select" id="filter_type" name="filter_type" onchange="toggleDateInput()">
+            <option value="all">جميع المبيعات</option>
+            <option value="day">يوم محدد</option>
+            <option value="month">شهر محدد</option>
+            <option value="year">سنة محددة</option>
+          </select>
+        </div>
+
+        <!-- Day -->
+        <div class="col-md-3" id="day_filter_container" style="display:none;">
+          <label for="filter_date" class="form-label">التاريخ</label>
+          <input type="date" class="form-control" id="filter_date" name="filter_date" value="">
+        </div>
+
+        <!-- Month -->
+        <div class="col-md-6" id="month_filter_container" style="display:none;">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="filter_month_year" class="form-label">السنة</label>
+              <select class="form-select" id="filter_month_year" name="filter_month_year">
+                <option value="">اختر السنة</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="filter_month_month" class="form-label">الشهر</label>
+              <select class="form-select" id="filter_month_month" name="filter_month_month">
+                <option value="">اختر الشهر</option>
+                <option value="01">يناير</option>
+                <option value="02">فبراير</option>
+                <option value="03">مارس</option>
+                <option value="04">أبريل</option>
+                <option value="05">مايو</option>
+                <option value="06">يونيو</option>
+                <option value="07">يوليو</option>
+                <option value="08">أغسطس</option>
+                <option value="09">سبتمبر</option>
+                <option value="10">أكتوبر</option>
+                <option value="11">نوفمبر</option>
+                <option value="12">ديسمبر</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year -->
+        <div class="col-md-3" id="year_filter_container" style="display:none;">
+          <label for="filter_year" class="form-label">السنة</label>
+          <select class="form-select" id="filter_year" name="filter_year">
+            <option value="">اختر السنة</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">&nbsp;</label>
+          <div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-search"></i> تطبيق التصفية
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="resetFilter()">
+              <i class="fas fa-undo"></i> إعادة تعيين
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ملخص التصفية الحالية -->
+  <div id="active_filter_alert" class="alert alert-info mb-4 d-none">
+    <h6 class="alert-heading mb-0">
+      <i class="fas fa-filter"></i>
+      <strong>التصفية الحالية:</strong>
+      <span id="active_filter_text"></span>
+    </h6>
+  </div>
+
+  <!-- جدول المبيعات -->
+  <div id="sales_block" class="card d-none">
+    <div class="card-header">
+      <h5 class="mb-0">إجمالي عمليات البيع: <span id="total_sales_count">0</span></h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>رقم العملية</th>
+              <th>التاريخ</th>
+              <th>اسم العميل</th>
+              <th>عدد المنتجات</th>
+              <th>المبلغ الإجمالي</th>
+              <th>طريقة الدفع</th>
+              <th>الحالة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="sales_tbody">
+            <!-- تُملأ ديناميكياً -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- البطاقات التلخيصية -->
+  <div id="summary_cards" class="row mt-4 d-none">
+    <div class="col-md-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <h5 class="card-title">إجمالي عمليات البيع</h5>
+          <h3 id="sum_total_sales_count">0</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success text-white">
+        <div class="card-body text-center">
+          <h5 class="card-title">إجمالي المبيعات</h5>
+          <h3><span id="sum_total_sales_amount">0.00</span> ريال</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <h5 class="card-title">المبيعات قبل الضريبة</h5>
+          <h3><span id="sum_total_sales_subtotal">0.00</span> ريال</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body text-center">
+          <h5 class="card-title">إجمالي الضريبة</h5>
+          <h3><span id="sum_total_vat_amount">0.00</span> ريال</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- حالة عدم وجود بيانات -->
+  <div id="empty_state" class="card d-none">
+    <div class="card-body text-center py-5">
+      <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">لا توجد مبيعات</h4>
+      <p class="text-muted" id="empty_state_text">لم يتم إنشاء أي مبيعات بعد</p>
+      <a href="create_sale.html" class="btn btn-primary">
+        <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- مكتبات JS نفسها -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- واجهة فقط: استبدال Jinja ببيانات محلية + منطق تصفية وعرض -->
+<script>
+  // ---------- بيانات تجريبية (واجهة فقط) ----------
+  const salesAll = [
+    {
+      id: "S-1001",
+      sale_number: "S-1001",
+      date_created: "2025-01-12T10:35:00",
+      customer_name: "عميل نقدي",
+      items: [{},{},{}], // 3 منتجات
+      subtotal: 1000.00,
+      vat_amount: 150.00,
+      total_amount: 1150.00,
+      payment_method: "نقدي",
+      status: "مكتمل"
+    },
+    {
+      id: "S-1002",
+      sale_number: "S-1002",
+      date_created: "2025-02-05T18:10:00",
+      customer_name: "أحمد علي",
+      items: [{}], // 1 منتج
+      subtotal: 350.00,
+      vat_amount: 52.50,
+      total_amount: 402.50,
+      payment_method: "بطاقة ائتمان",
+      status: "معلق"
+    },
+    {
+      id: "S-1003",
+      sale_number: "S-1003",
+      date_created: "2025-09-01T14:20:00",
+      customer_name: "شركة الواصل",
+      items: [{},{}], // 2 منتج
+      subtotal: 2200.00,
+      vat_amount: 330.00,
+      total_amount: 2530.00,
+      payment_method: "تحويل بنكي",
+      status: "مكتمل"
+    }
+  ];
+
+  // ---------- أدوات ----------
+  const fmtMoney = n => (Number(n)||0).toFixed(2);
+  function formatDateTime(iso) {
+    // يُظهر بصيغة YYYY-MM-DD HH:mm
+    const d = new Date(iso);
+    const pad = x => String(x).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  function sameDay(iso, y, m, d) {
+    const dt = new Date(iso);
+    return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
+  }
+  function sameMonth(iso, y, m) {
+    const dt = new Date(iso);
+    return dt.getFullYear()===y && (dt.getMonth()+1)===m;
+  }
+  function sameYear(iso, y) {
+    return new Date(iso).getFullYear()===y;
+  }
+
+  // ---------- تعبئة سنوات القوائم ----------
+  function populateYears() {
+    const yearNow = new Date().getFullYear();
+    const years = [];
+    for (let y=yearNow+2; y>=yearNow-10; y--) years.push(y);
+
+    const selYear1 = document.getElementById('filter_month_year');
+    const selYear2 = document.getElementById('filter_year');
+    years.forEach(y => {
+      const o1 = document.createElement('option'); o1.value = y; o1.textContent = y; selYear1.appendChild(o1);
+      const o2 = document.createElement('option'); o2.value = y; o2.textContent = y; selYear2.appendChild(o2);
+    });
+  }
+
+  // ---------- منطق التبديل بين مدخلات التاريخ ----------
+  function toggleDateInput() {
+    const type = document.getElementById('filter_type').value;
+    const dayC = document.getElementById('day_filter_container');
+    const monC = document.getElementById('month_filter_container');
+    const yearC = document.getElementById('year_filter_container');
+    dayC.style.display = 'none'; monC.style.display = 'none'; yearC.style.display = 'none';
+    if (type==='day') dayC.style.display = 'block';
+    else if (type==='month') monC.style.display = 'block';
+    else if (type==='year') yearC.style.display = 'block';
+  }
+
+  // ---------- تطبيق/إعادة التصفية ----------
+  function applyFilter() {
+    const type = document.getElementById('filter_type').value;
+    let filtered = [...salesAll];
+    let summaryText = '';
+    let emptyHint = 'لم يتم إنشاء أي مبيعات بعد';
+
+    if (type==='day') {
+      const val = document.getElementById('filter_date').value; // YYYY-MM-DD
+      if (val) {
+        const [y,m,d] = val.split('-').map(Number);
+        filtered = salesAll.filter(s => sameDay(s.date_created, y, m, d));
+        summaryText = `يوم ${val}`;
+        emptyHint = 'لا توجد مبيعات تطابق معايير التصفية المحددة';
+      }
+    } else if (type==='month') {
+      const y = parseInt(document.getElementById('filter_month_year').value);
+      const m = parseInt(document.getElementById('filter_month_month').value);
+      if (y && m) {
+        filtered = salesAll.filter(s => sameMonth(s.date_created, y, m));
+        summaryText = `شهر ${String(m).padStart(2,'0')}/${y}`;
+        emptyHint = 'لا توجد مبيعات تطابق معايير التصفية المحددة';
+      }
+    } else if (type==='year') {
+      const y = parseInt(document.getElementById('filter_year').value);
+      if (y) {
+        filtered = salesAll.filter(s => sameYear(s.date_created, y));
+        summaryText = `سنة ${y}`;
+        emptyHint = 'لا توجد مبيعات تطابق معايير التصفية المحددة';
+      }
+    }
+
+    renderSales(filtered, type, summaryText, emptyHint);
+  }
+
+  function resetFilter() {
+    document.getElementById('filterForm').reset();
+    toggleDateInput();
+    renderSales(salesAll, 'all', '', 'لم يتم إنشاء أي مبيعات بعد');
+  }
+
+  // ---------- العرض ----------
+  function renderSales(sales, type='all', summaryText='', emptyHint='لم يتم إنشاء أي مبيعات بعد') {
+    const hasData = sales && sales.length>0;
+
+    // ملخص التصفية
+    const alertBox = document.getElementById('active_filter_alert');
+    const alertText = document.getElementById('active_filter_text');
+    if (type!=='all' && summaryText) {
+      alertText.textContent = summaryText;
+      alertBox.classList.remove('d-none');
+    } else {
+      alertBox.classList.add('d-none');
+      alertText.textContent = '';
+    }
+
+    // إظهار/إخفاء البلوكات
+    document.getElementById('sales_block').classList.toggle('d-none', !hasData);
+    document.getElementById('summary_cards').classList.toggle('d-none', !hasData);
+    document.getElementById('empty_state').classList.toggle('d-none', hasData);
+
+    // نص حالة فارغة
+    document.getElementById('empty_state_text').textContent = (type!=='all') ? 'لا توجد مبيعات تطابق معايير التصفية المحددة' : emptyHint;
+
+    if (!hasData) return;
+
+    // تعبئة الجدول
+    const tbody = document.getElementById('sales_tbody');
+    tbody.innerHTML = '';
+    let totalSubtotal = 0, totalVat = 0, totalAmount = 0;
+
+    sales.forEach(sale => {
+      totalSubtotal += sale.subtotal || 0;
+      totalVat      += sale.vat_amount || 0;
+      totalAmount   += sale.total_amount || 0;
+
+      const tr = document.createElement('tr');
+
+      // رقم العملية
+      const tdNum = document.createElement('td');
+      tdNum.innerHTML = `<span class="badge bg-primary">${sale.sale_number}</span>`;
+      tr.appendChild(tdNum);
+
+      // التاريخ
+      const tdDate = document.createElement('td');
+      tdDate.textContent = formatDateTime(sale.date_created);
+      tr.appendChild(tdDate);
+
+      // العميل
+      const tdCust = document.createElement('td');
+      tdCust.textContent = sale.customer_name || 'عميل نقدي';
+      tr.appendChild(tdCust);
+
+      // عدد المنتجات
+      const tdItems = document.createElement('td');
+      const count = sale.items ? sale.items.length : 0;
+      tdItems.innerHTML = `<span class="badge bg-info">${count}</span>`;
+      tr.appendChild(tdItems);
+
+      // المبلغ الإجمالي + تفاصيل
+      const tdAmt = document.createElement('td');
+      tdAmt.innerHTML = `
+        <span class="fw-bold text-success">${fmtMoney(sale.total_amount)} ريال</span>
+        <br>
+        <small class="text-muted">
+          قبل الضريبة: ${fmtMoney(sale.subtotal)} ريال
+          <br>
+          الضريبة: ${fmtMoney(sale.vat_amount)} ريال
+        </small>`;
+      tr.appendChild(tdAmt);
+
+      // طريقة الدفع
+      const tdPay = document.createElement('td');
+      tdPay.textContent = sale.payment_method || '-';
+      tr.appendChild(tdPay);
+
+      // الحالة (شارة)
+      const tdStatus = document.createElement('td');
+      let badge = 'bg-warning';
+      if (sale.status === 'مكتمل') badge = 'bg-success';
+      else if (sale.status === 'ملغي') badge = 'bg-danger';
+      tdStatus.innerHTML = `<span class="badge ${badge}">${sale.status || '-'}</span>`;
+      tr.appendChild(tdStatus);
+
+      // الإجراءات
+      const tdAct = document.createElement('td');
+      tdAct.innerHTML = `
+        <div class="btn-group" role="group">
+          <a href="view_sale.html?id=${encodeURIComponent(sale.id)}"
+             class="btn btn-sm btn-info" title="عرض التفاصيل">
+            <i class="fas fa-eye"></i>
+          </a>
+          <button class="btn btn-sm btn-success" onclick="window.print()" title="طباعة الفاتورة">
+            <i class="fas fa-print"></i>
+          </button>
+        </div>
+      `;
+      tr.appendChild(tdAct);
+
+      tbody.appendChild(tr);
+    });
+
+    // الرأس + البطاقات
+    document.getElementById('total_sales_count').textContent = sales.length;
+    document.getElementById('sum_total_sales_count').textContent = sales.length;
+    document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
+    document.getElementById('sum_total_sales_subtotal').textContent = fmtMoney(totalSubtotal);
+    document.getElementById('sum_total_vat_amount').textContent = fmtMoney(totalVat);
+  }
+
+  // ---------- تهيئة ----------
+  // تسجيل الخروج
+  function logout() {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+      localStorage.removeItem('current_user');
+      alert('تم تسجيل الخروج بنجاح');
+      window.location.href = 'index.html';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    populateYears();
+    toggleDateInput();
+    // افتراضيًا: عرض جميع المبيعات
+    renderSales(salesAll, 'all', '', 'لم يتم إنشاء أي مبيعات بعد');
+  });
+</script>
+</body>
+</html>
