@@ -265,6 +265,11 @@
   <!-- مكتبات JS نفسها -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- Firebase Configuration -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-database.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
 
   <!-- سكربتات واجهة فقط (بدل استدعاءات Flask) -->
   <script>
@@ -302,7 +307,20 @@
       "Xiaomi": ["Mi 10", "Mi 11", "Redmi Note 12"]
     };
 
-    function populateBrands() {
+    async function populateBrandsFromFirebase() {
+      try {
+        // محاولة الحصول على البيانات من Firebase
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const phoneTypes = await window.storage.getPhoneTypes();
+          if (phoneTypes && Object.keys(phoneTypes).length > 0) {
+            brandsData = phoneTypes;
+            console.log('✅ تم تحميل أنواع الهواتف من Firebase:', brandsData);
+          }
+        }
+      } catch (error) {
+        console.log('⚠️ لم يتم تحميل البيانات من Firebase، استخدام البيانات المحلية:', error);
+      }
+
       const brandSelect = document.getElementById('brand');
       const keep = Array.from(brandSelect.options).filter(o => o.value === "" || o.value === "other");
       brandSelect.innerHTML = '';
@@ -332,7 +350,7 @@
       }
     }
 
-    function addPhoneType() {
+    async function addPhoneType() {
       const brandSelect = document.getElementById('brand');
       const selectedBrand = brandSelect.value;
 
@@ -343,18 +361,34 @@
       const model = prompt('أدخل اسم الموديل:');
       if (!model || !model.trim()) return;
 
-      brandsData[brand] = brandsData[brand] || [];
-      if (!brandsData[brand].includes(model.trim())) {
-        brandsData[brand].push(model.trim());
+      try {
+        // إضافة إلى Firebase إذا كان متاحاً
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const success = await window.storage.addPhoneType(brand, model.trim());
+          if (success) {
+            console.log('✅ تم إضافة نوع الهاتف إلى Firebase');
+          }
+        }
+
+        // تحديث البيانات المحلية
+        brandsData[brand] = brandsData[brand] || [];
+        if (!brandsData[brand].includes(model.trim())) {
+          brandsData[brand].push(model.trim());
+        }
+
+        await populateBrandsFromFirebase();
+        document.getElementById('brand').value = brand;
+        updateModelOptions();
+        document.getElementById('model').value = model.trim();
+        
+        alert('✅ تمت إضافة النوع بنجاح!');
+      } catch (error) {
+        console.error('❌ خطأ في إضافة نوع الهاتف:', error);
+        alert('❌ حدث خطأ في إضافة النوع. حاول مرة أخرى.');
       }
-      populateBrands();
-      document.getElementById('brand').value = brand;
-      updateModelOptions();
-      document.getElementById('model').value = model.trim();
-      alert('تمت إضافة النوع (واجهة فقط).');
     }
 
-    function deletePhoneType() {
+    async function deletePhoneType() {
       const brandSelect = document.getElementById('brand');
       const modelSelect = document.getElementById('model');
       const selectedBrand = brandSelect.value;
@@ -365,13 +399,116 @@
 
       if (!confirm(`هل أنت متأكد من حذف:\n\nالعلامة التجارية: ${selectedBrand}\nالموديل: ${selectedModel}\n\nهذا الإجراء لا يمكن التراجع عنه!`)) return;
 
-      brandsData[selectedBrand] = (brandsData[selectedBrand] || []).filter(m => m !== selectedModel);
-      if (brandsData[selectedBrand].length === 0) delete brandsData[selectedBrand];
+      try {
+        // حذف من Firebase إذا كان متاحاً
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const success = await window.storage.deletePhoneType(selectedBrand, selectedModel);
+          if (success) {
+            console.log('✅ تم حذف نوع الهاتف من Firebase');
+          }
+        }
 
-      populateBrands();
-      updateModelOptions();
-      alert('تم الحذف (واجهة فقط).');
+        // حذف من البيانات المحلية
+        brandsData[selectedBrand] = (brandsData[selectedBrand] || []).filter(m => m !== selectedModel);
+        if (brandsData[selectedBrand].length === 0) delete brandsData[selectedBrand];
+
+        await populateBrandsFromFirebase();
+        updateModelOptions();
+        alert('✅ تم الحذف بنجاح!');
+      } catch (error) {
+        console.error('❌ خطأ في حذف نوع الهاتف:', error);
+        alert('❌ حدث خطأ في الحذف. حاول مرة أخرى.');
+      }
     }
+
+    // حفظ بيانات الهاتف المستعمل في Firebase
+    async function saveUsedPhoneToFirebase() {
+      try {
+        // جمع بيانات النموذج
+        const phoneData = {
+          brand: document.getElementById('brand').value,
+          model: document.getElementById('model').value,
+          condition: 'used',
+          purchase_price: parseFloat(document.getElementById('purchase_price').value) || 0,
+          selling_price: parseFloat(document.getElementById('selling_price').value) || 0,
+          serial_number: document.getElementById('serial_number').value,
+          phone_number: document.getElementById('barcode_input').value || generatePhoneNumber(),
+          phone_condition: document.getElementById('phone_condition').value,
+          age: parseInt(document.getElementById('age').value) || 0,
+          description: document.getElementById('description').value,
+          customer_name: document.getElementById('customer_name').value,
+          customer_id: document.getElementById('customer_id').value,
+          phone_color: document.getElementById('phone_color').value,
+          phone_memory: document.getElementById('phone_memory').value,
+          buyer_name: document.getElementById('buyer_name').value,
+          date_added: new Date().toISOString()
+        };
+
+        // التحقق من البيانات المطلوبة
+        if (!phoneData.brand || !phoneData.model || !phoneData.serial_number) {
+          alert('يرجى ملء جميع الحقول المطلوبة');
+          return false;
+        }
+
+        if (phoneData.purchase_price <= 0 || phoneData.selling_price <= 0) {
+          alert('يرجى إدخال أسعار صحيحة');
+          return false;
+        }
+
+        if (!phoneData.phone_condition) {
+          alert('يرجى اختيار حالة الهاتف');
+          return false;
+        }
+
+        // حفظ في Firebase
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const phoneId = await window.storage.addPhone(phoneData);
+          if (phoneId) {
+            console.log('✅ تم حفظ الهاتف المستعمل في Firebase:', phoneId);
+            alert('✅ تم إضافة الهاتف المستعمل بنجاح!');
+            return true;
+          }
+        } else {
+          // حفظ في LocalStorage كبديل
+          const phones = JSON.parse(localStorage.getItem('phones') || '[]');
+          phoneData.id = Date.now().toString();
+          phones.push(phoneData);
+          localStorage.setItem('phones', JSON.stringify(phones));
+          alert('✅ تم إضافة الهاتف المستعمل بنجاح! (محلي)');
+          return true;
+        }
+      } catch (error) {
+        console.error('❌ خطأ في حفظ الهاتف المستعمل:', error);
+        alert('❌ حدث خطأ في حفظ الهاتف. حاول مرة أخرى.');
+        return false;
+      }
+    }
+
+    // توليد رقم هاتف تلقائي
+    function generatePhoneNumber() {
+      const timestamp = Date.now().toString().slice(-6);
+      return timestamp.padStart(6, '0');
+    }
+
+    // ربط نموذج الإرسال بدالة الحفظ
+    document.addEventListener('DOMContentLoaded', async () => {
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const success = await saveUsedPhoneToFirebase();
+          if (success) {
+            // إعادة تعيين النموذج
+            form.reset();
+            // إعادة تحميل قائمة الشركات
+            await populateBrandsFromFirebase();
+          }
+        });
+      }
+      
+      // تحميل قائمة الشركات من Firebase
+      await populateBrandsFromFirebase();
+    });
 
     // تسجيل الخروج
     function logout() {
@@ -382,8 +519,6 @@
       }
     }
 
-    // تهيئة العلامات عند التحميل
-    document.addEventListener('DOMContentLoaded', populateBrands);
   </script>
 </body>
 </html>
