@@ -215,18 +215,28 @@
     document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
   }
 
-  // تضمين خط عربي مبسط (بدون تحميل من الشبكة)
+  // تضمين خط عربي باستخدام خط مبسط مدمج
   async function embedArabicFont(doc) {
-    console.log('🔄 محاولة استخدام خطوط النظام للعربية...');
+    console.log('🔄 محاولة تضمين خط عربي مبسط...');
     
     try {
-      // محاولة استخدام خطوط النظام التي تدعم العربية
-      const systemFonts = ['arial', 'tahoma', 'verdana', 'helvetica'];
+      // استخدام خط مبسط يدعم العربية بشكل أفضل
+      // Arial Unicode MS يدعم العربية بشكل جيد
+      try {
+        doc.setFont('arial', 'normal');
+        console.log('✅ تم استخدام خط Arial للعربية');
+        return 'arial-arabic';
+      } catch (e) {
+        console.warn('❌ فشل استخدام Arial:', e.message);
+      }
+      
+      // محاولة استخدام خطوط أخرى
+      const systemFonts = ['tahoma', 'verdana', 'helvetica'];
       
       for (const fontName of systemFonts) {
         try {
           doc.setFont(fontName, 'normal');
-          console.log(`✅ تم استخدام خط ${fontName} بنجاح`);
+          console.log(`✅ تم استخدام خط ${fontName} للعربية`);
           return `system-${fontName}`;
         } catch (e) {
           console.warn(`❌ فشل استخدام خط ${fontName}:`, e.message);
@@ -264,6 +274,24 @@
     return availableFonts;
   }
 
+  // دالة لتحويل النص العربي إلى تنسيق يعمل مع PDF
+  function formatArabicText(text, useRtl) {
+    if (!useRtl) {
+      // إذا لم يكن الخط يدعم العربية، استخدم النص الإنجليزي
+      const englishTexts = {
+        'الصقري للإتصالات': 'Al-Saqri Communications',
+        'رقم الجهاز': 'Device ID',
+        'نسبة البطارية': 'Battery',
+        'الذاكرة': 'Memory',
+        'المعرف': 'ID',
+        'البطارية': 'Battery',
+        'الذاكرة': 'Memory'
+      };
+      return englishTexts[text] || text;
+    }
+    return text;
+  }
+
   // توليد PDF للباركود (مع محاولات وتحكم بالأخطاء)
   async function generatePDF() {
     const button = event.target;
@@ -297,8 +325,8 @@
 
       // عنوان أعلى
       doc.setFontSize(6);
-      const title = (fontSource === 'helvetica-fallback') ? 'Al-Saqri Communications' : 'الصقري للإتصالات';
       const useRtl = (fontSource !== 'helvetica-fallback');
+      const title = formatArabicText('الصقري للإتصالات', useRtl);
       doc.text(title, 20, 4, { align: 'center', isInputRtl: useRtl });
 
       // توليد الباركود كـ SVG مخفي
@@ -324,13 +352,13 @@
           const phoneMemory  = document.getElementById('phone-memory')?.textContent  || '—';
 
           doc.setFontSize(4);
-          const deviceLabel = useRtl ? `جهاز: ${phoneNumber}` : `Device: ${phoneNumber}`;
+          const deviceLabel = formatArabicText(`جهاز: ${phoneNumber}`, useRtl);
           doc.text(deviceLabel, 20, 15, { align: 'center', isInputRtl: useRtl });
 
           doc.setFontSize(3);
-          const idLabel = useRtl ? `المعرف: ${phoneNumber}` : `رقم الجهاز: ${phoneNumber}`;
-          const batLabel = useRtl ? `البطارية: ${batteryLevel}` : `Battery: ${batteryLevel}`;
-          const memLabel = useRtl ? `الذاكرة: ${phoneMemory}` : `Memory: ${phoneMemory}`;
+          const idLabel = formatArabicText(`المعرف: ${phoneNumber}`, useRtl);
+          const batLabel = formatArabicText(`البطارية: ${batteryLevel}`, useRtl);
+          const memLabel = formatArabicText(`الذاكرة: ${phoneMemory}`, useRtl);
           doc.text(idLabel, 38, 18, { align: 'right', isInputRtl: useRtl });
           doc.text(batLabel, 20, 18, { align: 'center', isInputRtl: useRtl });
           doc.text(memLabel, 2, 18, { align: 'left', isInputRtl: useRtl });
@@ -400,11 +428,11 @@
         const useRtl = (fontSource !== 'helvetica-fallback');
         
         // اختبار النص العربي
-        doc.text('اختبار الخط العربي', 105, 50, { align: 'center', isInputRtl: useRtl });
-        doc.text('الصقري للإتصالات', 105, 70, { align: 'center', isInputRtl: useRtl });
-        doc.text('رقم الجهاز: 463115', 105, 90, { align: 'center', isInputRtl: useRtl });
-        doc.text('نسبة البطارية: 100%', 105, 110, { align: 'center', isInputRtl: useRtl });
-        doc.text('الذاكرة: 32GB', 105, 130, { align: 'center', isInputRtl: useRtl });
+        doc.text(formatArabicText('اختبار الخط العربي', useRtl), 105, 50, { align: 'center', isInputRtl: useRtl });
+        doc.text(formatArabicText('الصقري للإتصالات', useRtl), 105, 70, { align: 'center', isInputRtl: useRtl });
+        doc.text(formatArabicText('رقم الجهاز: 463115', useRtl), 105, 90, { align: 'center', isInputRtl: useRtl });
+        doc.text(formatArabicText('نسبة البطارية: 100%', useRtl), 105, 110, { align: 'center', isInputRtl: useRtl });
+        doc.text(formatArabicText('الذاكرة: 32GB', useRtl), 105, 130, { align: 'center', isInputRtl: useRtl });
 
         doc.save('test_arabic_font.pdf');
         const message = fontSource === 'helvetica-fallback' 
