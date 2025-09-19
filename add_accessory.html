@@ -168,7 +168,7 @@
               </div>
 
               <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <button type="submit" class="btn btn-success btn-lg" onclick="demoSave()">
+                <button type="submit" class="btn btn-success btn-lg">
                   <i class="fas fa-save"></i> حفظ الأكسسوار
                 </button>
               </div>
@@ -298,101 +298,6 @@
       return number;
     }
 
-    // حفظ الأكسسوار
-    function demoSave() {
-      // جمع البيانات مع دعم الأرقام العربية
-      const purchasePriceRaw = document.getElementById('purchase_price').value;
-      const sellingPriceRaw = document.getElementById('selling_price').value;
-      const quantityRaw = document.getElementById('quantity').value;
-      
-      const data = {
-        name: document.getElementById('name').value.trim(),
-        category: document.getElementById('category').value,
-        description: document.getElementById('description').value.trim(),
-        purchase_price: parseArabicNumber(purchasePriceRaw),
-        selling_price: parseArabicNumber(sellingPriceRaw),
-        quantity: parseInt(convertArabicToEnglishNumbers(quantityRaw)) || 0,
-        supplier: document.getElementById('supplier').value.trim(),
-        notes: document.getElementById('notes').value.trim(),
-      };
-      
-      // للتشخيص (يمكن حذفه لاحقاً)
-      console.log('القيم الأصلية:', {
-        purchase_price: purchasePriceRaw,
-        selling_price: sellingPriceRaw,
-        quantity: quantityRaw
-      });
-      console.log('القيم بعد التحويل:', {
-        purchase_price: data.purchase_price,
-        selling_price: data.selling_price,
-        quantity: data.quantity
-      });
-
-      // التحقق من البيانات
-      if (!data.name) {
-        showAlert('danger', 'يرجى إدخال اسم الأكسسوار');
-        return;
-      }
-
-      if (!data.category) {
-        showAlert('danger', 'يرجى اختيار الفئة');
-        return;
-      }
-
-      if (!purchasePriceRaw || data.purchase_price <= 0) {
-        showAlert('danger', 'يرجى إدخال سعر شراء صحيح (مثال: ١٢٣.٤٥ أو 123.45)');
-        return;
-      }
-
-      if (!sellingPriceRaw || data.selling_price <= 0) {
-        showAlert('danger', 'يرجى إدخال سعر بيع صحيح (مثال: ٢٠٠.٧٥ أو 200.75)');
-        return;
-      }
-
-      if (!quantityRaw || data.quantity < 0) {
-        showAlert('danger', 'يرجى إدخال كمية صحيحة (مثال: ١٠ أو 10)');
-        return;
-      }
-
-      // إنشاء كائن الأكسسوار مع معرف فريد
-      const accessory = {
-        id: generateId(),
-        name: data.name,
-        category: data.category,
-        description: data.description,
-        purchase_price: data.purchase_price,
-        selling_price: data.selling_price,
-        purchase_price_with_vat: data.purchase_price * (1 + VAT_RATE),
-        selling_price_with_vat: data.selling_price * (1 + VAT_RATE),
-        quantity_in_stock: data.quantity,
-        supplier: data.supplier,
-        notes: data.notes,
-        date_added: new Date().toISOString()
-      };
-
-      // جلب الأكسسوارات الموجودة وإضافة الجديد
-      const accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
-      accessories.push(accessory);
-
-      // حفظ البيانات
-      try {
-        localStorage.setItem('accessories', JSON.stringify(accessories));
-        
-        showAlert('success', `تم حفظ الأكسسوار "${accessory.name}" بنجاح! 🎉`);
-        
-        // مسح النموذج
-        document.querySelector('form').reset();
-        
-        // مسح النموذج والتركيز على الحقل الأول
-        setTimeout(() => {
-          document.getElementById('name').focus();
-        }, 1000);
-
-      } catch (error) {
-        showAlert('danger', 'فشل في حفظ البيانات. تأكد من أن المتصفح يدعم التخزين المحلي.');
-        console.error('خطأ في الحفظ:', error);
-      }
-    }
 
     async function demoAddCategory() {
       const name = prompt('أدخل اسم الفئة الجديدة:');
@@ -538,32 +443,47 @@
     // حفظ الأكسسوار في Firebase
     async function saveAccessoryToFirebase() {
       try {
-        // جمع بيانات النموذج
+        // جمع بيانات النموذج مع دعم الأرقام العربية
+        const purchasePriceRaw = document.getElementById('purchase_price').value;
+        const sellingPriceRaw = document.getElementById('selling_price').value;
+        const quantityRaw = document.getElementById('quantity').value;
+        
         const accessoryData = {
-          name: document.getElementById('name').value,
+          name: document.getElementById('name').value.trim(),
+          arabic_name: document.getElementById('name').value.trim(), // إضافة الاسم العربي
           category: document.getElementById('category').value,
-          quantity: parseInt(document.getElementById('quantity').value) || 0,
-          purchase_price: parseFloat(document.getElementById('purchase_price').value) || 0,
-          selling_price: parseFloat(document.getElementById('selling_price').value) || 0,
-          description: document.getElementById('description').value,
-          supplier: document.getElementById('supplier').value,
-          notes: document.getElementById('notes').value,
+          quantity: parseInt(convertArabicToEnglishNumbers(quantityRaw)) || 0,
+          purchase_price: parseArabicNumber(purchasePriceRaw),
+          selling_price: parseArabicNumber(sellingPriceRaw),
+          description: document.getElementById('description').value.trim(),
+          supplier: document.getElementById('supplier').value.trim(),
+          notes: document.getElementById('notes').value.trim(),
           date_added: new Date().toISOString()
         };
 
         // التحقق من البيانات المطلوبة
-        if (!accessoryData.name || !accessoryData.category) {
-          showAlert('danger', 'يرجى ملء جميع الحقول المطلوبة');
+        if (!accessoryData.name) {
+          showAlert('danger', 'يرجى إدخال اسم الأكسسوار');
           return false;
         }
 
-        if (accessoryData.purchase_price <= 0 || accessoryData.selling_price <= 0) {
-          showAlert('danger', 'يرجى إدخال أسعار صحيحة');
+        if (!accessoryData.category) {
+          showAlert('danger', 'يرجى اختيار الفئة');
           return false;
         }
 
-        if (accessoryData.quantity <= 0) {
-          showAlert('danger', 'يرجى إدخال كمية صحيحة');
+        if (!purchasePriceRaw || accessoryData.purchase_price <= 0) {
+          showAlert('danger', 'يرجى إدخال سعر شراء صحيح (مثال: ١٢٣.٤٥ أو 123.45)');
+          return false;
+        }
+
+        if (!sellingPriceRaw || accessoryData.selling_price <= 0) {
+          showAlert('danger', 'يرجى إدخال سعر بيع صحيح (مثال: ٢٠٠.٧٥ أو 200.75)');
+          return false;
+        }
+
+        if (!quantityRaw || accessoryData.quantity < 0) {
+          showAlert('danger', 'يرجى إدخال كمية صحيحة (مثال: ١٠ أو 10)');
           return false;
         }
 
