@@ -117,19 +117,19 @@
                 <div class="info-card">
                   <h6>رقم الجهاز</h6>
                   <p id="phone-number">000001</p>
-                </div>
+            </div>
               </div>
               <div class="col-md-4">
                 <div class="info-card">
                   <h6>نسبة البطارية</h6>
                   <p id="battery-level">100</p>
-                </div>
+              </div>
               </div>
               <div class="col-md-4">
                 <div class="info-card">
                   <h6>الذاكرة</h6>
                   <p id="phone-memory">32GB</p>
-                </div>
+              </div>
               </div>
             </div>
           </div>
@@ -137,6 +137,9 @@
           <div class="d-grid gap-2">
             <button class="btn btn-primary" onclick="generatePDF()">
               <i class="fas fa-file-pdf"></i> تحميل PDF
+            </button>
+            <button class="btn btn-info" onclick="testArabicFont()">
+              <i class="fas fa-font"></i> اختبار الخط العربي
             </button>
             <a href="dashboard.html" class="btn btn-secondary">
               <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
@@ -212,13 +215,24 @@
     document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
   }
 
-  // تضمين خط عربي (Cairo) مع مسار احتياطي من CDN
+  // تضمين خط عربي (Cairo) مع عدة مصادر احتياطية
   async function embedArabicFont(doc) {
-    const localUrl = 'fonts/Cairo-Regular.ttf';
-    const cdnUrl = 'https://cdn.jsdelivr.net/gh/google/fonts/ofl/cairo/Cairo-Regular.ttf';
+    const fontUrls = [
+      'fonts/Cairo-Regular.ttf', // محلي
+      'https://fonts.gstatic.com/s/cairo/v28/SLXGc1nY6HkvangtZmpQdkhzfH5lkSs2SgRjCAGMQ1z0hOA.ttf', // Google Fonts
+      'https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/cairo/Cairo-Regular.ttf', // jsDelivr
+      'https://raw.githubusercontent.com/google/fonts/main/ofl/cairo/Cairo-Regular.ttf' // GitHub Raw
+    ];
+
     async function fetchAsBase64(url) {
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      console.log(`🔄 محاولة تحميل الخط من: ${url}`);
+      const res = await fetch(url, { 
+        cache: 'no-store',
+        mode: 'cors'
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} for ${url}`);
+      }
       const buf = await res.arrayBuffer();
       let binary = '';
       const bytes = new Uint8Array(buf);
@@ -226,25 +240,37 @@
       for (let i = 0; i < bytes.length; i += chunk) {
         binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
       }
-      return btoa(binary);
+      const base64 = btoa(binary);
+      console.log(`✅ تم تحميل الخط بنجاح من: ${url} (${Math.round(base64.length/1024)}KB)`);
+      return base64;
     }
-    try {
-      const b64 = await fetchAsBase64(localUrl);
-      doc.addFileToVFS('Cairo-Regular.ttf', b64);
-      doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
-      return 'local';
-    } catch (e1) {
-      console.warn('تعذر تحميل الخط محلياً، المحاولة عبر CDN...', e1);
-      const b64 = await fetchAsBase64(cdnUrl);
-      doc.addFileToVFS('Cairo-Regular.ttf', b64);
-      doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
-      return 'cdn';
+
+    for (let i = 0; i < fontUrls.length; i++) {
+      try {
+        const b64 = await fetchAsBase64(fontUrls[i]);
+        doc.addFileToVFS('Cairo-Regular.ttf', b64);
+        doc.addFont('Cairo-Regular.ttf', 'Cairo', 'normal');
+        console.log(`🎯 تم تسجيل خط Cairo بنجاح من المصدر ${i + 1}`);
+        return `source-${i + 1}`;
+      } catch (e) {
+        console.warn(`❌ فشل تحميل الخط من المصدر ${i + 1}:`, e.message);
+        if (i === fontUrls.length - 1) {
+          throw new Error('فشل تحميل الخط من جميع المصادر');
+        }
+      }
     }
   }
 
   // توليد PDF للباركود (مع محاولات وتحكم بالأخطاء)
   async function generatePDF() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
     try {
+      // إظهار مؤشر التحميل
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحميل الخط...';
+      button.disabled = true;
+
       if (!window.jspdf || !window.jspdf.jsPDF) {
         throw new Error('jsPDF غير محمل');
       }
@@ -254,12 +280,17 @@
       // محاولة تضمين الخط العربي، وإلا الرجوع لخط افتراضي
       let fontSource = 'fallback';
       try {
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تحميل الخط العربي...';
         fontSource = await embedArabicFont(doc);
         doc.setFont('Cairo', 'normal');
+        console.log('🎉 تم تحميل الخط العربي بنجاح!');
       } catch (fontErr) {
-        console.warn('فشل تضمين الخط العربي، سيتم استخدام helvetica:', fontErr);
+        console.warn('❌ فشل تضمين الخط العربي، سيتم استخدام helvetica:', fontErr);
         doc.setFont('helvetica', 'normal');
       }
+
+      // تحديث حالة الزر
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء PDF...';
 
       // عنوان أعلى
       doc.setFontSize(6);
@@ -303,9 +334,16 @@
 
           const fileName = `barcode_${phoneNumber || 'phone'}.pdf`;
           doc.save(fileName);
+          
+          // إعادة تعيين الزر
+          button.innerHTML = originalText;
+          button.disabled = false;
+          console.log('✅ تم إنشاء PDF بنجاح!');
         } catch (innerErr) {
           console.error('خطأ داخل onload أثناء إنشاء PDF:', innerErr);
           alert('تعذر إكمال إنشاء PDF (مرحلة الرسم). راجع Console.');
+          button.innerHTML = originalText;
+          button.disabled = false;
         } finally {
           URL.revokeObjectURL(svgUrl);
           // إزالة الـ SVG المخفي
@@ -320,11 +358,63 @@
         if (hiddenSvg) hiddenSvg.remove();
         console.error('فشل تحميل صورة الباركود من SVG:', e);
         alert('تعذر تحويل الباركود إلى صورة.');
+        button.innerHTML = originalText;
+        button.disabled = false;
       };
       img.src = svgUrl;
     } catch (error) {
       console.error('خطأ في توليد PDF (رئيسي):', error);
       alert('حدث خطأ في توليد PDF. تأكد من أن المكتبات والخط محملة بشكل صحيح.');
+      button.innerHTML = originalText;
+      button.disabled = false;
+    }
+  }
+
+  // اختبار تحميل الخط العربي
+  async function testArabicFont() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    try {
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري اختبار الخط...';
+      button.disabled = true;
+
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        throw new Error('jsPDF غير محمل');
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      try {
+        const fontSource = await embedArabicFont(doc);
+        doc.setFont('Cairo', 'normal');
+        
+        doc.setFontSize(16);
+        doc.text('اختبار الخط العربي', 105, 50, { align: 'center', isInputRtl: true });
+        doc.text('الصقري للإتصالات', 105, 70, { align: 'center', isInputRtl: true });
+        doc.text('رقم الجهاز: 463115', 105, 90, { align: 'center', isInputRtl: true });
+        doc.text('نسبة البطارية: 100%', 105, 110, { align: 'center', isInputRtl: true });
+        doc.text('الذاكرة: 32GB', 105, 130, { align: 'center', isInputRtl: true });
+
+        doc.save('test_arabic_font.pdf');
+        alert('✅ تم اختبار الخط العربي بنجاح! تم حفظ ملف test_arabic_font.pdf');
+        console.log('✅ اختبار الخط العربي نجح!');
+      } catch (fontErr) {
+        console.warn('❌ فشل تحميل الخط العربي:', fontErr);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(16);
+        doc.text('Arabic Font Test Failed', 105, 50, { align: 'center' });
+        doc.text('Using fallback font (helvetica)', 105, 70, { align: 'center' });
+        doc.save('test_fallback_font.pdf');
+        alert('❌ فشل تحميل الخط العربي. تم استخدام الخط الافتراضي. راجع Console للتفاصيل.');
+      }
+    } catch (error) {
+      console.error('خطأ في اختبار الخط:', error);
+      alert('حدث خطأ في اختبار الخط. راجع Console للتفاصيل.');
+    } finally {
+      button.innerHTML = originalText;
+      button.disabled = false;
     }
   }
 
