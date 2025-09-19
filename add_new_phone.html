@@ -149,16 +149,22 @@
 
               <h5 class="mt-4 mb-3">معلومات العميل</h5>
               <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="mb-3">
                     <label for="customer_name" class="form-label">اسم العميل</label>
                     <input type="text" class="form-control" id="customer_name" name="customer_name">
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="mb-3">
                     <label for="customer_id" class="form-label">رقم الهوية / الإقامة</label>
                     <input type="text" class="form-control" id="customer_id" name="customer_id">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="customer_phone" class="form-label">رقم هاتف العميل</label>
+                    <input type="text" class="form-control" id="customer_phone" name="customer_phone" placeholder="05xxxxxxxx">
                   </div>
                 </div>
               </div>
@@ -327,6 +333,7 @@
           description: document.getElementById('description').value,
           customer_name: document.getElementById('customer_name').value,
           customer_id: document.getElementById('customer_id').value,
+          customer_phone: document.getElementById('customer_phone').value,
           phone_color: document.getElementById('phone_color').value,
           phone_memory: document.getElementById('phone_memory').value,
           buyer_name: document.getElementById('buyer_name').value,
