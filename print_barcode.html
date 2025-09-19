@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>طباعة الباركود — الصقري للاتصالات</title>
-  
+
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -79,26 +79,23 @@
     .sticker-card{
       border:1px solid #d9d9d9;
       border-radius:1px;
-      padding:0.05cm;
+      padding:0.3mm;
       display:flex;
       flex-direction:column;
-      gap:0.03cm;
     }
 
-    .rows{ 
-      display:flex; 
-      flex-direction:row; 
-      gap:0.05cm; 
+    .device-info{
+      display:flex;
+      flex-direction:column;
+      gap:0.2mm;
+    }
+
+    .info-row{
+      display:flex;
       justify-content:space-between;
-    }
-
-    .row2{
-      display:flex;
-      flex-direction:column;
       align-items:center;
-      font-size:2mm;
-      line-height:1.05;
-      text-align:center;
+      font-size:1.8mm;
+      line-height:1.1;
     }
     .label{ color:#222; font-weight:600; text-align:center; }
     .value{ color:#000; font-weight:700; text-align:center; }
@@ -143,9 +140,11 @@
       }
       
       /* تحسين النصوص للطباعة */
-      .shop { font-size: 2.5mm; margin-bottom: 0.3mm; }
-      .sticker-barcode svg { max-height: 6mm; }
-      .row2 { font-size: 1.8mm; }
+      .shop { font-size: 2.2mm; margin-bottom: 0.2mm; }
+      .sticker-barcode svg { max-height: 5mm; }
+      .info-row { font-size: 1.5mm; gap: 0.1mm; }
+      .sticker-card { padding: 0.2mm; }
+      .device-info { gap: 0.1mm; }
     }
   </style>
 </head>
@@ -197,20 +196,20 @@
 
               <!-- تفاصيل الجهاز في الأسفل -->
               <div class="sticker-card">
-                <div class="rows">
-                  <div class="row2">
-                    <div class="label">رقم الجهاز</div>
-                    <div class="value" id="phone-number">000001</div>
+                <div class="device-info">
+                  <div class="info-row">
+                    <span class="label">رقم الجهاز</span>
+                    <span class="value" id="phone-number">463115</span>
                   </div>
-                  <div class="row2">
-                    <div class="label">نسبة البطارية</div>
-                    <div class="value" id="battery-level">100</div>
-                  </div>
-                  <div class="row2">
-                    <div class="label">الذاكرة</div>
-                    <div class="value" id="phone-memory">512</div>
-                  </div>
-                </div>
+                  <div class="info-row">
+                    <span class="label">نسبة البطارية</span>
+                    <span class="value" id="battery-level">100</span>
+              </div>
+                  <div class="info-row">
+                    <span class="label">الذاكرة</span>
+                    <span class="value" id="phone-memory">32GB</span>
+              </div>
+              </div>
               </div>
 
             </div>
@@ -277,12 +276,12 @@
 
   // تحديث تفاصيل الهاتف
   function updatePhoneDetails(phone) {
-    const phoneNumber = phone.phone_number || '000001';
+    const phoneNumber = phone.phone_number || '463115';
     const sequentialNumber = getSequentialNumber(phoneNumber);
     
     document.getElementById('phone-number').textContent = sequentialNumber;
     document.getElementById('battery-level').textContent = phone.condition === 'used' ? (phone.battery_level || '85') : '100';
-    document.getElementById('phone-memory').textContent = phone.phone_memory || '512';
+    document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
     
     // توليد الباركود
     generateBarcode(phoneNumber);
@@ -314,9 +313,9 @@
       
       // استخدام بيانات افتراضية
       const defaultPhone = {
-        phone_number: phoneNumber || '1',
+        phone_number: phoneNumber || '463115',
         condition: 'new',
-        phone_memory: '512',
+        phone_memory: '32GB',
         battery_level: '100'
       };
       
@@ -328,9 +327,9 @@
       
       // استخدام بيانات افتراضية في حالة الخطأ
       const defaultPhone = {
-        phone_number: '1',
+        phone_number: '463115',
         condition: 'new',
-        phone_memory: '512',
+        phone_memory: '32GB',
         battery_level: '100'
       };
       
