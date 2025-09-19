@@ -175,14 +175,16 @@
                 </div>
                 <div class="col-md-4">
                   <div class="mb-3">
-                    <label for="customer_id" class="form-label">رقم الهوية / الإقامة</label>
-                    <input type="text" class="form-control" id="customer_id" name="customer_id">
+                    <label for="customer_id" class="form-label">رقم الهوية / الإقامة <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="customer_id" name="customer_id" required maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="1234567890">
+                    <div class="form-text">يجب أن يكون 10 أرقام</div>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="mb-3">
-                    <label for="customer_phone" class="form-label">رقم هاتف العميل</label>
-                    <input type="text" class="form-control" id="customer_phone" name="customer_phone" placeholder="05xxxxxxxx">
+                    <label for="customer_phone" class="form-label">رقم هاتف العميل <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="customer_phone" name="customer_phone" required maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="05xxxxxxxx">
+                    <div class="form-text">يجب أن يكون 10 أرقام</div>
                   </div>
                 </div>
               </div>
@@ -318,6 +320,22 @@
 
     async function saveUsedPhoneToFirebase(){
       try{
+        // Validate customer ID and phone number
+        const customerId = document.getElementById('customer_id').value.trim();
+        const customerPhone = document.getElementById('customer_phone').value.trim();
+        
+        if (!customerId || customerId.length !== 10 || !/^[0-9]{10}$/.test(customerId)) {
+          alert('رقم الهوية/الإقامة مطلوب ويجب أن يكون 10 أرقام');
+          document.getElementById('customer_id').focus();
+          return false;
+        }
+        
+        if (!customerPhone || customerPhone.length !== 10 || !/^[0-9]{10}$/.test(customerPhone)) {
+          alert('رقم هاتف العميل مطلوب ويجب أن يكون 10 أرقام');
+          document.getElementById('customer_phone').focus();
+          return false;
+        }
+
         const phone_number = (document.getElementById('barcode_input').value||'').trim() || generatePhoneNumber();
         const ageMonths = parseInt(document.getElementById('age').value)||0;
 
@@ -371,10 +389,38 @@
       }catch(err){ console.error(err); alert('❌ حدث خطأ في حفظ الهاتف.'); return false; }
     }
 
+    // Add input validation for customer ID and phone
+    function setupInputValidation() {
+      const customerIdInput = document.getElementById('customer_id');
+      const customerPhoneInput = document.getElementById('customer_phone');
+      
+      // Only allow numbers and limit to 10 digits
+      [customerIdInput, customerPhoneInput].forEach(input => {
+        input.addEventListener('input', function(e) {
+          // Remove any non-numeric characters
+          let value = e.target.value.replace(/[^0-9]/g, '');
+          // Limit to 10 digits
+          if (value.length > 10) {
+            value = value.substring(0, 10);
+          }
+          e.target.value = value;
+        });
+        
+        // Prevent pasting non-numeric content
+        input.addEventListener('paste', function(e) {
+          e.preventDefault();
+          const paste = (e.clipboardData || window.clipboardData).getData('text');
+          const numericOnly = paste.replace(/[^0-9]/g, '').substring(0, 10);
+          e.target.value = numericOnly;
+        });
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const form = document.querySelector('form');
       form.addEventListener('submit', async (e)=>{ e.preventDefault(); if(await saveUsedPhoneToFirebase()){ form.reset(); await populateBrandsFromFirebase(); } });
       await populateBrandsFromFirebase();
+      setupInputValidation();
       if(!document.getElementById('barcode_input').value){ document.getElementById('barcode_input').focus(); }
     });
 
