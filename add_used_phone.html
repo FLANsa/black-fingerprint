@@ -162,7 +162,7 @@
 
               <div class="mb-3">
                 <label for="age" class="form-label">عمر البطارية</label>
-                <input type="number" class="form-control" id="age" name="age" required>
+                <input type="number" class="form-control" id="age" name="age" required min="0" max="100" placeholder="0-100">
               </div>
 
               <h5 class="mt-4 mb-3">معلومات العميل</h5>
@@ -334,6 +334,14 @@
           return false;
         }
 
+        // Validate battery age (0-100)
+        const batteryAge = parseInt(document.getElementById('age').value);
+        if (isNaN(batteryAge) || batteryAge < 0 || batteryAge > 100) {
+          alert('عمر البطارية يجب أن يكون بين 0 و 100');
+          document.getElementById('age').focus();
+          return false;
+        }
+
         const phone_number = (document.getElementById('barcode_input').value||'').trim() || generatePhoneNumber();
         const ageMonths = parseInt(document.getElementById('age').value)||0;
 
@@ -387,12 +395,13 @@
       }catch(err){ console.error(err); alert('❌ حدث خطأ في حفظ الهاتف.'); return false; }
     }
 
-    // Add input validation for customer ID and phone
+    // Add input validation for customer ID, phone, and battery age
     function setupInputValidation() {
       const customerIdInput = document.getElementById('customer_id');
       const customerPhoneInput = document.getElementById('customer_phone');
+      const batteryAgeInput = document.getElementById('age');
       
-      // Only allow numbers and limit to 10 digits
+      // Only allow numbers and limit to 10 digits for ID and phone
       [customerIdInput, customerPhoneInput].forEach(input => {
         input.addEventListener('input', function(e) {
           // Remove any non-numeric characters
@@ -411,6 +420,18 @@
           const numericOnly = paste.replace(/[^0-9]/g, '').substring(0, 10);
           e.target.value = numericOnly;
         });
+      });
+
+      // Battery age validation (0-100)
+      batteryAgeInput.addEventListener('input', function(e) {
+        let value = parseInt(e.target.value);
+        if (isNaN(value)) {
+          e.target.value = '';
+        } else if (value < 0) {
+          e.target.value = '0';
+        } else if (value > 100) {
+          e.target.value = '100';
+        }
       });
     }
 
