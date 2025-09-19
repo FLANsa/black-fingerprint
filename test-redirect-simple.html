@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار التوجيه</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        .result { margin: 20px 0; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>اختبار التوجيه إلى صفحة الباركود</h1>
+    
+    <button onclick="testRedirect1()">اختبار 1: رقم بسيط</button>
+    <button onclick="testRedirect2()">اختبار 2: رقم عشوائي</button>
+    <button onclick="testRedirect3()">اختبار 3: مع تأكيد</button>
+    
+    <div class="result" id="result"></div>
+    
+    <script>
+        function log(message) {
+            const result = document.getElementById('result');
+            result.innerHTML += '<div>' + new Date().toLocaleTimeString() + ': ' + message + '</div>';
+            console.log(message);
+        }
+        
+        function generatePhoneNumber() {
+            return 'PH' + Date.now().toString().slice(-8);
+        }
+        
+        function testRedirect1() {
+            const phoneNumber = '123456';
+            log('🔄 اختبار 1: التوجيه برقم ' + phoneNumber);
+            window.location.href = `print_barcode.html?phone_number=${phoneNumber}`;
+        }
+        
+        function testRedirect2() {
+            const phoneNumber = generatePhoneNumber();
+            log('🔄 اختبار 2: التوجيه برقم ' + phoneNumber);
+            window.location.href = `print_barcode.html?phone_number=${phoneNumber}`;
+        }
+        
+        function testRedirect3() {
+            const phoneNumber = generatePhoneNumber();
+            log('🔄 اختبار 3: مع تأكيد - رقم ' + phoneNumber);
+            
+            const shouldPrint = confirm('هل تريد التوجه إلى صفحة الباركود؟');
+            if (shouldPrint) {
+                log('✅ المستخدم وافق على التوجيه');
+                window.location.href = `print_barcode.html?phone_number=${phoneNumber}`;
+            } else {
+                log('❌ المستخدم رفض التوجيه');
+            }
+        }
+        
+        // فحص إذا كان هناك رقم في URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const phoneNumber = urlParams.get('phone_number');
+        if (phoneNumber) {
+            log('📱 تم استقبال رقم الهاتف من URL: ' + phoneNumber);
+        }
+    </script>
+</body>
+</html>
