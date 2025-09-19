@@ -300,12 +300,8 @@
     document.getElementById('selling_price').addEventListener('input', updateVATCalculations);
     document.addEventListener('DOMContentLoaded', updateVATCalculations);
 
-    // بدل Jinja: بيانات محلية للعلامات/الموديلات (واجهة فقط)
-    let brandsData = {
-      "Apple": ["iPhone 11", "iPhone 12", "iPhone 13", "iPhone 14"],
-      "Samsung": ["S20", "S21", "S22", "S23"],
-      "Xiaomi": ["Mi 10", "Mi 11", "Redmi Note 12"]
-    };
+    // بيانات الشركات والموديلات - سيتم تحميلها من Firebase
+    let brandsData = {};
 
     async function populateBrandsFromFirebase() {
       try {

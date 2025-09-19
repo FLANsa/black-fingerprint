@@ -331,14 +331,8 @@
       });
     }
 
-    // بدل Jinja: بيانات محلية قابلة للتعديل
-    // عدّل هذه الكائنات لاحقًا من API حقيقي
-    let brandsData = {
-      "Apple": ["iPhone 13", "iPhone 14", "iPhone 15"],
-      "Samsung": ["S22", "S23", "S24"],
-      "Xiaomi": ["Redmi Note 12", "Mi 11"],
-      // ... أضف ما تريد
-    };
+    // بيانات الشركات والموديلات - سيتم تحميلها من Firebase
+    let brandsData = {};
 
     async function populateBrandsFromFirebase() {
       try {
