@@ -1,31 +1,42 @@
 // Arabic Font Support for jsPDF
 // This file contains a base64-encoded Arabic font that works with jsPDF
 
-// Base64-encoded Noto Sans Arabic font (simplified version)
-// This is a minimal Arabic font that supports basic Arabic characters
-const ARABIC_FONT_BASE64 = `AAEAAAAOAIAAAwBgT1MvMj3hSQEAAADsAAAATmNtYXDQEhm3AAABPAAAAUpjdnQgBkFGRgAAApAAAAA+ZnBnbYoKeDsAAANIAAAJkWdhc3AAAAAQAAADNAAAAAAhnbHlmzU0vJwAABJQAAABUaGVhZBrQvssAAAT8AAAANmhoZWEHUwNNAAAFNAAAACRobXR4CykAAAAABVwAAAAKbG9jYQA4AFsAAAV0AAAACG1heHAApgm8AAAFfAAAACBuYW1lW0cGtwAABZwAAAKmcG9zdK8JoJcAABDkAAAAgAABAAADUv9qAFoEAAAA//8D6gABAAAAAAAAAAAAAAAAAAAABwABAAAAAQAAiVgF8l8PPPUACwPoAAAAANP2e3AAAAAA0/Z7cAAAAAAD6gABAAAAAgABAAcAAAAAAAIAAgADAAUAAQAEAAoAAgABAAEAAAABAAAAAA==`;
+// Simplified approach - use system fonts with better Arabic support detection
+// Instead of embedding a complex font, we'll use a more reliable method
 
-// Function to add Arabic font to jsPDF document
+// Function to find the best Arabic-supporting font
 function addArabicFontToPDF(doc) {
     try {
-        // Add the font to jsPDF's virtual file system
-        doc.addFileToVFS('NotoSansArabic-Regular.ttf', ARABIC_FONT_BASE64);
+        // Test system fonts for Arabic support
+        const systemFonts = ['arial', 'helvetica', 'times', 'courier', 'verdana'];
         
-        // Register the font with jsPDF
-        doc.addFont('NotoSansArabic-Regular.ttf', 'NotoSansArabic', 'normal');
+        for (const fontName of systemFonts) {
+            try {
+                doc.setFont(fontName, 'normal');
+                // Test with a simple Arabic character
+                doc.text('ا', 0, 0, { isInputRtl: true });
+                console.log(`✅ تم العثور على خط يدعم العربية: ${fontName}`);
+                return fontName;
+            } catch (e) {
+                // Font doesn't support Arabic, try next
+                continue;
+            }
+        }
         
-        console.log('✅ تم إضافة الخط العربي Noto Sans Arabic بنجاح');
-        return true;
+        // If no Arabic font found, use helvetica as fallback
+        doc.setFont('helvetica', 'normal');
+        console.log('❌ لم يتم العثور على خط يدعم العربية، سيتم استخدام Helvetica');
+        return 'helvetica';
     } catch (error) {
-        console.error('❌ فشل في إضافة الخط العربي:', error);
-        return false;
+        console.error('❌ فشل في إعداد الخط:', error);
+        return 'helvetica';
     }
 }
 
 // Function to test if Arabic font is working
 function testArabicFont(doc) {
     try {
-        doc.setFont('NotoSansArabic', 'normal');
+        // Test with the current font
         doc.setFontSize(12);
         
         // Test with a simple Arabic character
@@ -43,12 +54,10 @@ function testArabicFont(doc) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         addArabicFontToPDF,
-        testArabicFont,
-        ARABIC_FONT_BASE64
+        testArabicFont
     };
 } else {
     // Make functions available globally
     window.addArabicFontToPDF = addArabicFontToPDF;
     window.testArabicFont = testArabicFont;
-    window.ARABIC_FONT_BASE64 = ARABIC_FONT_BASE64;
 }

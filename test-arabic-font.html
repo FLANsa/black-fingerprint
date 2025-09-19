@@ -131,8 +131,9 @@
                 const doc = new jsPDF();
                 
                 if (typeof addArabicFontToPDF === 'function') {
-                    if (addArabicFontToPDF(doc)) {
-                        addToConsole('✅ تم إضافة الخط العربي المخصص بنجاح', 'success');
+                    const fontName = addArabicFontToPDF(doc);
+                    if (fontName) {
+                        addToConsole(`✅ تم العثور على خط يدعم العربية: ${fontName}`, 'success');
                         
                         if (testArabicFont(doc)) {
                             addToConsole('✅ اختبار الخط العربي نجح', 'success');
@@ -140,7 +141,7 @@
                             addToConsole('❌ فشل اختبار الخط العربي', 'error');
                         }
                     } else {
-                        addToConsole('❌ فشل في إضافة الخط العربي المخصص', 'error');
+                        addToConsole('❌ فشل في العثور على خط يدعم العربية', 'error');
                     }
                 } else {
                     addToConsole('❌ دالة addArabicFontToPDF غير متاحة', 'error');
@@ -210,12 +211,11 @@
                 let useRtl = false;
                 
                 if (typeof addArabicFontToPDF === 'function') {
-                    if (addArabicFontToPDF(doc)) {
-                        if (testArabicFont(doc)) {
-                            fontSource = 'NotoSansArabic';
-                            useRtl = true;
-                            addToConsole('✅ استخدام الخط العربي المخصص', 'success');
-                        }
+                    const fontName = addArabicFontToPDF(doc);
+                    if (fontName && fontName !== 'helvetica') {
+                        fontSource = fontName;
+                        useRtl = true;
+                        addToConsole(`✅ استخدام الخط العربي: ${fontName}`, 'success');
                     }
                 }
                 

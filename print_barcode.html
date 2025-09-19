@@ -225,11 +225,10 @@
     try {
       // محاولة استخدام الخط العربي المخصص أولاً
       if (typeof addArabicFontToPDF === 'function') {
-        if (addArabicFontToPDF(doc)) {
-          if (testArabicFont(doc)) {
-            console.log('✅ تم استخدام الخط العربي المخصص بنجاح');
-            return 'custom-arabic';
-          }
+        const fontName = addArabicFontToPDF(doc);
+        if (fontName && fontName !== 'helvetica') {
+          console.log(`✅ تم استخدام الخط العربي: ${fontName}`);
+          return `arabic-${fontName}`;
         }
       }
       
