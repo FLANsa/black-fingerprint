@@ -194,35 +194,47 @@
     // إعدادات النظام
     const VAT_RATE = 0.15; // 15% ضريبة القيمة المضافة السعودية
     
-    // الفئات الافتراضية
-    const defaultCategories = [
-      { value: 'case', text: 'أغلفة' },
-      { value: 'charger', text: 'شواحن' },
-      { value: 'screen_protector', text: 'حماية الشاشة' },
-      { value: 'cable', text: 'كابلات' },
-      { value: 'headphone', text: 'سماعات' },
-      { value: 'other', text: 'أخرى' }
-    ];
-
-    // تحميل الفئات عند بدء الصفحة
-    function loadCategories() {
+    // تحميل الفئات من Firebase
+    async function loadCategories() {
       const categorySelect = document.getElementById('category');
       categorySelect.innerHTML = '<option value="">اختر الفئة</option>';
       
-      // إضافة الفئات المحفوظة أو الافتراضية
-      const savedCategories = JSON.parse(localStorage.getItem('accessory_categories') || 'null');
-      const categories = savedCategories || defaultCategories;
-      
-      categories.forEach(cat => {
-        const option = document.createElement('option');
-        option.value = cat.value;
-        option.textContent = cat.text;
-        categorySelect.appendChild(option);
-      });
-      
-      // حفظ الفئات الافتراضية إذا لم تكن محفوظة
-      if (!savedCategories) {
-        localStorage.setItem('accessory_categories', JSON.stringify(defaultCategories));
+      try {
+        // محاولة الحصول على الفئات من Firebase
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const categories = await window.storage.getAccessoryCategories();
+          if (categories && categories.length > 0) {
+            categories.forEach(cat => {
+              const option = document.createElement('option');
+              option.value = cat.name;
+              option.textContent = cat.arabic_name;
+              categorySelect.appendChild(option);
+            });
+            console.log('✅ تم تحميل فئات الأكسسوارات من Firebase');
+            return;
+          }
+        }
+        
+        // استخدام الفئات الافتراضية كبديل
+        const defaultCategories = [
+          { name: 'case', arabic_name: 'أغلفة' },
+          { name: 'charger', arabic_name: 'شواحن' },
+          { name: 'screen_protector', arabic_name: 'حماية الشاشة' },
+          { name: 'cable', arabic_name: 'كابلات' },
+          { name: 'headphone', arabic_name: 'سماعات' },
+          { name: 'other', arabic_name: 'أخرى' }
+        ];
+        
+        defaultCategories.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat.name;
+          option.textContent = cat.arabic_name;
+          categorySelect.appendChild(option);
+        });
+        
+        console.log('⚠️ استخدام الفئات الافتراضية');
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الفئات:', error);
       }
     }
 
@@ -504,15 +516,89 @@
       console.log(`تم إعداد دعم الأرقام العربية لـ ${numberFields.length} حقل`);
     }
 
+    // حفظ الأكسسوار في Firebase
+    async function saveAccessoryToFirebase() {
+      try {
+        // جمع بيانات النموذج
+        const accessoryData = {
+          name: document.getElementById('name').value,
+          category: document.getElementById('category').value,
+          quantity: parseInt(document.getElementById('quantity').value) || 0,
+          purchase_price: parseFloat(document.getElementById('purchase_price').value) || 0,
+          selling_price: parseFloat(document.getElementById('selling_price').value) || 0,
+          description: document.getElementById('description').value,
+          supplier: document.getElementById('supplier').value,
+          notes: document.getElementById('notes').value,
+          date_added: new Date().toISOString()
+        };
+
+        // التحقق من البيانات المطلوبة
+        if (!accessoryData.name || !accessoryData.category) {
+          showAlert('danger', 'يرجى ملء جميع الحقول المطلوبة');
+          return false;
+        }
+
+        if (accessoryData.purchase_price <= 0 || accessoryData.selling_price <= 0) {
+          showAlert('danger', 'يرجى إدخال أسعار صحيحة');
+          return false;
+        }
+
+        if (accessoryData.quantity <= 0) {
+          showAlert('danger', 'يرجى إدخال كمية صحيحة');
+          return false;
+        }
+
+        // حفظ في Firebase
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const accessoryId = await window.storage.addAccessory(accessoryData);
+          if (accessoryId) {
+            console.log('✅ تم حفظ الأكسسوار في Firebase:', accessoryId);
+            showAlert('success', 'تم إضافة الأكسسوار بنجاح!');
+            return true;
+          }
+        } else {
+          // حفظ في LocalStorage كبديل
+          const accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+          accessoryData.id = Date.now().toString();
+          accessories.push(accessoryData);
+          localStorage.setItem('accessories', JSON.stringify(accessories));
+          showAlert('success', 'تم إضافة الأكسسوار بنجاح! (محلي)');
+          return true;
+        }
+      } catch (error) {
+        console.error('❌ خطأ في حفظ الأكسسوار:', error);
+        showAlert('danger', 'حدث خطأ في حفظ الأكسسوار. حاول مرة أخرى.');
+        return false;
+      }
+    }
+
     // تهيئة الصفحة
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       // التحقق من تسجيل الدخول أولاً
       if (!checkLogin()) return;
 
-      loadCategories();
+      // انتظار تحميل Firebase
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      await loadCategories();
       
       // إعداد دعم الأرقام العربية
       setupArabicNumberSupport();
+      
+      // ربط نموذج الإرسال بدالة الحفظ
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const success = await saveAccessoryToFirebase();
+          if (success) {
+            // إعادة تعيين النموذج
+            form.reset();
+            // إعادة تحميل الفئات
+            await loadCategories();
+          }
+        });
+      }
       
       // تركيز على الحقل الأول
       document.getElementById('name').focus();
