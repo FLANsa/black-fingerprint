@@ -461,10 +461,15 @@
           const phoneId = await window.storage.addPhone(phoneData);
           if (phoneId) {
             console.log('✅ تم حفظ الهاتف المستعمل في Firebase:', phoneId);
-            alert('✅ تم إضافة الهاتف المستعمل بنجاح!');
-            
-            // توجيه إلى صفحة طباعة الباركود
-            window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+            console.log('📱 بيانات الهاتف المستعمل:', phoneData);
+            const shouldPrint = confirm('✅ تم إضافة الهاتف المستعمل بنجاح!\n\nهل تريد طباعة الباركود؟');
+            if (shouldPrint && phoneData.phone_number) {
+              console.log('🔄 التوجيه إلى صفحة الباركود:', phoneData.phone_number);
+              window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+            } else if (!phoneData.phone_number) {
+              console.error('❌ رقم الهاتف فارغ');
+              alert('تم إضافة الهاتف بنجاح، لكن رقم الهاتف فارغ');
+            }
             return true;
           }
         } else {
@@ -473,10 +478,15 @@
           phoneData.id = Date.now().toString();
           phones.push(phoneData);
           localStorage.setItem('phones', JSON.stringify(phones));
-          alert('✅ تم إضافة الهاتف المستعمل بنجاح! (محلي)');
-          
-          // توجيه إلى صفحة طباعة الباركود
-          window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+          console.log('✅ تم حفظ الهاتف المستعمل في LocalStorage:', phoneData);
+          const shouldPrint = confirm('✅ تم إضافة الهاتف المستعمل بنجاح! (محلي)\n\nهل تريد طباعة الباركود؟');
+          if (shouldPrint && phoneData.phone_number) {
+            console.log('🔄 التوجيه إلى صفحة الباركود (محلي):', phoneData.phone_number);
+            window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+          } else if (!phoneData.phone_number) {
+            console.error('❌ رقم الهاتف فارغ (محلي)');
+            alert('تم إضافة الهاتف بنجاح، لكن رقم الهاتف فارغ');
+          }
           return true;
         }
       } catch (error) {
@@ -512,91 +522,6 @@
       await populateBrandsFromFirebase();
     });
 
-    // حفظ بيانات الهاتف المستعمل في Firebase
-    async function saveUsedPhoneToFirebase() {
-      try {
-        // جمع بيانات النموذج
-        const phoneData = {
-          brand: document.getElementById('brand').value,
-          model: document.getElementById('model').value,
-          condition: 'used',
-          purchase_price: parseFloat(document.getElementById('purchase_price').value) || 0,
-          selling_price: parseFloat(document.getElementById('selling_price').value) || 0,
-          serial_number: document.getElementById('serial_number').value,
-          phone_number: document.getElementById('barcode_input').value.trim() || generatePhoneNumber(),
-          warranty: parseInt(document.getElementById('warranty').value) || 0,
-          description: document.getElementById('description').value,
-          customer_name: document.getElementById('customer_name').value,
-          customer_id: document.getElementById('customer_id').value,
-          phone_color: document.getElementById('phone_color').value,
-          phone_memory: document.getElementById('phone_memory').value,
-          buyer_name: document.getElementById('buyer_name').value,
-          date_added: new Date().toISOString()
-        };
-
-        // التحقق من البيانات المطلوبة
-        if (!phoneData.brand || !phoneData.model || !phoneData.serial_number) {
-          alert('يرجى ملء جميع الحقول المطلوبة');
-          return false;
-        }
-
-        if (phoneData.purchase_price <= 0 || phoneData.selling_price <= 0) {
-          alert('يرجى إدخال أسعار صحيحة');
-          return false;
-        }
-
-        // حفظ في Firebase
-        if (window.storage && window.storage.isFirebaseAvailable) {
-          const phoneId = await window.storage.addPhone(phoneData);
-          if (phoneId) {
-            console.log('✅ تم حفظ الهاتف المستعمل في Firebase:', phoneId);
-            alert('✅ تم إضافة الهاتف المستعمل بنجاح!');
-            
-            // توجيه إلى صفحة طباعة الباركود
-            window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
-            return true;
-          }
-        } else {
-          // حفظ في LocalStorage كبديل
-          const phones = JSON.parse(localStorage.getItem('phones') || '[]');
-          phoneData.id = Date.now().toString();
-          phones.push(phoneData);
-          localStorage.setItem('phones', JSON.stringify(phones));
-          alert('✅ تم إضافة الهاتف المستعمل بنجاح! (محلي)');
-          
-          // توجيه إلى صفحة طباعة الباركود
-          window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
-          return true;
-        }
-      } catch (error) {
-        console.error('❌ خطأ في حفظ الهاتف المستعمل:', error);
-        alert('❌ حدث خطأ في حفظ الهاتف المستعمل. حاول مرة أخرى.');
-        return false;
-      }
-    }
-
-    // توليد رقم هاتف تلقائي
-    function generatePhoneNumber() {
-      const timestamp = Date.now().toString().slice(-6);
-      return timestamp.padStart(6, '0');
-    }
-
-    // ربط نموذج الإرسال بدالة الحفظ
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.querySelector('form');
-      if (form) {
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const success = await saveUsedPhoneToFirebase();
-          if (success) {
-            // إعادة تعيين النموذج
-            form.reset();
-            // إعادة تحميل قائمة الشركات
-            await populateBrandsFromFirebase();
-          }
-        });
-      }
-    });
 
     // تسجيل الخروج
     function logout() {
