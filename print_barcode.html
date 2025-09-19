@@ -39,8 +39,8 @@
 
     /* حجم الملصق الفعلي: عمودي مثل الصورة */
     .sticker{
-      width:6cm;
-      height:3cm;
+      width:4cm;
+      height:2.5cm;
       background:#fff;
       border:1px solid #ddd;
       box-sizing:border-box;
@@ -48,17 +48,17 @@
       /* تخطيط عمودي: اسم الشركة، باركود، تفاصيل */
       display:flex;
       flex-direction:column;
-      padding:0.2cm;
-      gap:0.15cm;
+      padding:0.1cm;
+      gap:0.08cm;
     }
 
     /* اسم الشركة في الأعلى */
     .shop{
       text-align:center;
       font-weight:700;
-      font-size:4mm;
+      font-size:3mm;
       line-height:1.1;
-      margin-bottom:0.1cm;
+      margin-bottom:0.05cm;
     }
 
     /* الباركود في الوسط */
@@ -67,28 +67,28 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      margin:0.1cm 0;
+      margin:0.05cm 0;
     }
     .sticker-barcode svg{
-      width:80%;
+      width:90%;
       height:auto;
-      max-height:1cm;
+      max-height:0.8cm;
     }
 
     /* تفاصيل الجهاز في الأسفل */
     .sticker-card{
       border:1px solid #d9d9d9;
-      border-radius:2px;
-      padding:0.1cm;
+      border-radius:1px;
+      padding:0.05cm;
       display:flex;
       flex-direction:column;
-      gap:0.05cm;
+      gap:0.03cm;
     }
 
     .rows{ 
       display:flex; 
       flex-direction:row; 
-      gap:0.1cm; 
+      gap:0.05cm; 
       justify-content:space-between;
     }
 
@@ -96,7 +96,7 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      font-size:2.5mm;
+      font-size:2mm;
       line-height:1.05;
       text-align:center;
     }
@@ -105,23 +105,47 @@
 
     /* ============ طباعة ============ */
     @page{
-      size: auto;           /* تستخدم الطابعة حجم الورقة/الملصق */
-      margin: 5mm;          /* عدّلها حسب بكرات الملصقات لديك */
+      size: 40mm 25mm;      /* حجم الصفحة بالضبط 40mm × 25mm */
+      margin: 0;            /* بدون هوامش */
     }
     @media print{
-      body{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      body{ 
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact; 
+        margin: 0;
+        padding: 0;
+      }
       .navbar, .btn, .card-header, .container > .row:first-child .col-12 .alert { display:none !important; }
-      .card, .card-body, .sticker-preview{ border:none !important; background:#fff !important; padding:0 !important; }
-
-      /* الملصق يبقى بالحجم السنتيمتري المحدد */
-      .sticker{ 
-        border:none; 
-        width:6cm;
-        height:3cm;
+      .card, .card-body, .sticker-preview{ 
+        border:none !important; 
+        background:#fff !important; 
+        padding:0 !important; 
+        margin: 0 !important;
       }
 
-      /* اختياري: محاذاة الملصق أعلى يسار الصفحة لتسلسل الطباعة */
-      html,body{ width:100%; }
+      /* الملصق بالحجم المحدد بالضبط */
+      .sticker{ 
+        border:none; 
+        width:40mm;
+        height:25mm;
+        margin: 0;
+        padding: 0.5mm;
+        gap: 0.3mm;
+      }
+
+      /* إخفاء كل شيء عدا الملصق */
+      html,body{ 
+        width: 40mm; 
+        height: 25mm; 
+        margin: 0; 
+        padding: 0; 
+        overflow: hidden;
+      }
+      
+      /* تحسين النصوص للطباعة */
+      .shop { font-size: 2.5mm; margin-bottom: 0.3mm; }
+      .sticker-barcode svg { max-height: 6mm; }
+      .row2 { font-size: 1.8mm; }
     }
   </style>
 </head>
@@ -224,11 +248,12 @@
     try {
       JsBarcode("#barcode", phoneNumber, {
         format: "CODE128",
-        width: 2,
-        height: 50,
+        width: 1.5,
+        height: 30,
         displayValue: false,
         background: "#ffffff",
-        lineColor: "#000000"
+        lineColor: "#000000",
+        margin: 0
       });
     } catch (error) {
       console.error('خطأ في توليد الباركود:', error);
