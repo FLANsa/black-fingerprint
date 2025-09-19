@@ -196,9 +196,6 @@
             <button class="btn btn-success" onclick="printBarcode()">
               <i class="fas fa-print"></i> طباعة الباركود
             </button>
-            <button class="btn btn-info" onclick="downloadBarcode()">
-              <i class="fas fa-download"></i> تحميل كصورة
-            </button>
             <a href="dashboard.html" class="btn btn-secondary">
               <i class="fas fa-arrow-right"></i> العودة للوحة التحكم
             </a>
@@ -251,32 +248,6 @@
   // طباعة الباركود
   function printBarcode() {
     window.print();
-  }
-
-  // تحميل الباركود كصورة
-  function downloadBarcode() {
-    const svg = document.getElementById('barcode');
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    
-    const svgData = new XMLSerializer().serializeToString(svg);
-    const svgBlob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
-    const svgUrl = URL.createObjectURL(svgBlob);
-    
-    img.onload = function() {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      
-      const pngFile = canvas.toDataURL('image/png');
-      const downloadLink = document.createElement('a');
-      downloadLink.download = `barcode_${currentPhone?.phone_number || 'phone'}.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
-    };
-    
-    img.src = svgUrl;
   }
 
   // جلب بيانات الهاتف من URL أو Firebase
