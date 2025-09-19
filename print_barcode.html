@@ -215,18 +215,19 @@
     document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
   }
 
-  // تضمين خط عربي باستخدام خط مبسط مدمج
+  // تضمين خط عربي باستخدام خط مبسط مدمج (محسن لـ macOS)
+
   async function embedArabicFont(doc) {
-    console.log('🔄 محاولة تضمين خط عربي مبسط...');
+    console.log('🔄 محاولة تضمين خط عربي مبسط (macOS)...');
     
     try {
-      // اختبار الخطوط التي تدعم العربية
-      const systemFonts = ['arial', 'tahoma', 'verdana', 'helvetica'];
+      // خطوط macOS التي تدعم العربية بشكل أفضل
+      const macFonts = ['arial', 'helvetica', 'times', 'courier', 'verdana'];
       
-      for (const fontName of systemFonts) {
+      for (const fontName of macFonts) {
         try {
           if (testArabicSupport(doc, fontName)) {
-            console.log(`✅ تم استخدام خط ${fontName} للعربية`);
+            console.log(`✅ تم استخدام خط ${fontName} للعربية على macOS`);
             return `arabic-${fontName}`;
           }
         } catch (e) {
@@ -236,7 +237,7 @@
       
       // إذا لم يجد خط يدعم العربية، استخدم الخط الافتراضي
       doc.setFont('helvetica', 'normal');
-      console.log('❌ لم يتم العثور على خط يدعم العربية، سيتم استخدام Helvetica');
+      console.log('❌ لم يتم العثور على خط يدعم العربية على macOS، سيتم استخدام Helvetica');
       return 'helvetica-fallback';
       
     } catch (error) {
@@ -245,25 +246,25 @@
     }
   }
 
-  // دالة لاختبار دعم العربية في الخط
+  // دالة لاختبار دعم العربية في الخط (محسنة لـ macOS)
   function testArabicSupport(doc, fontName) {
     try {
       doc.setFont(fontName, 'normal');
       // اختبار كتابة نص عربي بسيط
       const testText = 'ا';
       doc.text(testText, 0, 0, { isInputRtl: true });
-      console.log(`✅ خط ${fontName} يدعم العربية`);
+      console.log(`✅ خط ${fontName} يدعم العربية على macOS`);
       return true;
     } catch (e) {
-      console.log(`❌ خط ${fontName} لا يدعم العربية`);
+      console.log(`❌ خط ${fontName} لا يدعم العربية على macOS`);
       return false;
     }
   }
 
-  // دالة مساعدة لاختبار الخطوط المتاحة
+  // دالة مساعدة لاختبار الخطوط المتاحة (محسنة لـ macOS)
   function testAvailableFonts(doc) {
-    console.log('🔍 اختبار الخطوط المتاحة في jsPDF...');
-    const testFonts = ['helvetica', 'arial', 'tahoma', 'verdana', 'times', 'courier'];
+    console.log('🔍 اختبار الخطوط المتاحة في jsPDF على macOS...');
+    const testFonts = ['helvetica', 'arial', 'times', 'courier', 'verdana', 'tahoma'];
     const availableFonts = [];
     const arabicSupportFonts = [];
     
@@ -271,19 +272,19 @@
       try {
         doc.setFont(font, 'normal');
         availableFonts.push(font);
-        console.log(`✅ خط ${font} متاح`);
+        console.log(`✅ خط ${font} متاح على macOS`);
         
         // اختبار دعم العربية
         if (testArabicSupport(doc, font)) {
           arabicSupportFonts.push(font);
         }
       } catch (e) {
-        console.log(`❌ خط ${font} غير متاح`);
+        console.log(`❌ خط ${font} غير متاح على macOS`);
       }
     }
     
-    console.log(`📋 الخطوط المتاحة: ${availableFonts.join(', ')}`);
-    console.log(`🔤 الخطوط التي تدعم العربية: ${arabicSupportFonts.join(', ')}`);
+    console.log(`📋 الخطوط المتاحة على macOS: ${availableFonts.join(', ')}`);
+    console.log(`🔤 الخطوط التي تدعم العربية على macOS: ${arabicSupportFonts.join(', ')}`);
     return { available: availableFonts, arabic: arabicSupportFonts };
   }
 
