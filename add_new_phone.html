@@ -490,6 +490,9 @@
           if (phoneId) {
             console.log('✅ تم حفظ الهاتف في Firebase:', phoneId);
             alert('✅ تم إضافة الهاتف الجديد بنجاح!');
+            
+            // توجيه إلى صفحة طباعة الباركود
+            window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
             return true;
           }
         } else {
@@ -499,6 +502,9 @@
           phones.push(phoneData);
           localStorage.setItem('phones', JSON.stringify(phones));
           alert('✅ تم إضافة الهاتف الجديد بنجاح! (محلي)');
+          
+          // توجيه إلى صفحة طباعة الباركود
+          window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
           return true;
         }
       } catch (error) {

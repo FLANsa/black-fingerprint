@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>اختبار الباركود</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Barcode generation library -->
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding: 20px; }
+    .card { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-primary { background-color: #2c3e50; border-color: #2c3e50; }
+    .btn-primary:hover { background-color: #1a252f; border-color: #1a252f; }
+    .log { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; }
+    .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+    .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    .barcode-preview { text-align: center; padding: 20px; border: 2px dashed #ccc; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center mb-4">📱 اختبار الباركود</h1>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5>اختبار الباركود</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="phoneNumber" class="form-label">رقم الهاتف</label>
+              <input type="text" class="form-control" id="phoneNumber" value="000001" placeholder="أدخل رقم الهاتف">
+            </div>
+            <button class="btn btn-primary mb-2" onclick="generateTestBarcode()">توليد الباركود</button>
+            <button class="btn btn-success mb-2" onclick="testPrintBarcode()">اختبار طباعة الباركود</button>
+            <button class="btn btn-info mb-2" onclick="testGetPhone()">جلب بيانات هاتف</button>
+            <button class="btn btn-secondary" onclick="clearLog()">مسح السجل</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h5>معاينة الباركود</h5>
+          </div>
+          <div class="card-body">
+            <div class="barcode-preview">
+              <svg id="testBarcode"></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header">
+        <h5>سجل العمليات</h5>
+      </div>
+      <div class="card-body">
+        <div id="log" class="log"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Configuration -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-database.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
+
+  <script>
+    function log(message) {
+      const logDiv = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.textContent += `[${timestamp}] ${message}\n`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log').textContent = '';
+    }
+
+    function generateTestBarcode() {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      log(`🔄 توليد باركود للرقم: ${phoneNumber}`);
+      
+      try {
+        JsBarcode("#testBarcode", phoneNumber, {
+          format: "CODE128",
+          width: 2,
+          height: 50,
+          displayValue: true,
+          background: "#ffffff",
+          lineColor: "#000000"
+        });
+        log('✅ تم توليد الباركود بنجاح');
+      } catch (error) {
+        log(`❌ خطأ في توليد الباركود: ${error.message}`);
+      }
+    }
+
+    function testPrintBarcode() {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      log(`🔄 اختبار طباعة الباركود للرقم: ${phoneNumber}`);
+      
+      // توجيه إلى صفحة طباعة الباركود
+      window.open(`print_barcode.html?phone_number=${phoneNumber}`, '_blank');
+      log('✅ تم فتح صفحة طباعة الباركود');
+    }
+
+    async function testGetPhone() {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      log(`🔄 البحث عن الهاتف: ${phoneNumber}`);
+      
+      try {
+        if (!window.storage) {
+          log('❌ Storage Manager غير متاح');
+          return;
+        }
+        
+        const phones = await window.storage.getPhones();
+        const phone = phones.find(p => p.phone_number === phoneNumber);
+        
+        if (phone) {
+          log(`✅ تم العثور على الهاتف:`);
+          log(`📱 الشركة: ${phone.brand}`);
+          log(`📱 الموديل: ${phone.model}`);
+          log(`📱 الحالة: ${phone.condition}`);
+          log(`📱 الذاكرة: ${phone.phone_memory || 'غير محدد'}`);
+          log(`📱 اللون: ${phone.phone_color || 'غير محدد'}`);
+        } else {
+          log(`❌ لم يتم العثور على الهاتف: ${phoneNumber}`);
+        }
+        
+      } catch (error) {
+        log(`❌ خطأ في البحث عن الهاتف: ${error.message}`);
+      }
+    }
+
+    // اختبار تلقائي عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', async () => {
+      log('🚀 بدء اختبار الباركود...');
+      
+      // انتظار تحميل Firebase
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        log('✅ Firebase متاح ومتصل');
+      } else {
+        log('⚠️ Firebase غير متاح - استخدام LocalStorage');
+      }
+      
+      // توليد باركود افتراضي
+      generateTestBarcode();
+    });
+  </script>
+</body>
+</html>
