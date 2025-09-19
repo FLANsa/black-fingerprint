@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الخط العربي</title>
+    
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Arabic Font Support -->
+    <script src="js/arabic-font.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #1a252f;
+        }
+        .console-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #28a745;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .info {
+            color: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>اختبار الخط العربي في PDF</h1>
+        
+        <div class="test-section">
+            <h3>اختبار الخط العربي المخصص</h3>
+            <p>هذا الاختبار يتحقق من إمكانية استخدام الخط العربي المخصص في PDF</p>
+            <button onclick="testCustomArabicFont()">اختبار الخط المخصص</button>
+            <button onclick="testSystemFonts()">اختبار خطوط النظام</button>
+            <button onclick="generateTestPDF()">إنشاء PDF تجريبي</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>نتائج الاختبار</h3>
+            <div id="console-output" class="console-output">
+                <div class="info">انقر على أحد الأزرار أعلاه لبدء الاختبار...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>معلومات النظام</h3>
+            <p><strong>نظام التشغيل:</strong> <span id="os-info">جاري التحميل...</span></p>
+            <p><strong>المتصفح:</strong> <span id="browser-info">جاري التحميل...</span></p>
+            <p><strong>jsPDF:</strong> <span id="jspdf-info">جاري التحميل...</span></p>
+        </div>
+    </div>
+
+    <script>
+        // عرض معلومات النظام
+        function displaySystemInfo() {
+            document.getElementById('os-info').textContent = navigator.platform || 'غير محدد';
+            document.getElementById('browser-info').textContent = navigator.userAgent.split(' ')[0] || 'غير محدد';
+            document.getElementById('jspdf-info').textContent = window.jspdf ? 'متاح' : 'غير متاح';
+        }
+        
+        // إضافة رسالة إلى وحدة التحكم
+        function addToConsole(message, type = 'info') {
+            const consoleDiv = document.getElementById('console-output');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleDiv.appendChild(messageDiv);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        // اختبار الخط العربي المخصص
+        function testCustomArabicFont() {
+            addToConsole('🔄 بدء اختبار الخط العربي المخصص...', 'info');
+            
+            if (!window.jspdf) {
+                addToConsole('❌ jsPDF غير متاح', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                if (typeof addArabicFontToPDF === 'function') {
+                    if (addArabicFontToPDF(doc)) {
+                        addToConsole('✅ تم إضافة الخط العربي المخصص بنجاح', 'success');
+                        
+                        if (testArabicFont(doc)) {
+                            addToConsole('✅ اختبار الخط العربي نجح', 'success');
+                        } else {
+                            addToConsole('❌ فشل اختبار الخط العربي', 'error');
+                        }
+                    } else {
+                        addToConsole('❌ فشل في إضافة الخط العربي المخصص', 'error');
+                    }
+                } else {
+                    addToConsole('❌ دالة addArabicFontToPDF غير متاحة', 'error');
+                }
+            } catch (error) {
+                addToConsole(`❌ خطأ في اختبار الخط المخصص: ${error.message}`, 'error');
+            }
+        }
+        
+        // اختبار خطوط النظام
+        function testSystemFonts() {
+            addToConsole('🔄 بدء اختبار خطوط النظام...', 'info');
+            
+            if (!window.jspdf) {
+                addToConsole('❌ jsPDF غير متاح', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                const systemFonts = ['helvetica', 'arial', 'times', 'courier', 'verdana'];
+                let arabicSupportFound = false;
+                
+                for (const font of systemFonts) {
+                    try {
+                        doc.setFont(font, 'normal');
+                        addToConsole(`✅ خط ${font} متاح`, 'success');
+                        
+                        // اختبار بسيط للعربية
+                        try {
+                            doc.text('ا', 0, 0, { isInputRtl: true });
+                            addToConsole(`✅ خط ${font} يدعم العربية`, 'success');
+                            arabicSupportFound = true;
+                        } catch (e) {
+                            addToConsole(`❌ خط ${font} لا يدعم العربية`, 'error');
+                        }
+                    } catch (e) {
+                        addToConsole(`❌ خط ${font} غير متاح`, 'error');
+                    }
+                }
+                
+                if (!arabicSupportFound) {
+                    addToConsole('❌ لم يتم العثور على خط يدعم العربية', 'error');
+                }
+            } catch (error) {
+                addToConsole(`❌ خطأ في اختبار خطوط النظام: ${error.message}`, 'error');
+            }
+        }
+        
+        // إنشاء PDF تجريبي
+        function generateTestPDF() {
+            addToConsole('🔄 إنشاء PDF تجريبي...', 'info');
+            
+            if (!window.jspdf) {
+                addToConsole('❌ jsPDF غير متاح', 'error');
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // محاولة استخدام الخط العربي المخصص
+                let fontSource = 'helvetica';
+                let useRtl = false;
+                
+                if (typeof addArabicFontToPDF === 'function') {
+                    if (addArabicFontToPDF(doc)) {
+                        if (testArabicFont(doc)) {
+                            fontSource = 'NotoSansArabic';
+                            useRtl = true;
+                            addToConsole('✅ استخدام الخط العربي المخصص', 'success');
+                        }
+                    }
+                }
+                
+                // إضافة النصوص
+                doc.setFontSize(16);
+                doc.text('اختبار الخط العربي', 105, 30, { align: 'center', isInputRtl: useRtl });
+                doc.text('الصقري للإتصالات', 105, 50, { align: 'center', isInputRtl: useRtl });
+                doc.text('رقم الجهاز: 463115', 105, 70, { align: 'center', isInputRtl: useRtl });
+                doc.text('نسبة البطارية: 100%', 105, 90, { align: 'center', isInputRtl: useRtl });
+                doc.text('الذاكرة: 32GB', 105, 110, { align: 'center', isInputRtl: useRtl });
+                
+                // حفظ PDF
+                doc.save('test_arabic_font.pdf');
+                addToConsole('✅ تم إنشاء PDF بنجاح', 'success');
+                
+            } catch (error) {
+                addToConsole(`❌ خطأ في إنشاء PDF: ${error.message}`, 'error');
+            }
+        }
+        
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            displaySystemInfo();
+            addToConsole('🚀 تم تحميل صفحة الاختبار بنجاح', 'success');
+        });
+    </script>
+</body>
+</html>
