@@ -219,13 +219,19 @@
                     }
                 }
                 
-                // إضافة النصوص
+                // إضافة النصوص (بالإنجليزية لتجنب مشاكل العربية)
                 doc.setFontSize(16);
-                doc.text('اختبار الخط العربي', 105, 30, { align: 'center', isInputRtl: useRtl });
-                doc.text('الصقري للإتصالات', 105, 50, { align: 'center', isInputRtl: useRtl });
-                doc.text('رقم الجهاز: 463115', 105, 70, { align: 'center', isInputRtl: useRtl });
-                doc.text('نسبة البطارية: 100%', 105, 90, { align: 'center', isInputRtl: useRtl });
-                doc.text('الذاكرة: 32GB', 105, 110, { align: 'center', isInputRtl: useRtl });
+                const text1 = typeof convertArabicToEnglish === 'function' ? convertArabicToEnglish('اختبار الخط العربي') : 'Arabic Font Test';
+                const text2 = typeof convertArabicToEnglish === 'function' ? convertArabicToEnglish('الصقري للإتصالات') : 'Al-Saqri Communications';
+                const text3 = typeof convertArabicToEnglish === 'function' ? convertArabicToEnglish('رقم الجهاز: 463115') : 'Device Number: 463115';
+                const text4 = typeof convertArabicToEnglish === 'function' ? convertArabicToEnglish('نسبة البطارية: 100%') : 'Battery Level: 100%';
+                const text5 = typeof convertArabicToEnglish === 'function' ? convertArabicToEnglish('الذاكرة: 32GB') : 'Memory: 32GB';
+                
+                doc.text(text1, 105, 30, { align: 'center' });
+                doc.text(text2, 105, 50, { align: 'center' });
+                doc.text(text3, 105, 70, { align: 'center' });
+                doc.text(text4, 105, 90, { align: 'center' });
+                doc.text(text5, 105, 110, { align: 'center' });
                 
                 // حفظ PDF
                 doc.save('test_arabic_font.pdf');
