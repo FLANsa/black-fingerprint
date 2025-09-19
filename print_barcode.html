@@ -225,10 +225,10 @@
     try {
       // محاولة استخدام الخط العربي المخصص أولاً
       if (typeof addArabicFontToPDF === 'function') {
-        const fontName = addArabicFontToPDF(doc);
-        if (fontName && fontName !== 'helvetica') {
+        const fontName = await addArabicFontToPDF(doc);
+        if (fontName && fontName.startsWith('arabic-')) {
           console.log(`✅ تم استخدام الخط العربي: ${fontName}`);
-          return `arabic-${fontName}`;
+          return fontName;
         }
       }
       
@@ -302,7 +302,12 @@
 
   // دالة لتحويل النص العربي إلى تنسيق يعمل مع PDF
   function formatArabicText(text, useRtl) {
-    // Always use English for PDF since Arabic doesn't render properly
+    // If Arabic font is available, use Arabic text
+    if (useRtl) {
+      return text; // Return Arabic text as-is
+    }
+    
+    // Fallback to English if Arabic font is not available
     if (typeof convertArabicToEnglish === 'function') {
       return convertArabicToEnglish(text);
     }
@@ -354,8 +359,9 @@
 
       // عنوان أعلى
       doc.setFontSize(6);
-      const title = formatArabicText('الصقري للإتصالات', false);
-      doc.text(title, 20, 4, { align: 'center' });
+      const useRtl = fontSource.startsWith('arabic-');
+      const title = formatArabicText('الصقري للإتصالات', useRtl);
+      doc.text(title, 20, 4, { align: 'center', isInputRtl: useRtl });
 
       // توليد الباركود كـ SVG مخفي
       const phoneNumber = document.getElementById('phone-number')?.textContent || '1';
@@ -380,16 +386,16 @@
           const phoneMemory  = document.getElementById('phone-memory')?.textContent  || '—';
 
           doc.setFontSize(4);
-          const deviceLabel = formatArabicText(`جهاز: ${phoneNumber}`, false);
-          doc.text(deviceLabel, 20, 15, { align: 'center' });
+          const deviceLabel = formatArabicText(`جهاز: ${phoneNumber}`, useRtl);
+          doc.text(deviceLabel, 20, 15, { align: 'center', isInputRtl: useRtl });
 
           doc.setFontSize(3);
-          const idLabel = formatArabicText(`المعرف: ${phoneNumber}`, false);
-          const batLabel = formatArabicText(`البطارية: ${batteryLevel}`, false);
-          const memLabel = formatArabicText(`الذاكرة: ${phoneMemory}`, false);
-          doc.text(idLabel, 38, 18, { align: 'right' });
-          doc.text(batLabel, 20, 18, { align: 'center' });
-          doc.text(memLabel, 2, 18, { align: 'left' });
+          const idLabel = formatArabicText(`المعرف: ${phoneNumber}`, useRtl);
+          const batLabel = formatArabicText(`البطارية: ${batteryLevel}`, useRtl);
+          const memLabel = formatArabicText(`الذاكرة: ${phoneMemory}`, useRtl);
+          doc.text(idLabel, 38, 18, { align: 'right', isInputRtl: useRtl });
+          doc.text(batLabel, 20, 18, { align: 'center', isInputRtl: useRtl });
+          doc.text(memLabel, 2, 18, { align: 'left', isInputRtl: useRtl });
 
           const fileName = `barcode_${phoneNumber || 'phone'}.pdf`;
           doc.save(fileName);
