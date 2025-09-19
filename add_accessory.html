@@ -394,7 +394,7 @@
       }
     }
 
-    function demoAddCategory() {
+    async function demoAddCategory() {
       const name = prompt('أدخل اسم الفئة الجديدة:');
       if (!name || !name.trim()) return;
       
@@ -409,34 +409,40 @@
         return arabicToEnglish[char] || char;
       });
 
-      // جلب الفئات المحفوظة
-      const categories = JSON.parse(localStorage.getItem('accessory_categories') || '[]');
-      
-      // التحقق من عدم التكرار
-      if (categories.find(cat => cat.text === name.trim() || cat.value === categoryValue)) {
-        showAlert('warning', 'هذه الفئة موجودة بالفعل');
-        return;
-      }
+      try {
+        // إضافة الفئة إلى Firebase
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const categoryData = {
+            name: categoryValue,
+            arabic_name: name.trim(),
+            description: `فئة ${name.trim()}`
+          };
+          
+          const categoryId = await window.storage.addAccessoryCategory(categoryData);
+          if (categoryId) {
+            console.log('✅ تم إضافة الفئة إلى Firebase:', categoryId);
+          }
+        }
 
-      // إضافة الفئة الجديدة
-      const newCategory = { value: categoryValue, text: name.trim() };
-      categories.push(newCategory);
-      
-      // حفظ الفئات المحدثة
-      localStorage.setItem('accessory_categories', JSON.stringify(categories));
-      
-      // إضافة للقائمة المنسدلة
-      const sel = document.getElementById('category');
-      const opt = document.createElement('option');
-      opt.value = categoryValue;
-      opt.textContent = name.trim();
-      sel.appendChild(opt);
-      sel.value = categoryValue;
-      
-      showAlert('success', `تم إضافة فئة "${name.trim()}" بنجاح!`);
+        // إضافة للقائمة المنسدلة
+        const sel = document.getElementById('category');
+        const opt = document.createElement('option');
+        opt.value = categoryValue;
+        opt.textContent = name.trim();
+        sel.appendChild(opt);
+        sel.value = categoryValue;
+        
+        showAlert('success', `تم إضافة فئة "${name.trim()}" بنجاح!`);
+        
+        // إعادة تحميل الفئات من قاعدة البيانات
+        await loadCategories();
+      } catch (error) {
+        console.error('❌ خطأ في إضافة الفئة:', error);
+        showAlert('danger', 'حدث خطأ في إضافة الفئة');
+      }
     }
 
-    function demoDeleteCategory() {
+    async function demoDeleteCategory() {
       const sel = document.getElementById('category');
       if (!sel.value) { 
         showAlert('warning', 'يرجى اختيار فئة أولاً');
@@ -445,18 +451,31 @@
       
       const selectedOption = sel.options[sel.selectedIndex];
       const categoryText = selectedOption.textContent;
+      const categoryValue = sel.value;
       
       if (!confirm(`هل أنت متأكد من حذف فئة "${categoryText}"؟`)) return;
       
-      // حذف من التخزين المحلي
-      const categories = JSON.parse(localStorage.getItem('accessory_categories') || '[]');
-      const updatedCategories = categories.filter(cat => cat.value !== sel.value);
-      localStorage.setItem('accessory_categories', JSON.stringify(updatedCategories));
-      
-      // حذف من القائمة
-      selectedOption.remove();
-      
-      showAlert('success', `تم حذف فئة "${categoryText}" بنجاح!`);
+      try {
+        // حذف من Firebase
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const success = await window.storage.deleteAccessoryCategory(categoryText);
+          if (success) {
+            console.log('✅ تم حذف الفئة من Firebase:', categoryText);
+          }
+        }
+        
+        // حذف من القائمة
+        selectedOption.remove();
+        sel.value = ''; // إعادة تعيين القيمة المحددة
+        
+        showAlert('success', `تم حذف فئة "${categoryText}" بنجاح!`);
+        
+        // إعادة تحميل الفئات من قاعدة البيانات
+        await loadCategories();
+      } catch (error) {
+        console.error('❌ خطأ في حذف الفئة:', error);
+        showAlert('danger', 'حدث خطأ في حذف الفئة');
+      }
     }
 
     // التحقق من تسجيل الدخول
