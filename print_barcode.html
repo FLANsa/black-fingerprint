@@ -122,7 +122,7 @@
 </head>
 <body>
   <div class="container">
-    <div class="card">
+      <div class="card">
       <div class="card-header">
         <h3>طباعة باركود الهاتف</h3>
         <div class="actions no-print">
@@ -132,9 +132,12 @@
           <button id="btnPrintPDF" class="btn btn-outline">
             طباعة PDF <i class="fa fa-print"></i>
           </button>
+          <button id="btnUpdateDevice" class="btn btn-outline">
+            تحديث بيانات الجهاز <i class="fa fa-edit"></i>
+          </button>
           <a href="dashboard.html" class="btn btn-outline">العودة للوحة التحكم</a>
-        </div>
-      </div>
+            </div>
+          </div>
       <div class="card-body">
         <div class="sticker-preview">
           <!-- الملصق الحقيقي (سيتم تصويره وتحويله إلى PDF) -->
@@ -164,11 +167,11 @@
             </div>
           </div><!-- /sticker -->
         </div><!-- /preview -->
-      </div>
     </div>
   </div>
+</div>
 
-  <script>
+<script>
     (function () {
       // إعدادات الملصق النهائي على PDF: 40×25 ملم
       const STICKER_MM = { w: 40, h: 25 };
@@ -205,6 +208,38 @@
         
         console.log('🔢 تم توليد رقم جهاز جديد:', formattedNumber);
         return formattedNumber;
+      }
+
+      // حفظ الجهاز الجديد في قاعدة البيانات
+      async function saveNewDeviceToDatabase(deviceNumber) {
+        try {
+          if (!window.storage) {
+            console.warn('⚠️ Firebase غير متاح، لا يمكن حفظ الجهاز');
+            return;
+          }
+
+          // إنشاء بيانات الجهاز الجديد
+          const newDevice = {
+            phone_number: deviceNumber,
+            condition: 'new', // افتراضي جديد
+            battery_level: '100',
+            phone_memory: '32GB',
+            age: null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+
+          console.log('💾 حفظ الجهاز الجديد في قاعدة البيانات:', newDevice);
+
+          // حفظ الجهاز في قاعدة البيانات
+          await window.storage.addPhone(newDevice);
+          
+          console.log('✅ تم حفظ الجهاز الجديد بنجاح في قاعدة البيانات');
+          
+        } catch (error) {
+          console.error('❌ خطأ في حفظ الجهاز الجديد:', error);
+          alert('حدث خطأ في حفظ الجهاز الجديد: ' + error.message);
+        }
       }
 
       // جلب بيانات الهاتف من URL أو Firebase
@@ -283,6 +318,9 @@
               phone_memory: '32GB'
             });
             
+            // حفظ الجهاز الجديد في قاعدة البيانات
+            await saveNewDeviceToDatabase(newDeviceNumber);
+            
             // توليد الباركود برقم الجهاز الجديد
             generateBarcode(newDeviceNumber);
             return;
@@ -317,7 +355,7 @@
             });
             
             console.log('✅ تم توليد الباركود بنجاح');
-          } else {
+    } else {
             console.error('❌ Canvas أو JsBarcode غير متاح');
           }
         } catch (error) {
@@ -411,13 +449,64 @@
         }
       }
 
+      // تحديث بيانات الجهاز في قاعدة البيانات
+      async function updateDeviceInDatabase() {
+        try {
+          const phoneNumber = document.getElementById('phone-number').textContent;
+          const batteryLevel = document.getElementById('battery-level').textContent;
+          const phoneMemory = document.getElementById('phone-memory').textContent;
+          
+          if (!phoneNumber || phoneNumber === 'جاري التحميل...') {
+            alert('لا يوجد جهاز لتحديثه');
+            return;
+          }
+
+          if (!window.storage) {
+            alert('Firebase غير متاح');
+            return;
+          }
+
+          // تحديث بيانات الجهاز
+          const updatedDevice = {
+            phone_number: phoneNumber,
+            battery_level: batteryLevel,
+            phone_memory: phoneMemory,
+            updated_at: new Date().toISOString()
+          };
+
+          console.log('🔄 تحديث بيانات الجهاز:', updatedDevice);
+
+          // البحث عن الجهاز وتحديثه
+          const phones = await window.storage.getPhones();
+          const phoneIndex = phones.findIndex(p => p.phone_number === phoneNumber);
+          
+          if (phoneIndex !== -1) {
+            // تحديث الجهاز الموجود
+            phones[phoneIndex] = { ...phones[phoneIndex], ...updatedDevice };
+            await window.storage.updatePhone(phoneIndex, phones[phoneIndex]);
+            console.log('✅ تم تحديث بيانات الجهاز بنجاح');
+            alert('تم تحديث بيانات الجهاز بنجاح');
+          } else {
+            console.log('❌ لم يتم العثور على الجهاز للتحديث');
+            alert('لم يتم العثور على الجهاز للتحديث');
+          }
+
+        } catch (error) {
+          console.error('❌ خطأ في تحديث بيانات الجهاز:', error);
+          alert('حدث خطأ في تحديث بيانات الجهاز: ' + error.message);
+        }
+      }
+
       // تحميل البيانات عند بدء الصفحة
       document.addEventListener('DOMContentLoaded', loadPhoneData);
 
       // أحداث الأزرار
       btnDownload?.addEventListener('click', (e) => { e.preventDefault(); downloadPdf(); });
       btnPrint?.addEventListener('click', (e) => { e.preventDefault(); printPdf(); });
+      
+      const btnUpdate = document.getElementById('btnUpdateDevice');
+      btnUpdate?.addEventListener('click', (e) => { e.preventDefault(); updateDeviceInDatabase(); });
     })();
-  </script>
+</script>
 </body>
 </html>
