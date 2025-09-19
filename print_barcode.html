@@ -220,32 +220,23 @@
     console.log('🔄 محاولة تضمين خط عربي مبسط...');
     
     try {
-      // استخدام خط مبسط يدعم العربية بشكل أفضل
-      // Arial Unicode MS يدعم العربية بشكل جيد
-      try {
-        doc.setFont('arial', 'normal');
-        console.log('✅ تم استخدام خط Arial للعربية');
-        return 'arial-arabic';
-      } catch (e) {
-        console.warn('❌ فشل استخدام Arial:', e.message);
-      }
-      
-      // محاولة استخدام خطوط أخرى
-      const systemFonts = ['tahoma', 'verdana', 'helvetica'];
+      // اختبار الخطوط التي تدعم العربية
+      const systemFonts = ['arial', 'tahoma', 'verdana', 'helvetica'];
       
       for (const fontName of systemFonts) {
         try {
-          doc.setFont(fontName, 'normal');
-          console.log(`✅ تم استخدام خط ${fontName} للعربية`);
-          return `system-${fontName}`;
+          if (testArabicSupport(doc, fontName)) {
+            console.log(`✅ تم استخدام خط ${fontName} للعربية`);
+            return `arabic-${fontName}`;
+          }
         } catch (e) {
-          console.warn(`❌ فشل استخدام خط ${fontName}:`, e.message);
+          console.warn(`❌ فشل اختبار خط ${fontName}:`, e.message);
         }
       }
       
-      // إذا فشلت جميع الخطوط، استخدم الخط الافتراضي
+      // إذا لم يجد خط يدعم العربية، استخدم الخط الافتراضي
       doc.setFont('helvetica', 'normal');
-      console.log('✅ تم استخدام خط Helvetica الافتراضي');
+      console.log('❌ لم يتم العثور على خط يدعم العربية، سيتم استخدام Helvetica');
       return 'helvetica-fallback';
       
     } catch (error) {
@@ -254,24 +245,46 @@
     }
   }
 
+  // دالة لاختبار دعم العربية في الخط
+  function testArabicSupport(doc, fontName) {
+    try {
+      doc.setFont(fontName, 'normal');
+      // اختبار كتابة نص عربي بسيط
+      const testText = 'ا';
+      doc.text(testText, 0, 0, { isInputRtl: true });
+      console.log(`✅ خط ${fontName} يدعم العربية`);
+      return true;
+    } catch (e) {
+      console.log(`❌ خط ${fontName} لا يدعم العربية`);
+      return false;
+    }
+  }
+
   // دالة مساعدة لاختبار الخطوط المتاحة
   function testAvailableFonts(doc) {
     console.log('🔍 اختبار الخطوط المتاحة في jsPDF...');
     const testFonts = ['helvetica', 'arial', 'tahoma', 'verdana', 'times', 'courier'];
     const availableFonts = [];
+    const arabicSupportFonts = [];
     
     for (const font of testFonts) {
       try {
         doc.setFont(font, 'normal');
         availableFonts.push(font);
         console.log(`✅ خط ${font} متاح`);
+        
+        // اختبار دعم العربية
+        if (testArabicSupport(doc, font)) {
+          arabicSupportFonts.push(font);
+        }
       } catch (e) {
         console.log(`❌ خط ${font} غير متاح`);
       }
     }
     
     console.log(`📋 الخطوط المتاحة: ${availableFonts.join(', ')}`);
-    return availableFonts;
+    console.log(`🔤 الخطوط التي تدعم العربية: ${arabicSupportFonts.join(', ')}`);
+    return { available: availableFonts, arabic: arabicSupportFonts };
   }
 
   // دالة لتحويل النص العربي إلى تنسيق يعمل مع PDF
@@ -325,7 +338,7 @@
 
       // عنوان أعلى
       doc.setFontSize(6);
-      const useRtl = (fontSource !== 'helvetica-fallback');
+      const useRtl = fontSource.startsWith('arabic-');
       const title = formatArabicText('الصقري للإتصالات', useRtl);
       doc.text(title, 20, 4, { align: 'center', isInputRtl: useRtl });
 
@@ -425,7 +438,7 @@
         console.log(`✅ تم إعداد الخط: ${fontSource}`);
         
         doc.setFontSize(16);
-        const useRtl = (fontSource !== 'helvetica-fallback');
+        const useRtl = fontSource.startsWith('arabic-');
         
         // اختبار النص العربي
         doc.text(formatArabicText('اختبار الخط العربي', useRtl), 105, 50, { align: 'center', isInputRtl: useRtl });
