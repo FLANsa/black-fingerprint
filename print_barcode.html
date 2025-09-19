@@ -246,7 +246,9 @@
   // توليد الباركود
   function generateBarcode(phoneNumber) {
     try {
-      JsBarcode("#barcode", phoneNumber, {
+      // استخدام رقم متسلسل يبدأ من 1
+      const barcodeNumber = getSequentialNumber(phoneNumber);
+      JsBarcode("#barcode", barcodeNumber, {
         format: "CODE128",
         width: 1.5,
         height: 30,
@@ -260,14 +262,29 @@
     }
   }
 
+  // توليد رقم متسلسل يبدأ من 1
+  function getSequentialNumber(phoneNumber) {
+    // إذا كان رقم الهاتف يحتوي على أرقام، استخدم آخر رقم
+    const numbers = phoneNumber.match(/\d+/g);
+    if (numbers && numbers.length > 0) {
+      const lastNumber = parseInt(numbers[numbers.length - 1]);
+      return lastNumber.toString();
+    }
+    // إذا لم يكن هناك أرقام، استخدم 1
+    return "1";
+  }
+
   // تحديث تفاصيل الهاتف
   function updatePhoneDetails(phone) {
-    document.getElementById('phone-number').textContent = phone.phone_number || '000001';
+    const phoneNumber = phone.phone_number || '000001';
+    const sequentialNumber = getSequentialNumber(phoneNumber);
+    
+    document.getElementById('phone-number').textContent = sequentialNumber;
     document.getElementById('battery-level').textContent = phone.condition === 'used' ? (phone.battery_level || '85') : '100';
     document.getElementById('phone-memory').textContent = phone.phone_memory || '512';
     
     // توليد الباركود
-    generateBarcode(phone.phone_number || '000001');
+    generateBarcode(phoneNumber);
   }
 
   // طباعة الباركود
@@ -296,7 +313,7 @@
       
       // استخدام بيانات افتراضية
       const defaultPhone = {
-        phone_number: phoneNumber || '000001',
+        phone_number: phoneNumber || '1',
         condition: 'new',
         phone_memory: '512',
         battery_level: '100'
@@ -310,7 +327,7 @@
       
       // استخدام بيانات افتراضية في حالة الخطأ
       const defaultPhone = {
-        phone_number: '000001',
+        phone_number: '1',
         condition: 'new',
         phone_memory: '512',
         battery_level: '100'
