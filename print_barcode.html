@@ -259,7 +259,11 @@
           backgroundColor: '#ffffff',
           scale: scale,         // يرفع الدقة
           useCORS: true,        // للسماح بتحميل صور من نفس الأصل
-          logging: false
+          logging: false,
+          x: 0,
+          y: 0,
+          width: stickerEl.clientWidth,
+          height: stickerEl.clientHeight
         });
       }
 
@@ -276,8 +280,14 @@
           format: [STICKER_MM.w, STICKER_MM.h]
         });
 
-        // نضيف الصورة لتملأ الصفحة بالكامل
-        doc.addImage(imgData, 'PNG', 0, 0, STICKER_MM.w, STICKER_MM.h);
+        // حساب الموضع ليكون في المنتصف تماماً
+        const imgWidth = STICKER_MM.w;
+        const imgHeight = STICKER_MM.h;
+        const x = 0;
+        const y = 0;
+
+        // نضيف الصورة لتملأ الصفحة بالكامل مع توسيط
+        doc.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight, undefined, 'FAST');
 
         // نُعيد Blob URL لاستخدامه للتحميل أو الطباعة
         return doc.output('bloburl');
@@ -294,7 +304,9 @@
           unit: 'mm',
           format: [STICKER_MM.w, STICKER_MM.h]
         });
-        doc.addImage(imgData, 'PNG', 0, 0, STICKER_MM.w, STICKER_MM.h);
+        
+        // إضافة الصورة في المنتصف تماماً
+        doc.addImage(imgData, 'PNG', 0, 0, STICKER_MM.w, STICKER_MM.h, undefined, 'FAST');
 
         // اسم الملف يتضمن رقم الجهاز
         const phoneNumber = document.getElementById('phone-number').textContent || 'phone';
