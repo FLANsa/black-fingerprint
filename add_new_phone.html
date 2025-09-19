@@ -462,7 +462,7 @@
           purchase_price: parseArabicNumber(document.getElementById('purchase_price').value),
           selling_price: parseArabicNumber(document.getElementById('selling_price').value),
           serial_number: document.getElementById('serial_number').value,
-          phone_number: document.getElementById('barcode_input').value || generatePhoneNumber(),
+          phone_number: document.getElementById('barcode_input').value.trim() || generatePhoneNumber(),
           warranty: parseInt(document.getElementById('warranty').value) || 0,
           description: document.getElementById('description').value,
           customer_name: document.getElementById('customer_name').value,
@@ -489,10 +489,17 @@
           const phoneId = await window.storage.addPhone(phoneData);
           if (phoneId) {
             console.log('✅ تم حفظ الهاتف في Firebase:', phoneId);
-            alert('✅ تم إضافة الهاتف الجديد بنجاح!');
+            console.log('📱 بيانات الهاتف:', phoneData);
             
-            // توجيه إلى صفحة طباعة الباركود
-            window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+            // تأكيد من المستخدم قبل التوجيه
+            const shouldPrint = confirm('✅ تم إضافة الهاتف بنجاح!\n\nهل تريد طباعة الباركود؟');
+            if (shouldPrint && phoneData.phone_number) {
+              console.log('🔄 التوجيه إلى صفحة الباركود:', phoneData.phone_number);
+              window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+            } else if (!phoneData.phone_number) {
+              console.error('❌ رقم الهاتف فارغ');
+              alert('تم إضافة الهاتف بنجاح، لكن رقم الهاتف فارغ');
+            }
             return true;
           }
         } else {
@@ -501,10 +508,17 @@
           phoneData.id = Date.now().toString();
           phones.push(phoneData);
           localStorage.setItem('phones', JSON.stringify(phones));
-          alert('✅ تم إضافة الهاتف الجديد بنجاح! (محلي)');
+          console.log('✅ تم حفظ الهاتف محلياً:', phoneData);
           
-          // توجيه إلى صفحة طباعة الباركود
-          window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+          // تأكيد من المستخدم قبل التوجيه
+          const shouldPrint = confirm('✅ تم إضافة الهاتف بنجاح! (محلي)\n\nهل تريد طباعة الباركود؟');
+          if (shouldPrint && phoneData.phone_number) {
+            console.log('🔄 التوجيه إلى صفحة الباركود (محلي):', phoneData.phone_number);
+            window.location.href = `print_barcode.html?phone_number=${phoneData.phone_number}`;
+          } else if (!phoneData.phone_number) {
+            console.error('❌ رقم الهاتف فارغ (محلي)');
+            alert('تم إضافة الهاتف بنجاح، لكن رقم الهاتف فارغ');
+          }
           return true;
         }
       } catch (error) {
