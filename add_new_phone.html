@@ -528,10 +528,25 @@
       }
     }
 
-    // توليد رقم هاتف تلقائي
+    // توليد رقم هاتف تلقائي (6 أرقام متسلسلة)
     function generatePhoneNumber() {
-      const timestamp = Date.now().toString().slice(-6);
-      return timestamp.padStart(6, '0');
+      // الحصول على آخر رقم جهاز من localStorage أو البدء من 0
+      let lastNumber = localStorage.getItem('lastDeviceNumber');
+      if (!lastNumber) {
+        lastNumber = 0;
+      }
+      
+      // زيادة الرقم
+      const newNumber = parseInt(lastNumber) + 1;
+      
+      // تنسيق الرقم ليكون 6 أرقام (000001, 000002, إلخ)
+      const formattedNumber = newNumber.toString().padStart(6, '0');
+      
+      // حفظ الرقم الجديد
+      localStorage.setItem('lastDeviceNumber', newNumber.toString());
+      
+      console.log('🔢 تم توليد رقم جهاز جديد:', formattedNumber);
+      return formattedNumber;
     }
 
     // ربط نموذج الإرسال بدالة الحفظ
