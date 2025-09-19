@@ -219,21 +219,31 @@
                     }
                 }
                 
-                // إضافة النصوص (بالعربية إذا كان الخط متاح)
-                doc.setFontSize(16);
-                const useRtl = fontSource.startsWith('arabic-');
+                // إضافة النصوص (بالعربية باستخدام Canvas)
+                const useCanvas = fontSource === 'arabic-canvas';
                 
-                const text1 = useRtl ? 'اختبار الخط العربي' : 'Arabic Font Test';
-                const text2 = useRtl ? 'الصقري للإتصالات' : 'Al-Saqri Communications';
-                const text3 = useRtl ? 'رقم الجهاز: 463115' : 'Device Number: 463115';
-                const text4 = useRtl ? 'نسبة البطارية: 100%' : 'Battery Level: 100%';
-                const text5 = useRtl ? 'الذاكرة: 32GB' : 'Memory: 32GB';
-                
-                doc.text(text1, 105, 30, { align: 'center', isInputRtl: useRtl });
-                doc.text(text2, 105, 50, { align: 'center', isInputRtl: useRtl });
-                doc.text(text3, 105, 70, { align: 'center', isInputRtl: useRtl });
-                doc.text(text4, 105, 90, { align: 'center', isInputRtl: useRtl });
-                doc.text(text5, 105, 110, { align: 'center', isInputRtl: useRtl });
+                if (useCanvas && typeof addArabicTextAsImage === 'function') {
+                    // Use Canvas for Arabic text
+                    addArabicTextAsImage(doc, 'اختبار الخط العربي', 50, 25, 20, 100, 20);
+                    addArabicTextAsImage(doc, 'الصقري للإتصالات', 50, 45, 18, 120, 18);
+                    addArabicTextAsImage(doc, 'رقم الجهاز: 463115', 50, 65, 16, 140, 16);
+                    addArabicTextAsImage(doc, 'نسبة البطارية: 100%', 50, 85, 16, 140, 16);
+                    addArabicTextAsImage(doc, 'الذاكرة: 32GB', 50, 105, 16, 120, 16);
+                } else {
+                    // Use regular text
+                    doc.setFontSize(16);
+                    const text1 = 'Arabic Font Test';
+                    const text2 = 'Al-Saqri Communications';
+                    const text3 = 'Device Number: 463115';
+                    const text4 = 'Battery Level: 100%';
+                    const text5 = 'Memory: 32GB';
+                    
+                    doc.text(text1, 105, 30, { align: 'center' });
+                    doc.text(text2, 105, 50, { align: 'center' });
+                    doc.text(text3, 105, 70, { align: 'center' });
+                    doc.text(text4, 105, 90, { align: 'center' });
+                    doc.text(text5, 105, 110, { align: 'center' });
+                }
                 
                 // حفظ PDF
                 doc.save('test_arabic_font.pdf');

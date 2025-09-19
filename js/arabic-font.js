@@ -1,30 +1,47 @@
 // Arabic Font Support for jsPDF
-// This file provides proper Arabic font support for PDF generation
+// This file provides proper Arabic text rendering using Canvas
 
-// Function to load Arabic font from Google Fonts
-async function loadArabicFont(doc) {
+// Function to render Arabic text to canvas and return as image data
+function renderArabicTextToCanvas(text, fontSize = 12, width = 200, height = 30) {
     try {
-        console.log('🔄 جاري تحميل الخط العربي من Google Fonts...');
+        // Create canvas
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
         
-        // Try to load Amiri font from Google Fonts
-        const fontUrl = 'https://fonts.gstatic.com/s/amiri/v27/J7aRnpd8CGxBHqUpvrIw74NL.woff2';
+        canvas.width = width;
+        canvas.height = height;
         
-        const response = await fetch(fontUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
+        // Set font
+        ctx.font = `${fontSize}px Arial, Tahoma, sans-serif`;
+        ctx.fillStyle = '#000000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         
-        const arrayBuffer = await response.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        // Enable RTL
+        ctx.direction = 'rtl';
         
-        // Add font to jsPDF
-        doc.addFileToVFS('Amiri-Regular.woff2', base64);
-        doc.addFont('Amiri-Regular.woff2', 'Amiri', 'normal');
+        // Draw text
+        ctx.fillText(text, width / 2, height / 2);
         
-        console.log('✅ تم تحميل الخط العربي Amiri بنجاح');
-        return true;
+        // Return as data URL
+        return canvas.toDataURL('image/png');
     } catch (error) {
-        console.warn('❌ فشل تحميل الخط العربي من Google Fonts:', error);
+        console.error('❌ فشل في رسم النص العربي:', error);
+        return null;
+    }
+}
+
+// Function to add Arabic text as image to PDF
+function addArabicTextAsImage(doc, text, x, y, fontSize = 12, width = 200, height = 30) {
+    try {
+        const imageData = renderArabicTextToCanvas(text, fontSize, width, height);
+        if (imageData) {
+            doc.addImage(imageData, 'PNG', x, y, width / 4, height / 4); // Scale down for PDF
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('❌ فشل في إضافة النص العربي كصورة:', error);
         return false;
     }
 }
@@ -52,22 +69,13 @@ function convertArabicToEnglish(text) {
     return englishText;
 }
 
-// Function to set up Arabic font for PDF
+// Function to set up Arabic font for PDF (using Canvas method)
 async function addArabicFontToPDF(doc) {
     try {
-        // Try to load Arabic font first
-        const arabicLoaded = await loadArabicFont(doc);
-        
-        if (arabicLoaded) {
-            doc.setFont('Amiri', 'normal');
-            console.log('✅ تم إعداد الخط العربي للـ PDF');
-            return 'arabic-amiri';
-        } else {
-            // Fallback to system font
-            doc.setFont('helvetica', 'normal');
-            console.log('❌ فشل تحميل الخط العربي، سيتم استخدام Helvetica');
-            return 'helvetica-fallback';
-        }
+        // Set default font for non-Arabic text
+        doc.setFont('helvetica', 'normal');
+        console.log('✅ تم إعداد الخط للـ PDF (سيتم استخدام Canvas للنص العربي)');
+        return 'arabic-canvas';
     } catch (error) {
         console.error('❌ فشل في إعداد الخط:', error);
         doc.setFont('helvetica', 'normal');
@@ -75,17 +83,22 @@ async function addArabicFontToPDF(doc) {
     }
 }
 
-// Function to test if Arabic font is working
+// Function to test if Arabic text rendering is working
 function testArabicFont(doc) {
     try {
-        doc.setFontSize(12);
-        // Test with Arabic text
-        doc.text('اختبار', 10, 10, { isInputRtl: true });
+        // Test Canvas rendering
+        const testText = 'اختبار';
+        const imageData = renderArabicTextToCanvas(testText, 12, 100, 20);
         
-        console.log('✅ اختبار الخط العربي نجح');
-        return true;
+        if (imageData) {
+            console.log('✅ اختبار النص العربي نجح (Canvas)');
+            return true;
+        } else {
+            console.log('❌ فشل اختبار النص العربي (Canvas)');
+            return false;
+        }
     } catch (error) {
-        console.error('❌ فشل اختبار الخط العربي:', error);
+        console.error('❌ فشل اختبار النص العربي:', error);
         return false;
     }
 }
@@ -96,12 +109,14 @@ if (typeof module !== 'undefined' && module.exports) {
         addArabicFontToPDF,
         testArabicFont,
         convertArabicToEnglish,
-        loadArabicFont
+        addArabicTextAsImage,
+        renderArabicTextToCanvas
     };
 } else {
     // Make functions available globally
     window.addArabicFontToPDF = addArabicFontToPDF;
     window.testArabicFont = testArabicFont;
     window.convertArabicToEnglish = convertArabicToEnglish;
-    window.loadArabicFont = loadArabicFont;
+    window.addArabicTextAsImage = addArabicTextAsImage;
+    window.renderArabicTextToCanvas = renderArabicTextToCanvas;
 }
