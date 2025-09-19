@@ -96,9 +96,10 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      font-size:1.6mm;
+      font-size:1.4mm;
       line-height:1.1;
       flex:1;
+      text-align:center;
     }
     .label{ color:#222; font-weight:600; text-align:center; }
     .value{ color:#000; font-weight:700; text-align:center; }
@@ -145,7 +146,7 @@
       /* تحسين النصوص للطباعة */
       .shop { font-size: 2.2mm; margin-bottom: 0.2mm; }
       .sticker-barcode svg { height: 8mm !important; }  /* ارتفاع أدق للطباعة */
-      .info-item { font-size: 1.8mm; }                  /* تكبير طفيف ليسهل ظهورها */
+      .info-item { font-size: 1.6mm; }                  /* تكبير طفيف ليسهل ظهورها */
       .sticker-card { padding: 0.2mm; min-height: 8mm; }/* يمنع انكماش التفاصيل */
       .device-info { gap: 0.3mm; }
     }
@@ -355,15 +356,16 @@
           const imgData = canvas.toDataURL('image/png');
           doc.addImage(imgData, 'PNG', 2, 6, 36, 8);
 
-          // إضافة تفاصيل الجهاز
+          // إضافة تفاصيل الجهاز (أفقياً)
           const phoneNumber = document.getElementById('phone-number').textContent;
           const batteryLevel = document.getElementById('battery-level').textContent;
           const phoneMemory = document.getElementById('phone-memory').textContent;
 
-          doc.setFontSize(3);
-          doc.text(`رقم الجهاز: ${phoneNumber}`, 2, 16);
-          doc.text(`نسبة البطارية: ${batteryLevel}`, 2, 19);
-          doc.text(`الذاكرة: ${phoneMemory}`, 2, 22);
+          doc.setFontSize(2.5);
+          // ترتيب البيانات أفقياً
+          doc.text(`رقم: ${phoneNumber}`, 2, 16);
+          doc.text(`بطارية: ${batteryLevel}`, 14, 16);
+          doc.text(`ذاكرة: ${phoneMemory}`, 26, 16);
 
           // حفظ PDF
           const fileName = `barcode_${phoneNumber || 'phone'}.pdf`;
