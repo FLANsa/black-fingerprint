@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تشخيص Firebase</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+    .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .status { padding: 15px; margin: 10px 0; border-radius: 4px; }
+    .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+    .btn-primary { background-color: #007bff; color: white; }
+    .btn-success { background-color: #28a745; color: white; }
+    .btn-warning { background-color: #ffc107; color: black; }
+    .btn-danger { background-color: #dc3545; color: white; }
+    .log { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 500px; overflow-y: auto; white-space: pre-wrap; }
+    .config-display { background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+    .section { margin: 20px 0; padding: 15px; border: 1px solid #dee2e6; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 تشخيص Firebase</h1>
+    
+    <div class="section">
+      <h3>إعدادات Firebase</h3>
+      <div id="configDisplay" class="config-display">جاري تحميل الإعدادات...</div>
+    </div>
+    
+    <div class="section">
+      <h3>حالة الاتصال</h3>
+      <div id="status" class="status info">جاري التحقق من الاتصال...</div>
+    </div>
+    
+    <div class="section">
+      <h3>اختبارات الاتصال</h3>
+      <button class="btn-primary" onclick="testFirebaseConfig()">اختبار إعدادات Firebase</button>
+      <button class="btn-success" onclick="testFirebaseConnection()">اختبار اتصال Firebase</button>
+      <button class="btn-warning" onclick="testDatabaseOperations()">اختبار عمليات قاعدة البيانات</button>
+      <button class="btn-danger" onclick="testFirestoreRules()">اختبار قواعد Firestore</button>
+    </div>
+    
+    <div class="section">
+      <h3>سجل العمليات</h3>
+      <button class="btn-warning" onclick="clearLog()">مسح السجل</button>
+      <div id="log" class="log"></div>
+    </div>
+  </div>
+
+  <!-- Firebase Configuration -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-database.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
+
+  <script>
+    function log(message) {
+      const logDiv = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.textContent += `[${timestamp}] ${message}\n`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById('log').textContent = '';
+    }
+
+    function updateStatus(message, type = 'info') {
+      const statusDiv = document.getElementById('status');
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+    function displayConfig() {
+      const configDiv = document.getElementById('configDisplay');
+      const config = {
+        apiKey: "AIzaSyB_MvtG7xnY5c18GybVF_SYJfxOa8mxgc8",
+        authDomain: "alsaqri-dc3ca.firebaseapp.com",
+        projectId: "alsaqri-dc3ca",
+        storageBucket: "alsaqri-dc3ca.firebasestorage.app",
+        messagingSenderId: "325709838350",
+        appId: "1:325709838350:web:c3c5dfadc079ce825ae45f",
+        measurementId: "G-Q8E93ZR4FZ"
+      };
+      
+      configDiv.textContent = JSON.stringify(config, null, 2);
+    }
+
+    async function testFirebaseConfig() {
+      log('🔄 اختبار إعدادات Firebase...');
+      
+      try {
+        // التحقق من وجود Firebase
+        if (typeof firebase === 'undefined') {
+          log('❌ Firebase SDK غير محمل');
+          return;
+        }
+        
+        // التحقق من الإعدادات
+        const config = {
+          apiKey: "AIzaSyB_MvtG7xnY5c18GybVF_SYJfxOa8mxgc8",
+          authDomain: "alsaqri-dc3ca.firebaseapp.com",
+          projectId: "alsaqri-dc3ca",
+          storageBucket: "alsaqri-dc3ca.firebasestorage.app",
+          messagingSenderId: "325709838350",
+          appId: "1:325709838350:web:c3c5dfadc079ce825ae45f",
+          measurementId: "G-Q8E93ZR4FZ"
+        };
+        
+        log('✅ إعدادات Firebase صحيحة');
+        log(`📊 Project ID: ${config.projectId}`);
+        log(`🔑 API Key: ${config.apiKey.substring(0, 10)}...`);
+        log(`🌐 Auth Domain: ${config.authDomain}`);
+        
+        // التحقق من Firebase App
+        if (window.firebaseDB) {
+          log('✅ Firebase App تم تهيئته');
+          log(`📊 Database instance: ${window.firebaseDB}`);
+        } else {
+          log('❌ Firebase App غير مهيأ');
+        }
+        
+      } catch (error) {
+        log(`❌ خطأ في اختبار الإعدادات: ${error.message}`);
+      }
+    }
+
+    async function testFirebaseConnection() {
+      log('🔄 اختبار اتصال Firebase...');
+      updateStatus('جاري اختبار الاتصال...', 'info');
+      
+      try {
+        // انتظار تحميل Firebase
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // التحقق من Firebase Config
+        if (window.firebaseDB) {
+          log('✅ Firebase Database متاح');
+          log(`📊 Database instance: ${window.firebaseDB}`);
+        } else {
+          log('❌ Firebase Database غير متاح');
+          updateStatus('❌ Firebase Database غير متاح', 'error');
+          return;
+        }
+        
+        if (window.firebaseAuth) {
+          log('✅ Firebase Auth متاح');
+        } else {
+          log('❌ Firebase Auth غير متاح');
+        }
+        
+        // التحقق من Storage Manager
+        if (window.storage) {
+          log('✅ Storage Manager متاح');
+          log(`🔥 Firebase متاح: ${window.storage.isFirebaseAvailable}`);
+          
+          if (window.storage.isFirebaseAvailable) {
+            updateStatus('✅ متصل بـ Firebase بنجاح!', 'success');
+            log('🎉 تم الاتصال بـ Firebase بنجاح!');
+          } else {
+            updateStatus('⚠️ Firebase غير متاح - استخدام LocalStorage', 'warning');
+            log('⚠️ يتم استخدام LocalStorage كبديل');
+          }
+        } else {
+          log('❌ Storage Manager غير متاح');
+          updateStatus('❌ Storage Manager غير متاح', 'error');
+        }
+        
+      } catch (error) {
+        log(`❌ خطأ في اختبار الاتصال: ${error.message}`);
+        log(`❌ تفاصيل الخطأ: ${error.stack}`);
+        updateStatus('❌ فشل في الاتصال', 'error');
+      }
+    }
+
+    async function testDatabaseOperations() {
+      log('🔄 بدء اختبار عمليات قاعدة البيانات...');
+      
+      try {
+        if (!window.storage) {
+          log('❌ Storage Manager غير متاح');
+          return;
+        }
+        
+        // اختبار إضافة نوع هاتف
+        log('📱 اختبار إضافة نوع هاتف...');
+        const addResult = await window.storage.addPhoneType('Test Brand', 'Test Model');
+        if (addResult) {
+          log('✅ تم إضافة نوع الهاتف بنجاح');
+        } else {
+          log('❌ فشل في إضافة نوع الهاتف');
+        }
+        
+        // اختبار جلب أنواع الهواتف
+        log('📱 اختبار جلب أنواع الهواتف...');
+        const phoneTypes = await window.storage.getPhoneTypes();
+        log(`✅ تم جلب ${Object.keys(phoneTypes || {}).length} شركة`);
+        log(`📱 أنواع الهواتف: ${JSON.stringify(phoneTypes, null, 2)}`);
+        
+        // اختبار إضافة هاتف
+        log('📱 اختبار إضافة هاتف...');
+        const phoneData = {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          condition: 'new',
+          purchase_price: 1000,
+          selling_price: 1200,
+          serial_number: 'TEST' + Date.now(),
+          phone_number: '000001',
+          warranty: 12,
+          description: 'هاتف تجريبي للاختبار',
+          date_added: new Date().toISOString()
+        };
+        
+        const phoneId = await window.storage.addPhone(phoneData);
+        if (phoneId) {
+          log(`✅ تم إضافة الهاتف بنجاح - ID: ${phoneId}`);
+        } else {
+          log('❌ فشل في إضافة الهاتف');
+        }
+        
+        // اختبار جلب الهواتف
+        log('📱 اختبار جلب الهواتف...');
+        const phones = await window.storage.getPhones();
+        log(`✅ تم جلب ${phones.length} هاتف`);
+        
+        // اختبار إحصائيات التخزين
+        log('📊 اختبار إحصائيات التخزين...');
+        const stats = await window.storage.getStorageStats();
+        log(`📊 الإحصائيات: ${JSON.stringify(stats, null, 2)}`);
+        
+        log('🎉 تم اختبار جميع العمليات بنجاح!');
+        
+      } catch (error) {
+        log(`❌ خطأ في اختبار العمليات: ${error.message}`);
+        log(`❌ تفاصيل الخطأ: ${error.stack}`);
+      }
+    }
+
+    async function testFirestoreRules() {
+      log('🔄 اختبار قواعد Firestore...');
+      
+      try {
+        if (!window.storage || !window.storage.isFirebaseAvailable) {
+          log('❌ Firebase غير متاح لاختبار القواعد');
+          return;
+        }
+        
+        // محاولة قراءة مجموعة فارغة
+        log('📖 اختبار قراءة مجموعة فارغة...');
+        const phones = await window.storage.getPhones();
+        log(`✅ تم قراءة ${phones.length} هاتف`);
+        
+        // محاولة إضافة بيانات تجريبية
+        log('✍️ اختبار إضافة بيانات تجريبية...');
+        const testData = {
+          brand: 'Test Brand',
+          model: 'Test Model',
+          condition: 'new',
+          purchase_price: 1000,
+          selling_price: 1200,
+          serial_number: 'TEST' + Date.now(),
+          phone_number: '000001',
+          warranty: 12,
+          description: 'هاتف تجريبي لاختبار القواعد',
+          date_added: new Date().toISOString()
+        };
+        
+        const result = await window.storage.addPhone(testData);
+        if (result) {
+          log('✅ تم إضافة البيانات بنجاح - القواعد تسمح بالكتابة');
+        } else {
+          log('❌ فشل في إضافة البيانات - قد تكون القواعد تمنع الكتابة');
+        }
+        
+      } catch (error) {
+        log(`❌ خطأ في اختبار القواعد: ${error.message}`);
+        if (error.message.includes('permission')) {
+          log('⚠️ يبدو أن هناك مشكلة في أذونات Firestore');
+        }
+      }
+    }
+
+    // اختبار تلقائي عند تحميل الصفحة
+    document.addEventListener('DOMContentLoaded', () => {
+      log('🚀 بدء تشخيص Firebase...');
+      displayConfig();
+      setTimeout(testFirebaseConnection, 1000);
+    });
+  </script>
+</body>
+</html>

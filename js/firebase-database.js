@@ -161,6 +161,42 @@ class FirebaseDatabase {
     }
   }
 
+  async getSale(saleId) {
+    try {
+      const saleDoc = await getDoc(doc(this.db, 'sales', saleId));
+      if (saleDoc.exists()) {
+        return { id: saleDoc.id, ...saleDoc.data() };
+      }
+      return null;
+    } catch (error) {
+      console.error('❌ Error getting sale:', error);
+      throw error;
+    }
+  }
+
+  async updateSale(saleId, saleData) {
+    try {
+      await updateDoc(doc(this.db, 'sales', saleId), {
+        ...saleData,
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Sale updated:', saleId);
+    } catch (error) {
+      console.error('❌ Error updating sale:', error);
+      throw error;
+    }
+  }
+
+  async deleteSale(saleId) {
+    try {
+      await deleteDoc(doc(this.db, 'sales', saleId));
+      console.log('✅ Sale deleted:', saleId);
+    } catch (error) {
+      console.error('❌ Error deleting sale:', error);
+      throw error;
+    }
+  }
+
   // ===== إدارة فئات الأكسسوارات =====
   async addAccessoryCategory(categoryData) {
     try {
@@ -192,6 +228,27 @@ class FirebaseDatabase {
     }
   }
 
+  async deleteAccessoryCategory(categoryName) {
+    try {
+      const categoriesSnapshot = await getDocs(
+        query(collection(this.db, 'accessory_categories'), 
+              where('arabic_name', '==', categoryName))
+      );
+      
+      const deletePromises = [];
+      categoriesSnapshot.forEach((doc) => {
+        deletePromises.push(deleteDoc(doc.ref));
+      });
+      
+      await Promise.all(deletePromises);
+      console.log('✅ Accessory category deleted:', categoryName);
+      return true;
+    } catch (error) {
+      console.error('❌ Error deleting accessory category:', error);
+      throw error;
+    }
+  }
+
   // ===== إدارة أنواع الهواتف =====
   async addPhoneType(phoneTypeData) {
     try {
@@ -219,6 +276,28 @@ class FirebaseDatabase {
       return phoneTypes;
     } catch (error) {
       console.error('❌ Error getting phone types:', error);
+      throw error;
+    }
+  }
+
+  async deletePhoneType(brand, model) {
+    try {
+      const phoneTypesSnapshot = await getDocs(
+        query(collection(this.db, 'phone_types'), 
+              where('brand', '==', brand), 
+              where('model', '==', model))
+      );
+      
+      const deletePromises = [];
+      phoneTypesSnapshot.forEach((doc) => {
+        deletePromises.push(deleteDoc(doc.ref));
+      });
+      
+      await Promise.all(deletePromises);
+      console.log('✅ Phone type deleted:', brand, model);
+      return true;
+    } catch (error) {
+      console.error('❌ Error deleting phone type:', error);
       throw error;
     }
   }
@@ -336,6 +415,6 @@ class FirebaseDatabase {
 }
 
 // إنشاء instance واحد للاستخدام في جميع أنحاء التطبيق
-window.firebaseDB = new FirebaseDatabase();
+window.firebaseDatabase = new FirebaseDatabase();
 
 console.log('🔥 Firebase Database Manager initialized successfully!');

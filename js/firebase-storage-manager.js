@@ -1,9 +1,38 @@
 // Firebase Storage Manager - إدارة التخزين المختلط
 // يعمل مع Firebase Firestore أو LocalStorage كبديل
 
+// Configuration constants
+const CONFIG = {
+  STORAGE_KEYS: {
+    PHONES: 'phones',
+    ACCESSORIES: 'accessories',
+    SALES: 'sales',
+    PHONE_TYPES: 'phone_types',
+    ACCESSORY_CATEGORIES: 'accessory_categories',
+    CURRENT_USER: 'current_user'
+  }
+};
+
+// Default data
+const DEFAULT_PHONE_TYPES = {
+  "Apple": ["iPhone 13", "iPhone 14", "iPhone 15"],
+  "Samsung": ["S22", "S23", "S24"],
+  "Xiaomi": ["Redmi Note 12", "Mi 11"]
+};
+
+const DEFAULT_ACCESSORY_CATEGORIES = [
+  { name: 'accessory', arabic_name: 'إكسسوار', description: 'إكسسوارات عامة' },
+  { name: 'charger', arabic_name: 'شاحن', description: 'شواحن الهواتف' },
+  { name: 'case', arabic_name: 'غلاف', description: 'أغلفة الهواتف' },
+  { name: 'screen_protector', arabic_name: 'حماية الشاشة', description: 'حماية شاشة الهاتف' },
+  { name: 'cable', arabic_name: 'كابل', description: 'كابلات البيانات والشحن' },
+  { name: 'headphone', arabic_name: 'سماعات', description: 'سماعات الهواتف' },
+  { name: 'other', arabic_name: 'أخرى', description: 'فئات أخرى' }
+];
+
 class FirebaseStorageManager {
   constructor() {
-    this.firebaseDB = window.firebaseDB;
+    this.firebaseDB = window.firebaseDatabase;
     this.isFirebaseAvailable = !!(this.firebaseDB && this.firebaseDB.db);
     
     if (this.isFirebaseAvailable) {
