@@ -161,6 +161,9 @@
 <script type="module" src="js/firebase-database.js"></script>
 <script type="module" src="js/firebase-storage-manager.js"></script>
 
+<!-- Arabic Font Support -->
+<script src="js/arabic-font.js"></script>
+
 <script>
   let currentPhone = null;
 
@@ -215,13 +218,23 @@
     document.getElementById('phone-memory').textContent = phone.phone_memory || '32GB';
   }
 
-  // تضمين خط عربي باستخدام خط مبسط مدمج (محسن لـ macOS)
-
+  // تضمين خط عربي باستخدام خط مخصص (محسن لـ macOS)
   async function embedArabicFont(doc) {
-    console.log('🔄 محاولة تضمين خط عربي مبسط (macOS)...');
+    console.log('🔄 محاولة تضمين الخط العربي المخصص...');
     
     try {
-      // خطوط macOS التي تدعم العربية بشكل أفضل
+      // محاولة استخدام الخط العربي المخصص أولاً
+      if (typeof addArabicFontToPDF === 'function') {
+        if (addArabicFontToPDF(doc)) {
+          if (testArabicFont(doc)) {
+            console.log('✅ تم استخدام الخط العربي المخصص بنجاح');
+            return 'custom-arabic';
+          }
+        }
+      }
+      
+      // إذا فشل الخط المخصص، جرب خطوط النظام
+      console.log('🔄 الخط المخصص فشل، جاري تجربة خطوط النظام...');
       const macFonts = ['arial', 'helvetica', 'times', 'courier', 'verdana'];
       
       for (const fontName of macFonts) {
@@ -237,7 +250,7 @@
       
       // إذا لم يجد خط يدعم العربية، استخدم الخط الافتراضي
       doc.setFont('helvetica', 'normal');
-      console.log('❌ لم يتم العثور على خط يدعم العربية على macOS، سيتم استخدام Helvetica');
+      console.log('❌ لم يتم العثور على خط يدعم العربية، سيتم استخدام Helvetica');
       return 'helvetica-fallback';
       
     } catch (error) {
@@ -339,7 +352,7 @@
 
       // عنوان أعلى
       doc.setFontSize(6);
-      const useRtl = fontSource.startsWith('arabic-');
+      const useRtl = fontSource.startsWith('arabic-') || fontSource === 'custom-arabic';
       const title = formatArabicText('الصقري للإتصالات', useRtl);
       doc.text(title, 20, 4, { align: 'center', isInputRtl: useRtl });
 
@@ -439,7 +452,7 @@
         console.log(`✅ تم إعداد الخط: ${fontSource}`);
         
         doc.setFontSize(16);
-        const useRtl = fontSource.startsWith('arabic-');
+        const useRtl = fontSource.startsWith('arabic-') || fontSource === 'custom-arabic';
         
         // اختبار النص العربي
         doc.text(formatArabicText('اختبار الخط العربي', useRtl), 105, 50, { align: 'center', isInputRtl: useRtl });
