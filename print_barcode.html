@@ -5,152 +5,60 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>طباعة الباركود — الصقري للاتصالات</title>
 
-  <!-- خطوط وستايل عام -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
 
-  <!-- مكتبات التصدير -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <script src="js/arabic-font.js"></script>
+
+  <!-- Firebase so we can read the phone back -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-database.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
 
   <style>
-    :root { --card-bg: #ffffff; --muted:#cfcfcf; }
-    body { font-family: 'Cairo', sans-serif; background:#f8f9fa; margin:0; padding:24px; }
-    .container { max-width: 900px; margin: 0 auto; }
-    .card {
-      background: var(--card-bg);
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    }
-    .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #e5e7eb;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .card-header h3 { margin:0; font-size: 1.1rem; font-weight: 700; }
-    .card-body { padding: 20px; }
-
-    /* معاينة داخل إطار منقط */
-    .sticker-preview{
-      border:2px dashed var(--muted);
-      padding:20px;
-      background:#f9f9f9;
-      border-radius:10px;
-      display:flex;
-      justify-content:center;
-      margin-bottom: 18px;
-    }
-
-    /* حجم الملصق للمعاينة: 6cm × 3cm (أكبر قليلاً لراحة القراءة) */
-    .sticker{
-      width:6cm;
-      height:3cm;
-      background:#fff;
-      border:1px solid #ddd;
-      box-sizing:border-box;
-      display:flex;
-      flex-direction:column;
-      padding:0.2cm;
-      gap:0.15cm;
-    }
-
-    /* اسم الشركة */
-    .shop{
-      text-align:center;
-      font-weight:700;
-      font-size:4mm; /* مقروء */
-      line-height:1.1;
-      margin-bottom:0.1cm;
-    }
-
-    /* الباركود في الوسط */
-    .sticker-barcode{
-      flex:1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      margin:-0.4cm 0 0 0; /* رفع الباركود ليكون في المنتصف تماماً */
-    }
-    .sticker-barcode img{
-      width:120%; /* زيادة عرض الباركود أكثر */
-      height:auto;
-      max-height:1.0cm; /* زيادة ارتفاع الباركود قليلاً */
-      image-rendering: crisp-edges;
-      image-rendering: pixelated;
-      display:block;
-    }
-
-    /* تفاصيل الجهاز بالأسفل: 3 أعمدة */
-    .rows{ 
-      display:flex; 
-      flex-direction:row; 
-      gap:0.1cm; 
-      justify-content:space-between;
-      margin-top: -0.35cm; /* رفع العناصر قليلاً أكثر */
-    }
-    .row2{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      font-size:2.5mm;
-      line-height:1.05;
-      text-align:center;
-      width: 33.333%;
-    }
+    :root { --card-bg:#fff; --muted:#cfcfcf; }
+    body { font-family:'Cairo',sans-serif; background:#f8f9fa; margin:0; padding:24px; }
+    .container { max-width:900px; margin:0 auto; }
+    .card { background:var(--card-bg); border:1px solid #e5e7eb; border-radius:12px; box-shadow:0 10px 20px rgba(0,0,0,.05); }
+    .card-header { padding:16px 20px; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; }
+    .card-header h3 { margin:0; font-size:1.1rem; font-weight:700; }
+    .card-body { padding:20px; }
+    .sticker-preview{ border:2px dashed var(--muted); padding:20px; background:#f9f9f9; border-radius:10px; display:flex; justify-content:center; margin-bottom:18px; }
+    .sticker{ width:6cm; height:3cm; background:#fff; border:1px solid #ddd; box-sizing:border-box; display:flex; flex-direction:column; padding:0.2cm; gap:0.15cm; }
+    .shop{ text-align:center; font-weight:700; font-size:4mm; line-height:1.1; margin-bottom:0.1cm; }
+    .sticker-barcode{ flex:1; display:flex; align-items:center; justify-content:center; margin:-0.4cm 0 0 0; }
+    .sticker-barcode canvas{ width:120%; height:auto; max-height:1.0cm; image-rendering:crisp-edges; image-rendering:pixelated; display:block; }
+    .rows{ display:flex; flex-direction:row; gap:0.1cm; justify-content:space-between; margin-top:-0.35cm; }
+    .row2{ display:flex; flex-direction:column; align-items:center; font-size:2.5mm; line-height:1.05; text-align:center; width:33.333%; }
     .label{ color:#222; font-weight:600; text-align:center; }
     .value{ color:#000; font-weight:700; text-align:center; }
-
-    /* أزرار */
-    .actions { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn {
-      appearance:none; border:0; padding:10px 14px; border-radius:10px; cursor:pointer;
-      font-weight:700; font-family:inherit;
-    }
-    .btn-primary { background:#10b981; color:#fff; }
-    .btn-outline { background:#fff; color:#111; border:1px solid #e5e7eb; }
-    .btn i { margin-left:8px; }
-
-    /* طباعة المتصفح (للزر "طباعة PDF") — سنحوّل إلى PDF أولاً ثم نطبع */
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{ appearance:none; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; font-family:inherit; }
+    .btn-primary{ background:#10b981; color:#fff; }
+    .btn-outline{ background:#fff; color:#111; border:1px solid #e5e7eb; }
+    .btn i{ margin-left:8px; }
     @page{ size:auto; margin:5mm; }
-    @media print{
-      .no-print { display:none !important; }
-    }
+    @media print{ .no-print{ display:none !important; } }
   </style>
 </head>
 <body>
   <div class="container">
-      <div class="card">
+    <div class="card">
       <div class="card-header">
         <h3>طباعة باركود الهاتف</h3>
         <div class="actions no-print">
-          <button id="btnDownloadPDF" class="btn btn-primary">
-            تحميل PDF <i class="fa fa-download"></i>
-          </button>
-          <button id="btnPrintPDF" class="btn btn-outline">
-            طباعة PDF <i class="fa fa-print"></i>
-          </button>
-          <button id="btnUpdateDevice" class="btn btn-outline">
-            تحديث بيانات الجهاز <i class="fa fa-edit"></i>
-          </button>
+          <button id="btnDownloadPDF" class="btn btn-primary">تحميل PDF <i class="fa fa-download"></i></button>
+          <button id="btnPrintPDF" class="btn btn-outline">طباعة PDF <i class="fa fa-print"></i></button>
           <a href="dashboard.html" class="btn btn-outline">العودة للوحة التحكم</a>
-            </div>
-          </div>
+        </div>
+      </div>
       <div class="card-body">
         <div class="sticker-preview">
-          <!-- الملصق الحقيقي (سيتم تصويره وتحويله إلى PDF) -->
           <div id="sticker" class="sticker">
-            <!-- اسم الشركة -->
             <div class="shop">الصقري للاتصالات</div>
-
-            <!-- الباركود -->
-            <div class="sticker-barcode">
-              <canvas id="barcode-canvas"></canvas>
-            </div>
-
-            <!-- التفاصيل -->
+            <div class="sticker-barcode"><canvas id="barcode-canvas"></canvas></div>
             <div class="rows">
               <div class="row2">
                 <div class="label">رقم الجهاز</div>
@@ -167,313 +75,177 @@
             </div>
           </div><!-- /sticker -->
         </div><!-- /preview -->
+      </div>
     </div>
   </div>
-</div>
 
 <script>
-    (function () {
-      // إعدادات الملصق النهائي على PDF: 40×25 ملم
-      const STICKER_MM = { w: 40, h: 25 };
-      const DPI = 300;                            // دقة ممتازة للطباعة
-      const PX_PER_MM = DPI / 25.4;
-      const TARGET_W = Math.round(STICKER_MM.w * PX_PER_MM);
-      const TARGET_H = Math.round(STICKER_MM.h * PX_PER_MM);
+(function(){
+  // Sticker output size
+  const STICKER_MM = { w:40, h:25 }, DPI = 300, PX_PER_MM = DPI/25.4;
+  const TARGET_W = Math.round(STICKER_MM.w * PX_PER_MM);
+  const TARGET_H = Math.round(STICKER_MM.h * PX_PER_MM);
 
-      const stickerEl = document.getElementById('sticker');
-      const btnDownload = document.getElementById('btnDownloadPDF');
-      const btnPrint = document.getElementById('btnPrintPDF');
+  const stickerEl = document.getElementById('sticker');
+  const btnDownload = document.getElementById('btnDownloadPDF');
+  const btnPrint = document.getElementById('btnPrintPDF');
 
-      if (!stickerEl) {
-        console.error('Sticker element not found!');
+  function generateBarcode(code){
+    const canvas = document.getElementById('barcode-canvas');
+    if(!canvas || !window.JsBarcode) return;
+    JsBarcode(canvas, String(code||'').trim(), {
+      format:"CODE128",
+      width:3,
+      height:35,
+      displayValue:false,
+      background:"#ffffff",
+      lineColor:"#000000"
+    });
+  }
+
+  async function captureStickerCanvas(){
+    const scaleX = TARGET_W / stickerEl.clientWidth;
+    const scaleY = TARGET_H / stickerEl.clientHeight;
+    const scale = Math.min(scaleX, scaleY);
+    return await html2canvas(stickerEl, {
+      backgroundColor:'#ffffff',
+      scale,
+      useCORS:true,
+      logging:false,
+      x:0, y:0,
+      width: stickerEl.clientWidth,
+      height: stickerEl.clientHeight
+    });
+  }
+
+  async function downloadPdf(){
+    const canvas = await captureStickerCanvas();
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:[STICKER_MM.w, STICKER_MM.h] });
+    doc.addImage(imgData, 'PNG', 0, 0, STICKER_MM.w, STICKER_MM.h, undefined, 'FAST');
+    const pn = document.getElementById('phone-number').textContent || 'phone';
+    doc.save(`barcode_${pn}.pdf`);
+  }
+
+  async function printPdf(){
+    const canvas = await captureStickerCanvas();
+    const imgData = canvas.toDataURL('image/png');
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:[STICKER_MM.w, STICKER_MM.h] });
+    doc.addImage(imgData, 'PNG', 0, 0, STICKER_MM.w, STICKER_MM.h, undefined, 'FAST');
+    const blobUrl = doc.output('bloburl');
+    const win = window.open(blobUrl);
+    if(!win){ alert('يرجى السماح بفتح النوافذ المنبثقة للطباعة.'); return; }
+    const onLoad = ()=>{ win.focus(); win.print(); };
+    if(win.document.readyState==='complete'){ onLoad(); } else { win.onload = onLoad; }
+  }
+
+  function valuesFromPhone(phone){
+    const phone_number = phone?.phone_number || phone?.barcode || phone?.id || '';
+    const memory = phone?.phone_memory || phone?.memory || phone?.storage || '-';
+    // priority: explicit battery_level → if new then 100 → if age exists show it as months → fallback '-'
+    let battery = '-';
+    if (phone?.battery_level != null && phone.battery_level !== '') battery = String(phone.battery_level);
+    else if (phone?.condition === 'new') battery = '100';
+    else if (phone?.age != null) battery = String(phone.age); // تم الحفظ من صفحة المستعمل كـ battery_level أيضاً
+    return { phone_number, memory, battery };
+  }
+
+  function fillSticker({phone_number, memory, battery}){
+    document.getElementById('phone-number').textContent = phone_number || '-';
+    document.getElementById('phone-memory').textContent = memory || '-';
+    document.getElementById('battery-level').textContent = battery || '-';
+    generateBarcode(phone_number || '-');
+  }
+
+  async function findPhoneByNumber(phoneNumber){
+    if(!phoneNumber) return null;
+
+    // 1) Fast handoff from add page
+    try{
+      const last = JSON.parse(localStorage.getItem('lastAddedPhone')||'null');
+      if(last && (String(last.phone_number)===String(phoneNumber))){
+        return last;
+      }
+    }catch{}
+
+    // 2) Firebase (if available)
+    try{
+      if(window.storage && window.storage.isFirebaseAvailable){
+        // If your API has a direct method, prefer it:
+        if(typeof window.storage.getPhoneByNumber === 'function'){
+          const one = await window.storage.getPhoneByNumber(String(phoneNumber));
+          if(one) return one;
+        }
+        // Otherwise scan list (supports object or array):
+        const all = await window.storage.getPhones();
+        if(all){
+          if(Array.isArray(all)){
+            const found = all.find(p => String(p.phone_number)===String(phoneNumber));
+            if(found) return found;
+          }else if(typeof all==='object'){
+            const found = Object.values(all).find(p => String(p.phone_number)===String(phoneNumber));
+            if(found) return found;
+          }
+        }
+      }
+    }catch(e){ console.warn('Firebase lookup failed:', e); }
+
+    // 3) LocalStorage fallback
+    try{
+      const arr = JSON.parse(localStorage.getItem('phones')||'[]');
+      if(Array.isArray(arr)){
+        const found = arr.find(p => String(p.phone_number)===String(phoneNumber));
+        if(found) return found;
+      }
+    }catch{}
+
+    return null;
+  }
+
+  async function loadPhoneData(){
+    // allow Firebase modules to initialize
+    await new Promise(r => setTimeout(r, 300));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const pn = urlParams.get('phone_number');
+
+    if(pn){
+      const phone = await findPhoneByNumber(pn);
+      if(phone){
+        fillSticker(valuesFromPhone(phone));
+        return;
+      }else{
+        // If not found anywhere, still show the code the user passed
+        fillSticker({ phone_number: pn, memory:'-', battery:'-' });
+        alert('لم يتم العثور على بيانات الهاتف في القاعدة، تم استخدام رقم الجهاز فقط.');
         return;
       }
+    }
 
-      // توليد رقم جهاز تلقائياً (6 أرقام)
-      function generateDeviceNumber() {
-        // الحصول على آخر رقم جهاز من localStorage أو البدء من 0
-        let lastNumber = localStorage.getItem('lastDeviceNumber');
-        if (!lastNumber) {
-          lastNumber = 0;
-        }
-        
-        // زيادة الرقم
-        const newNumber = parseInt(lastNumber) + 1;
-        
-        // تنسيق الرقم ليكون 6 أرقام (000001, 000002, إلخ)
-        const formattedNumber = newNumber.toString().padStart(6, '0');
-        
-        // حفظ الرقم الجديد
-        localStorage.setItem('lastDeviceNumber', newNumber.toString());
-        
-        console.log('🔢 تم توليد رقم جهاز جديد:', formattedNumber);
-        return formattedNumber;
+    // No ?phone_number= : try lastAddedPhone directly (user came here manually after adding)
+    try{
+      const last = JSON.parse(localStorage.getItem('lastAddedPhone')||'null');
+      if(last){
+        fillSticker(valuesFromPhone(last));
+        return;
       }
+    }catch{}
 
-
-      // جلب بيانات الهاتف من URL أو Firebase
-      async function loadPhoneData() {
-        try {
-          // محاولة جلب رقم الهاتف من URL
-          const urlParams = new URLSearchParams(window.location.search);
-          const phoneNumber = urlParams.get('phone_number');
-          
-          console.log('🔍 البحث عن الهاتف برقم:', phoneNumber);
-          
-          if (phoneNumber && window.storage) {
-            // البحث عن الهاتف في Firebase
-            const phones = await window.storage.getPhones();
-            console.log('📱 جميع الهواتف:', phones);
-            
-            const phone = phones.find(p => p.phone_number === phoneNumber);
-            console.log('✅ الهاتف الموجود:', phone);
-            
-            if (phone) {
-              // تحديث البيانات في الواجهة من بيانات الجوال المدخل فقط
-              document.getElementById('phone-number').textContent = phone.phone_number || '-';
-              
-              // تحديد نسبة البطارية حسب نوع الهاتف
-              let batteryLevel = '-';
-              if (phone.condition === 'new') {
-                batteryLevel = '100'; // هاتف جديد = 100%
-              } else if (phone.condition === 'used' && phone.age) {
-                batteryLevel = phone.age; // هاتف مستعمل = عمر الهاتف
-              } else if (phone.battery_level) {
-                batteryLevel = phone.battery_level; // استخدام القيمة المحفوظة
-              }
-              
-              // تحديد الذاكرة من قاعدة البيانات
-              let phoneMemory = '-';
-              if (phone.phone_memory) {
-                phoneMemory = phone.phone_memory;
-              } else if (phone.memory) {
-                phoneMemory = phone.memory;
-              } else if (phone.storage) {
-                phoneMemory = phone.storage;
-              }
-              
-              document.getElementById('battery-level').textContent = batteryLevel;
-              document.getElementById('phone-memory').textContent = phoneMemory;
-              
-              console.log('📊 بيانات الجوال المحدثة:', {
-                phone_number: phone.phone_number,
-                condition: phone.condition,
-                battery_level: batteryLevel,
-                age: phone.age,
-                phone_memory: phoneMemory,
-                all_phone_data: phone // عرض جميع البيانات للتأكد
-              });
-              
-              // توليد الباركود برقم الجوال المدخل فقط
-              generateBarcode(phone.phone_number);
-              return;
-            } else {
-              console.warn('❌ لم يتم العثور على الهاتف برقم:', phoneNumber);
-              alert('لم يتم العثور على الهاتف برقم: ' + phoneNumber);
-            }
-          } else {
-            // إذا لم يتم العثور على رقم الهاتف في URL، توليد رقم جديد
-            console.log('🆕 لم يتم العثور على رقم الهاتف في URL، توليد رقم جديد');
-            const newDeviceNumber = generateDeviceNumber();
-            
-            // تحديث البيانات في الواجهة
-            document.getElementById('phone-number').textContent = newDeviceNumber;
-            document.getElementById('battery-level').textContent = '100'; // افتراضي للهاتف الجديد
-            document.getElementById('phone-memory').textContent = '32GB'; // افتراضي
-            
-            console.log('📊 بيانات الجهاز الجديد:', {
-              phone_number: newDeviceNumber,
-              battery_level: '100',
-              phone_memory: '32GB'
-            });
-            
-            
-            // توليد الباركود برقم الجهاز الجديد
-            generateBarcode(newDeviceNumber);
-            return;
-          }
-          
-        } catch (error) {
-          console.error('❌ خطأ في جلب بيانات الهاتف:', error);
-          alert('حدث خطأ في جلب بيانات الهاتف: ' + error.message);
-        }
-      }
-
-      // توليد الباركود
-      function generateBarcode(phoneNumber) {
-        try {
-          // التحقق من وجود رقم الهاتف
-          if (!phoneNumber || phoneNumber === '-') {
-            console.error('❌ رقم الهاتف غير صحيح:', phoneNumber);
-            return;
-          }
-          
-          const canvas = document.getElementById('barcode-canvas');
-          if (canvas && window.JsBarcode) {
-            console.log('🔢 توليد الباركود برقم:', phoneNumber);
-            
-            JsBarcode(canvas, phoneNumber, {
-              format: "CODE128",
-              width: 3, /* زيادة عرض الخطوط أكثر */
-              height: 35, /* زيادة ارتفاع الباركود قليلاً */
-              displayValue: false,
-              background: "#ffffff",
-              lineColor: "#000000"
-            });
-            
-            console.log('✅ تم توليد الباركود بنجاح');
-    } else {
-            console.error('❌ Canvas أو JsBarcode غير متاح');
-          }
-        } catch (error) {
-          console.error('❌ خطأ في توليد الباركود:', error);
-        }
-      }
-
-      // نلتقط الملصق كصورة عالية الدقة (Canvas) عبر html2canvas
-      async function captureStickerCanvas() {
-        // نجعل الناتج يطابق أبعاد PDF بالبكسل (حتى لو المعاينة 6×3 سم)
-        const scaleX = TARGET_W / stickerEl.clientWidth;
-        const scaleY = TARGET_H / stickerEl.clientHeight;
-        const scale = Math.min(scaleX, scaleY);
-
-        return await html2canvas(stickerEl, {
-          backgroundColor: '#ffffff',
-          scale: scale,         // يرفع الدقة
-          useCORS: true,        // للسماح بتحميل صور من نفس الأصل
-          logging: false,
-          x: 0,
-          y: 0,
-          width: stickerEl.clientWidth,
-          height: stickerEl.clientHeight
-        });
-      }
-
-      // نصدر PDF بحجم 40×25 مم
-      async function exportPdfBlobUrl() {
-        const canvas = await captureStickerCanvas();
-        const imgData = canvas.toDataURL('image/png');
-
-        // نستخدم jsPDF بأبعاد الملصق (Landscape لأن العرض أكبر)
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-          orientation: 'landscape',
-          unit: 'mm',
-          format: [STICKER_MM.w, STICKER_MM.h]
-        });
-
-        // حساب الموضع ليكون في المنتصف تماماً
-        const imgWidth = STICKER_MM.w;
-        const imgHeight = STICKER_MM.h;
-        const x = 0;
-        const y = 0;
-
-        // نضيف الصورة لتملأ الصفحة بالكامل مع توسيط
-        doc.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight, undefined, 'FAST');
-
-        // نُعيد Blob URL لاستخدامه للتحميل أو الطباعة
-        return doc.output('bloburl');
-      }
-
-      // تحميل كملف
-      async function downloadPdf() {
-        const canvas = await captureStickerCanvas();
-        const imgData = canvas.toDataURL('image/png');
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
-          orientation: 'landscape',
-          unit: 'mm',
-          format: [STICKER_MM.w, STICKER_MM.h]
-        });
-        
-        // إضافة الصورة في المنتصف تماماً
-        doc.addImage(imgData, 'PNG', 0, 0, STICKER_MM.w, STICKER_MM.h, undefined, 'FAST');
-
-        // اسم الملف يتضمن رقم الجهاز
-        const phoneNumber = document.getElementById('phone-number').textContent || 'phone';
-        const fileName = `barcode_${phoneNumber}.pdf`;
-        doc.save(fileName);
-      }
-
-      // طباعة: نفتح في نافذة ونستدعي print()
-      async function printPdf() {
-        const url = await exportPdfBlobUrl();
-        const win = window.open(url);
-        if (!win) {
-          alert('يرجى السماح بفتح النوافذ المنبثقة للطباعة.');
-          return;
-        }
-        // ننتظر فتح النافذة ثم نطبع
-        const onLoad = () => {
-          win.focus();
-          win.print();
-        };
-        if (win.document.readyState === 'complete') {
-          onLoad();
-        } else {
-          win.onload = onLoad;
-        }
-      }
-
-      // تحديث بيانات الجهاز في قاعدة البيانات
-      async function updateDeviceInDatabase() {
-        try {
-          const phoneNumber = document.getElementById('phone-number').textContent;
-          const batteryLevel = document.getElementById('battery-level').textContent;
-          const phoneMemory = document.getElementById('phone-memory').textContent;
-          
-          if (!phoneNumber || phoneNumber === 'جاري التحميل...') {
-            alert('لا يوجد جهاز لتحديثه');
-            return;
-          }
-
-          if (!window.storage) {
-            alert('Firebase غير متاح');
-            return;
-          }
-
-          // تحديث بيانات الجهاز
-          const updatedDevice = {
-            phone_number: phoneNumber,
-            battery_level: batteryLevel,
-            phone_memory: phoneMemory,
-            updated_at: new Date().toISOString()
-          };
-
-          console.log('🔄 تحديث بيانات الجهاز:', updatedDevice);
-
-          // البحث عن الجهاز وتحديثه
-          const phones = await window.storage.getPhones();
-          const phoneIndex = phones.findIndex(p => p.phone_number === phoneNumber);
-          
-          if (phoneIndex !== -1) {
-            // تحديث الجهاز الموجود
-            phones[phoneIndex] = { ...phones[phoneIndex], ...updatedDevice };
-            await window.storage.updatePhone(phoneIndex, phones[phoneIndex]);
-            console.log('✅ تم تحديث بيانات الجهاز بنجاح');
-            alert('تم تحديث بيانات الجهاز بنجاح');
-          } else {
-            console.log('❌ لم يتم العثور على الجهاز للتحديث');
-            alert('لم يتم العثور على الجهاز للتحديث');
-          }
-
-        } catch (error) {
-          console.error('❌ خطأ في تحديث بيانات الجهاز:', error);
-          alert('حدث خطأ في تحديث بيانات الجهاز: ' + error.message);
-        }
-      }
-
-      // تحميل البيانات عند بدء الصفحة
-      document.addEventListener('DOMContentLoaded', loadPhoneData);
-
-      // أحداث الأزرار
-      btnDownload?.addEventListener('click', (e) => { e.preventDefault(); downloadPdf(); });
-      btnPrint?.addEventListener('click', (e) => { e.preventDefault(); printPdf(); });
-      
-      const btnUpdate = document.getElementById('btnUpdateDevice');
-      btnUpdate?.addEventListener('click', (e) => { e.preventDefault(); updateDeviceInDatabase(); });
+    // Finally, generate a new label if nothing provided
+    const generated = (() => {
+      let last = localStorage.getItem('lastDeviceNumber')||'0';
+      const next = (parseInt(last,10)+1); localStorage.setItem('lastDeviceNumber', String(next));
+      return String(next).padStart(6,'0');
     })();
+    fillSticker({ phone_number: generated, memory:'32GB', battery:'100' });
+  }
+
+  document.addEventListener('DOMContentLoaded', loadPhoneData);
+  btnDownload?.addEventListener('click', (e)=>{ e.preventDefault(); downloadPdf(); });
+  btnPrint?.addEventListener('click', (e)=>{ e.preventDefault(); printPdf(); });
+})();
 </script>
 </body>
 </html>
