@@ -1,0 +1,33 @@
+{
+  "name": "alsaqri-phones",
+  "version": "1.0.0",
+  "description": "الصقري للاتصالات - نظام إدارة متجر الهواتف الذكية",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "build": "echo 'No build step required for static site'",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "phone-store",
+    "inventory-management",
+    "arabic",
+    "saudi-arabia",
+    "pos-system",
+    "phone-shop"
+  ],
+  "author": "الصقري للاتصالات",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FLANsa/alsaqri-phones.git"
+  },
+  "homepage": "https://alsaqri-phones.onrender.com",
+  "engines": {
+    "node": ">=14.0.0",
+    "python": ">=3.7.0"
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}
