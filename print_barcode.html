@@ -72,12 +72,12 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      margin:0.02cm 0 0 0; /* رفع الباركود قليلاً أكثر */
+      margin:-0.05cm 0 0 0; /* رفع الباركود أكثر */
     }
     .sticker-barcode img{
-      width:90%; /* تكبير الباركود */
+      width:95%; /* تكبير الباركود في العرض */
       height:auto;
-      max-height:1.2cm; /* زيادة الارتفاع الأقصى */
+      max-height:0.8cm; /* تقصير الباركود (تقليل الارتفاع) */
       image-rendering: crisp-edges;
       image-rendering: pixelated;
       display:block;
@@ -236,8 +236,8 @@
           if (canvas && window.JsBarcode) {
             JsBarcode(canvas, phoneNumber, {
               format: "CODE128",
-              width: 2.5, /* تكبير عرض الخطوط */
-              height: 50, /* تكبير ارتفاع الباركود */
+              width: 3, /* تكبير عرض الخطوط أكثر */
+              height: 30, /* تقصير ارتفاع الباركود */
               displayValue: false,
               background: "#ffffff",
               lineColor: "#000000"
