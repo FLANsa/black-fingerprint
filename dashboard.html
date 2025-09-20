@@ -309,6 +309,88 @@
     }
   }
 
+  // ---------- أدوات مساعدة للوقت/التاريخ ----------
+  // يحوّل أي مدخل تاريخ (Date | ISO string | number | Firestore Timestamp | {seconds/_seconds, nanoseconds/_nanoseconds}) إلى Date صالح
+  function normalizeToDate(v) {
+    if (v == null) return null;
+
+    // 1) Date جاهز
+    if (v instanceof Date) {
+      return isNaN(v.getTime()) ? null : v;
+    }
+
+    // 2) Firestore Timestamp: toDate()
+    if (typeof v === 'object') {
+      if (typeof v.toDate === 'function') {
+        const d = v.toDate();
+        return isNaN(d?.getTime()) ? null : d;
+      }
+      // 3) شكل seconds/nanoseconds أو _seconds/_nanoseconds
+      if ('seconds' in v || '_seconds' in v) {
+        const sec  = Number(v.seconds ?? v._seconds ?? 0);
+        const nsec = Number(v.nanoseconds ?? v._nanoseconds ?? 0);
+        const ms = (sec * 1000) + Math.floor(nsec / 1e6);
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? null : d;
+      }
+    }
+
+    // 4) رقم: ms أو s
+    if (typeof v === 'number') {
+      const ms = v > 1e12 ? v : v * 1000; // إذا أقل من 1e12 نفترض ثواني
+      const d = new Date(ms);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // 5) سترنق: ISO أو رقمية
+    if (typeof v === 'string') {
+      const s = v.trim();
+      if (/^\d+$/.test(s)) {
+        const n = parseInt(s, 10);
+        const ms = n > 1e12 ? n : n * 1000;
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      const d = new Date(s); // مثل "2025-09-20T11:34:48.797Z"
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    return null;
+  }
+
+  // يرجّع أفضل تاريخ موجود في السجل
+  function getSaleDateValue(sale) {
+    return (
+      normalizeToDate(sale?.date_created) ||
+      normalizeToDate(sale?.date_added)   ||
+      normalizeToDate(sale?.createdAt)    ||
+      normalizeToDate(sale?.created_at)   ||
+      null
+    );
+  }
+
+  // تحويل الأرقام العربية إلى لاتينية — يدعم المدخلات الرقمية
+  function convertToLatinNumbers(input) {
+    if (input == null) return '';
+    const str = String(input);
+    const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+    return str.replace(/[٠-٩]/g, d => map[d] || d);
+  }
+
+  // التحقق من بيع الهاتف
+  function isPhoneSold(phoneId, salesData = []) {
+    try {
+      const sales = salesData.length > 0 ? salesData : JSON.parse(localStorage.getItem('sales') || '[]');
+      return sales.some(sale =>
+        Array.isArray(sale.items) &&
+        sale.items.some(item => item.type === 'phone' && (item.id === phoneId || item.phone_id === phoneId))
+      );
+    } catch (error) {
+      console.error('❌ خطأ في التحقق من بيع الهاتف:', error);
+      return false;
+    }
+  }
+
   // تحديث لوحة التحكم بالبيانات الحقيقية
   async function updateDashboard() {
     try {
@@ -329,16 +411,24 @@
         sales = JSON.parse(localStorage.getItem('sales') || '[]');
       }
 
-      // تحديث إحصائيات الهواتف
-      const totalPhones = phones.length;
-      const totalPurchaseValue = phones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
-      const totalSellingValue = phones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
+      // تصفية الهواتف المباعة - إبقاء الهواتف المتاحة فقط
+      const availablePhones = phones.filter(phone => {
+        const phoneId = phone.id || phone.phone_number;
+        return phoneId && !isPhoneSold(phoneId, sales);
+      });
+
+      console.log('📱 الهواتف المتاحة:', availablePhones.length, 'من أصل', phones.length);
+
+      // تحديث إحصائيات الهواتف (الهواتف المتاحة فقط)
+      const totalPhones = availablePhones.length;
+      const totalPurchaseValue = availablePhones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
+      const totalSellingValue = availablePhones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
       const totalExpectedProfit = totalSellingValue - totalPurchaseValue;
 
-      document.getElementById('total_phones').textContent = totalPhones;
-      document.getElementById('total_purchase_value').textContent = totalPurchaseValue.toFixed(2) + ' ريال';
-      document.getElementById('total_selling_value').textContent = totalSellingValue.toFixed(2) + ' ريال';
-      document.getElementById('total_expected_profit').textContent = totalExpectedProfit.toFixed(2) + ' ريال';
+      document.getElementById('total_phones').textContent = convertToLatinNumbers(totalPhones);
+      document.getElementById('total_purchase_value').textContent = convertToLatinNumbers(totalPurchaseValue.toFixed(2)) + ' ريال';
+      document.getElementById('total_selling_value').textContent = convertToLatinNumbers(totalSellingValue.toFixed(2)) + ' ريال';
+      document.getElementById('total_expected_profit').textContent = convertToLatinNumbers(totalExpectedProfit.toFixed(2)) + ' ريال';
 
 
       // تحديث إحصائيات المبيعات
@@ -347,15 +437,15 @@
       const totalSalesSubtotal = sales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
       const totalVatAmount = sales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
 
-      document.getElementById('total_sales_count').textContent = totalSales;
-      document.getElementById('total_sales_amount').textContent = totalSalesAmount.toFixed(0);
-      document.getElementById('total_sales_subtotal').textContent = totalSalesSubtotal.toFixed(2) + ' ريال';
-      document.getElementById('total_vat_amount').textContent = totalVatAmount.toFixed(2) + ' ريال';
-      document.getElementById('total_actual_profit').textContent = (totalSalesSubtotal * 0.2).toFixed(2) + ' ريال'; // تقدير 20% ربح
+      document.getElementById('total_sales_count').textContent = convertToLatinNumbers(totalSales);
+      document.getElementById('total_sales_amount').textContent = convertToLatinNumbers(totalSalesAmount.toFixed(0));
+      document.getElementById('total_sales_subtotal').textContent = convertToLatinNumbers(totalSalesSubtotal.toFixed(2)) + ' ريال';
+      document.getElementById('total_vat_amount').textContent = convertToLatinNumbers(totalVatAmount.toFixed(2)) + ' ريال';
+      document.getElementById('total_actual_profit').textContent = convertToLatinNumbers((totalSalesSubtotal * 0.2).toFixed(2)) + ' ريال'; // تقدير 20% ربح
 
       // حساب نسبة الربح
       const profitRatio = totalSalesSubtotal > 0 ? 20 : 0; // نسبة تقديرية
-      document.getElementById('profit_ratio').textContent = profitRatio.toFixed(1) + '%';
+      document.getElementById('profit_ratio').textContent = convertToLatinNumbers(profitRatio.toFixed(1)) + '%';
 
     } catch (error) {
       console.error('خطأ في تحديث لوحة التحكم:', error);
