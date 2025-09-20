@@ -100,30 +100,11 @@
           <!-- واجهة فقط: لا إرسال لخادم -->
           <form id="searchForm" action="#" onsubmit="handleSearch(event)">
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-12">
                 <div class="mb-3">
                   <label for="search_term" class="form-label">كلمة البحث</label>
                   <input type="text" class="form-control form-control-lg" id="search_term" name="search_term"
                          placeholder="أدخل الباركود، الرقم التسلسلي، اسم المنتج...">
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="mb-3">
-                  <label for="search_type" class="form-label">نوع البحث</label>
-                  <select class="form-select form-select-lg" id="search_type" name="search_type" onchange="toggleStatusFilter()">
-                    <option value="all">الكل</option>
-                    <option value="phones">الهواتف</option>
-                    <option value="accessories">الأكسسوارات</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <div class="mb-3">
-                  <label for="status_filter" class="form-label">حالة الهاتف</label>
-                  <select class="form-select form-select-lg" id="status_filter" name="status_filter" style="display: none;">
-                    <option value="all">الكل</option>
-                    <option value="available">متاح</option>
-                  </select>
                 </div>
               </div>
             </div>
@@ -181,24 +162,14 @@
     return arr.some(x => s.includes((x||'').toString().toLowerCase()));
   }
 
-  // ===== إظهار/إخفاء فلتر الحالة =====
-  function toggleStatusFilter() {
-    const searchType = document.getElementById('search_type').value;
-    const statusFilter = document.getElementById('status_filter');
-    
-    if (searchType === 'phones') {
-      statusFilter.style.display = 'block';
-    } else {
-      statusFilter.style.display = 'none';
-    }
-  }
+  // (تمت إزالة عناصر نوع البحث وحالة الهاتف من واجهة البحث)
 
   // ===== منطق البحث من قاعدة البيانات =====
   async function handleSearch(e){
     e.preventDefault();
     const term = (document.getElementById('search_term').value || '').trim();
-    const type = document.getElementById('search_type').value || 'all';
-    const statusFilter = document.getElementById('status_filter').value || 'all';
+    const type = 'all';
+    const statusFilter = 'all';
 
     console.log('🔍 البحث عن:', term, 'نوع:', type, 'حالة:', statusFilter);
 
@@ -229,7 +200,7 @@
       let phones = [];
       let accessories = [];
 
-      if (type === 'all' || type === 'phones') {
+      if (true) {
         phones = allPhones.filter(p => {
           
           // البحث في النص
@@ -239,7 +210,7 @@
         });
       }
 
-      if (type === 'all' || type === 'accessories') {
+      if (true) {
         accessories = allAccessories.filter(a => {
           const searchText = `${a.name || ''} ${a.arabic_name || ''} ${a.category || ''}`.toLowerCase();
           console.log('🔍 البحث في الأكسسوار:', a.name || a.arabic_name, 'النص:', searchText);
