@@ -385,11 +385,8 @@
   function editPhone(phoneNumber) {
     const phone = allPhones.find(p => p.phone_number === phoneNumber || p.id === phoneNumber);
     if (phone) {
-      if (phone.condition === 'new' || phone.phone_type === 'new') {
-        window.location.href = `add_new_phone.html?edit=${phoneNumber}`;
-      } else {
-        window.location.href = `add_used_phone.html?edit=${phoneNumber}`;
-      }
+      // توجيه إلى صفحة التعديل المخصصة
+      window.location.href = `edit_phone.html?edit=${phoneNumber}`;
     }
   }
 
