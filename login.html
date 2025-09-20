@@ -112,13 +112,23 @@
     }
 
     // بيانات المستخدمين الافتراضية (يمكن تطويرها لاحقاً)
+    // كلمات المرور مخزنة كقِيَم SHA-256 (ليس نصاً واضحاً)
     const validUsers = [
-      { username: 'admin', password: 'admin123', name: 'مدير النظام', role: 'admin', dashboard: 'dashboard.html' },
-      { username: 'user', password: 'user123', name: 'موظف المبيعات', role: 'user', dashboard: 'limited_dashboard.html' }
+      { username: 'admin', passwordHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', name: 'مدير النظام', role: 'admin', dashboard: 'dashboard.html' },
+      { username: 'user',  passwordHash: 'e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446', name: 'موظف المبيعات', role: 'user',  dashboard: 'limited_dashboard.html' }
     ];
 
-    // البحث عن المستخدم
-    const user = validUsers.find(u => u.username === username && u.password === password);
+    // حساب SHA-256 محلياً لكلمة المرور المدخلة ثم المقارنة مع المخزن
+    async function sha256Hex(text){
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest('SHA-256', enc);
+      const bytes = Array.from(new Uint8Array(buf));
+      return bytes.map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    (async () => {
+      const inputHash = await sha256Hex(password);
+      const user = validUsers.find(u => u.username === username && u.passwordHash === inputHash);
 
     if (user) {
       // حفظ بيانات المستخدم في التخزين المحلي
@@ -141,6 +151,7 @@
     } else {
       showAlert('danger', 'اسم المستخدم أو كلمة المرور غير صحيحة');
     }
+    })();
   }
 
   // التحقق من تسجيل الدخول عند تحميل الصفحة
