@@ -651,7 +651,6 @@
         <div id="tax-qr" aria-label="QR code for tax number"></div>
       </div>
       <p>شكرا لزيارتكم الصقري للإتصالات</p>
-      <p>تاريخ الطباعة: <span id="print-date"></span></p>
     </div>
   </div>
 </div>
@@ -704,8 +703,6 @@
   document.addEventListener('DOMContentLoaded', async () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // تعيين تاريخ الطباعة عند تحميل الصفحة (اليوم فقط)
-    setPrintDate();
     
     // إنشاء QR Code للرقم الضريبي (مع تأخير للتأكد من تحميل المكتبة)
     setTimeout(() => {
@@ -930,8 +927,6 @@
       return;
     }
 
-    // تحديث تاريخ الطباعة (اليوم فقط)
-    setPrintDate();
     populateReceiptTemplate();
     
     // التأكد من جاهزية QR Code للطباعة
@@ -1058,13 +1053,6 @@
     document.getElementById('receipt_total').textContent = totalAmount.toFixed(2) + ' ريال';
   }
 
-  // ✅ تعيين تاريخ الطباعة = اليوم فقط (لاتيني) بتوقيت الرياض
-  function setPrintDate() {
-    const printDateElement = document.getElementById('print-date');
-    if (printDateElement) {
-      printDateElement.textContent = todayRiyadh();
-    }
-  }
 
   // --- QR: constants ---
   const TAX_NUMBER = "310105614500003";
