@@ -421,9 +421,26 @@
 
       // تحديث إحصائيات الهواتف (الهواتف المتاحة فقط)
       const totalPhones = availablePhones.length;
-      const totalPurchaseValue = availablePhones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
-      const totalSellingValue = availablePhones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
+      
+      // حساب القيم للهواتف المتاحة فقط
+      const phonesPurchaseValue = availablePhones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
+      const phonesSellingValue = availablePhones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
+      
+      // حساب القيم للأكسسوارات المتاحة (الكمية > 0)
+      const availableAccessories = accessories.filter(acc => (acc.quantity_in_stock || acc.quantity || 0) > 0);
+      const accessoriesPurchaseValue = availableAccessories.reduce((sum, acc) => sum + (acc.purchase_price || 0) * (acc.quantity_in_stock || acc.quantity || 0), 0);
+      const accessoriesSellingValue = availableAccessories.reduce((sum, acc) => sum + (acc.selling_price || 0) * (acc.quantity_in_stock || acc.quantity || 0), 0);
+      
+      // إجمالي القيم (هواتف + أكسسوارات)
+      const totalPurchaseValue = phonesPurchaseValue + accessoriesPurchaseValue;
+      const totalSellingValue = phonesSellingValue + accessoriesSellingValue;
       const totalExpectedProfit = totalSellingValue - totalPurchaseValue;
+
+      console.log('📱 الهواتف المتاحة:', availablePhones.length, 'من أصل', phones.length);
+      console.log('📦 الأكسسوارات المتاحة:', availableAccessories.length, 'من أصل', accessories.length);
+      console.log('💰 قيمة شراء الهواتف:', phonesPurchaseValue);
+      console.log('💰 قيمة شراء الأكسسوارات:', accessoriesPurchaseValue);
+      console.log('💰 إجمالي القيمة الشرائية:', totalPurchaseValue);
 
       document.getElementById('total_phones').textContent = convertToLatinNumbers(totalPhones);
       document.getElementById('total_purchase_value').textContent = convertToLatinNumbers(totalPurchaseValue.toFixed(2)) + ' ريال';
