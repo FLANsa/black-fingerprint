@@ -342,19 +342,30 @@
       productSelect.innerHTML = '<option value="">اختر المنتج</option>';
 
       if (productType === 'phone') {
-        phones.forEach(phone => {
+        // فلترة الهواتف المتاحة فقط (استبعاد المباعة)
+        const availablePhones = phones.filter(phone => (phone.status || 'available') === 'available');
+        
+        if (availablePhones.length === 0) {
           const option = document.createElement('option');
-          option.value = phone.id || phone.phone_number;
-          const manufacturer = phone.manufacturer || phone.brand;
-          const model = phone.model;
-          const barcode = phone.phone_number || phone.serial_number;
-          option.textContent = `${manufacturer} ${model} - باركود: ${barcode}`;
-          option.setAttribute('data-price', phone.selling_price);
-          option.setAttribute('data-name', `${manufacturer} ${model}`);
-          option.setAttribute('data-description', phone.description || '');
-          option.setAttribute('data-barcode', barcode);
+          option.value = '';
+          option.textContent = 'لا توجد هواتف متاحة للبيع';
+          option.disabled = true;
           productSelect.appendChild(option);
-        });
+        } else {
+          availablePhones.forEach(phone => {
+            const option = document.createElement('option');
+            option.value = phone.id || phone.phone_number;
+            const manufacturer = phone.manufacturer || phone.brand;
+            const model = phone.model;
+            const barcode = phone.phone_number || phone.serial_number;
+            option.textContent = `${manufacturer} ${model} - باركود: ${barcode}`;
+            option.setAttribute('data-price', phone.selling_price);
+            option.setAttribute('data-name', `${manufacturer} ${model}`);
+            option.setAttribute('data-description', phone.description || '');
+            option.setAttribute('data-barcode', barcode);
+            productSelect.appendChild(option);
+          });
+        }
       } else {
         // البحث عن الأكسسوارات التي تطابق الفئة المختارة
         accessories.forEach(acc => {
@@ -522,8 +533,9 @@
         return;
       }
 
-      // البحث في الهواتف
-      const foundPhone = phones.find(phone => {
+      // البحث في الهواتف المتاحة فقط
+      const availablePhones = phones.filter(phone => (phone.status || 'available') === 'available');
+      const foundPhone = availablePhones.find(phone => {
         const phoneBarcode = phone.phone_number || phone.serial_number;
         return phoneBarcode && phoneBarcode.toString() === barcode;
       });
@@ -545,11 +557,25 @@
         `;
         resultDiv.style.display = 'block';
       } else {
-        resultDiv.innerHTML = `
-          <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i> لم يتم العثور على هاتف بالباركود: ${barcode}
-          </div>
-        `;
+        // التحقق من وجود الهاتف في القائمة الكاملة (مباع أم لا)
+        const allPhones = phones.find(phone => {
+          const phoneBarcode = phone.phone_number || phone.serial_number;
+          return phoneBarcode && phoneBarcode.toString() === barcode;
+        });
+        
+        if (allPhones && allPhones.status === 'sold') {
+          resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="fas fa-times-circle"></i> هذا الهاتف تم بيعه مسبقاً ولا يمكن بيعه مرة أخرى
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i> لم يتم العثور على هاتف بالباركود: ${barcode}
+            </div>
+          `;
+        }
         resultDiv.style.display = 'block';
       }
     }
