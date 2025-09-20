@@ -274,34 +274,39 @@
   let currentFilteredSales = [];
 
   // ---------- أدوات مساعدة للوقت/التاريخ ----------
-  // يحوّل أي مدخل تاريخ (ISO string | number | Firestore Timestamp | object seconds/nanos) إلى كائن Date صالح
+  // يحوّل أي مدخل تاريخ (Date | ISO string | number | Firestore Timestamp | {seconds/_seconds, nanoseconds/_nanoseconds}) إلى Date صالح
   function normalizeToDate(v) {
     if (v == null) return null;
 
-    // Firestore Timestamp: له toDate()
+    // 1) Date جاهز
+    if (v instanceof Date) {
+      return isNaN(v.getTime()) ? null : v;
+    }
+
+    // 2) Firestore Timestamp: toDate()
     if (typeof v === 'object') {
       if (typeof v.toDate === 'function') {
         const d = v.toDate();
         return isNaN(d?.getTime()) ? null : d;
       }
-      // شكل seconds/nanoseconds
+      // 3) شكل seconds/nanoseconds أو _seconds/_nanoseconds
       if ('seconds' in v || '_seconds' in v) {
-        const sec = Number(v.seconds ?? v._seconds ?? 0);
-        const nsec = Number(v.nanoseconds ?? v.nsecs ?? 0);
+        const sec  = Number(v.seconds ?? v._seconds ?? 0);
+        const nsec = Number(v.nanoseconds ?? v._nanoseconds ?? 0);
         const ms = (sec * 1000) + Math.floor(nsec / 1e6);
         const d = new Date(ms);
         return isNaN(d.getTime()) ? null : d;
       }
     }
 
-    // رقم: قد يكون ms أو s
+    // 4) رقم: ms أو s
     if (typeof v === 'number') {
-      const ms = v > 1e12 ? v : v * 1000; // > ~2001-09-09
+      const ms = v > 1e12 ? v : v * 1000; // إذا أقل من 1e12 نفترض ثواني
       const d = new Date(ms);
       return isNaN(d.getTime()) ? null : d;
     }
 
-    // سترنق: قد تكون ISO أو رقمية
+    // 5) سترنق: ISO أو رقمية
     if (typeof v === 'string') {
       const s = v.trim();
       if (/^\d+$/.test(s)) {
@@ -310,33 +315,30 @@
         const d = new Date(ms);
         return isNaN(d.getTime()) ? null : d;
       }
-      const d = new Date(s);
+      const d = new Date(s); // مثل "2025-09-20T11:34:48.797Z"
       return isNaN(d.getTime()) ? null : d;
     }
 
     return null;
   }
 
-  // ترجّع Date مفضّلة للصف: date_created ثم date_added ثم created_at… الخ
+  // يرجّع أفضل تاريخ موجود في السجل
   function getSaleDateValue(sale) {
     return (
       normalizeToDate(sale?.date_created) ||
       normalizeToDate(sale?.date_added)   ||
+      normalizeToDate(sale?.createdAt)    || // حسب بياناتك
       normalizeToDate(sale?.created_at)   ||
-      normalizeToDate(sale?.createdAt)    ||
       null
     );
   }
 
-  // تحويل الأرقام العربية إلى لاتينية — يدعم المدخلات الرقمية أيضاً
+  // تحويل الأرقام العربية إلى لاتينية — يدعم المدخلات الرقمية
   function convertToLatinNumbers(input) {
     if (input == null) return '';
     const str = String(input);
-    const arabicToLatin = {
-      '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
-      '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
-    };
-    return str.replace(/[٠-٩]/g, d => arabicToLatin[d] || d);
+    const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+    return str.replace(/[٠-٩]/g, d => map[d] || d);
   }
 
   const fmtMoney = n => convertToLatinNumbers((Number(n)||0).toFixed(2));
