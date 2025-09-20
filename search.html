@@ -248,8 +248,8 @@
     const total = (phones?.length || 0) + (accessories?.length || 0);
     countEl.textContent = total;
 
+    wrap.classList.remove('d-none');
     if (total === 0){
-      wrap.classList.remove('d-none');
       body.innerHTML = `
         <div class="text-center py-4">
           <i class="fas fa-search fa-3x text-muted mb-3"></i>
@@ -549,8 +549,7 @@
       console.log('⚠️ Firebase غير متاح، استخدام localStorage');
     }
     
-    // تحميل جميع البيانات عند فتح الصفحة
-    await loadAllData();
+    // لا تُظهر النتائج افتراضياً — تُعرض فقط بعد البحث أو عند النقر على "عرض الكل"
   });
 </script>
 </body>
