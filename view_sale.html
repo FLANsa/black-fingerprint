@@ -109,14 +109,26 @@
     .qr-block {
       text-align: center;
       margin: 8px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     #tax-qr {
-      width: 120px; height: 120px;
+      width: 120px; 
+      height: 120px;
       margin: 0 auto 6px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #tax-qr img, #tax-qr canvas {
-      width: 120px; height: 120px; /* lock size for thermal printers */
-      display: block; margin: 0 auto;
+      width: 120px; 
+      height: 120px; /* lock size for thermal printers */
+      display: block; 
+      margin: 0 auto;
+      max-width: 100%;
+      max-height: 100%;
     }
     .qr-caption {
       font-size: 11px;
@@ -124,10 +136,26 @@
 
     /* Ensure visible in print */
     @media print {
-      #tax-qr, #tax-qr img, #tax-qr canvas {
-        width: 120px !important; height: 120px !important;
+      .qr-block {
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 8px auto !important;
       }
-      .qr-caption { font-size: 11px !important; }
+      #tax-qr, #tax-qr img, #tax-qr canvas {
+        width: 120px !important; 
+        height: 120px !important;
+        display: block !important;
+        margin: 0 auto !important;
+        text-align: center !important;
+      }
+      .qr-caption { 
+        font-size: 11px !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+      }
     }
     
     @media print {
@@ -147,6 +175,31 @@
         color: black !important;
         background: white !important;
         page-break-inside: avoid !important;
+      }
+      
+      .receipt-template .qr-block {
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 8px auto !important;
+        width: 100% !important;
+      }
+      
+      .receipt-template #tax-qr {
+        margin: 0 auto !important;
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+      
+      .receipt-template #tax-qr img,
+      .receipt-template #tax-qr canvas {
+        margin: 0 auto !important;
+        display: block !important;
+        text-align: center !important;
       }
       
       .receipt-header {
