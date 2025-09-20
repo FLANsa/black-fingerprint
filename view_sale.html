@@ -1,406 +1,911 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>تفاصيل عملية البيع — الصقري للاتصالات</title>
 
-  <!-- نفس الخطوط/المكتبات -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
   <style>
-    body { font-family: 'Cairo', sans-serif; background:#f8f9fa; }
-    .card { box-shadow: 0 2px 6px rgba(0,0,0,.08); }
-    /* قسيمة الطباعة (مخفية بالشاشة) */
-    .receipt-template { display: none; }
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
+    .navbar { 
+      background-color: #2c3e50; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1030; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar-brand, .nav-link { color: white !important; }
+    .card { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-primary { background-color: #2c3e50; border-color: #2c3e50; }
+    .btn-primary:hover { background-color: #1a252f; border-color: #1a252f; }
+    
+    /* Receipt roll printer styles */
+    .receipt-template {
+      display: none;
+    }
+    
     @media print {
-      .container, .btn, .d-flex, .card { display:none !important; }
+      .container, .btn, .d-flex, .card {
+        display: none !important;
+      }
+      
       .receipt-template {
-        display:block !important; width:80mm !important; max-width:80mm !important;
-        margin:0 auto !important; padding:5mm !important; font-family:'Courier New',monospace !important;
-        font-size:12px !important; line-height:1.2 !important; color:#000 !important; background:#fff !important;
+        display: block !important;
+        width: 80mm !important;
+        max-width: 80mm !important;
+        margin: 0 auto !important;
+        padding: 5mm !important;
+        font-family: 'Courier New', monospace !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+        color: black !important;
+        background: white !important;
         page-break-inside: avoid !important;
       }
-      .receipt-header{ text-align:center !important; margin-bottom:20px !important; border-bottom:1px dashed #000 !important; padding-bottom:15px !important; }
-      .company-info h1{ font-size:18px !important; margin:0 0 10px !important; font-weight:bold !important; }
-      .company-info p, .sale-info p, .customer-info p{ margin:3px 0 !important; font-size:11px !important; }
-      .sale-info h2{ font-size:16px !important; margin:15px 0 10px !important; font-weight:bold !important; }
-      .customer-info h3, .receipt-items h3{ font-size:14px !important; margin:15px 0 8px !important; font-weight:bold !important; text-align:center !important;}
-      .items-table{ width:100% !important; border-collapse:collapse !important; font-size:10px !important; }
-      .items-table th{ border-bottom:1px solid #000 !important; padding:5px 2px !important; text-align:center !important; font-weight:bold !important; }
-      .items-table td{ padding:3px 2px !important; text-align:center !important; border-bottom:1px dotted #ccc !important; }
-      .receipt-summary{ margin:20px 0 !important; border-top:1px dashed #000 !important; padding-top:15px !important; }
-      .summary-row{ display:flex !important; justify-content:space-between !important; margin:8px 0 !important; font-size:12px !important; }
-      .summary-row.total{ font-weight:bold !important; font-size:14px !important; border-top:1px solid #000 !important; padding-top:8px !important; margin-top:15px !important; }
-      .receipt-footer{ text-align:center !important; margin-top:25px !important; border-top:1px dashed #000 !important; padding-top:15px !important; }
-      .receipt-footer p{ margin:5px 0 !important; font-size:11px !important; }
-      .receipt-header, .receipt-items, .receipt-summary, .receipt-footer{ page-break-inside:avoid !important; }
-      @page{ size:80mm auto !important; margin:5mm !important; }
-      *{ -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
+      
+      .receipt-header {
+        text-align: center !important;
+        margin-bottom: 20px !important;
+        border-bottom: 1px dashed #000 !important;
+        padding-bottom: 15px !important;
+      }
+      
+      .company-info h1 {
+        font-size: 18px !important;
+        margin: 0 0 10px 0 !important;
+        font-weight: bold !important;
+        color: black !important;
+      }
+      
+      .company-info p {
+        margin: 3px 0 !important;
+        font-size: 11px !important;
+        color: black !important;
+      }
+      
+      .sale-info h2 {
+        font-size: 16px !important;
+        margin: 15px 0 10px 0 !important;
+        font-weight: bold !important;
+        color: black !important;
+      }
+      
+      .sale-info p {
+        margin: 3px 0 !important;
+        font-size: 11px !important;
+        color: black !important;
+      }
+      
+      .customer-info h3 {
+        font-size: 14px !important;
+        margin: 15px 0 8px 0 !important;
+        font-weight: bold !important;
+        color: black !important;
+      }
+      
+      .customer-info p {
+        margin: 2px 0 !important;
+        font-size: 11px !important;
+        color: black !important;
+      }
+      
+      .receipt-items {
+        margin: 20px 0 !important;
+      }
+      
+      .receipt-items h3 {
+        font-size: 14px !important;
+        margin: 0 0 10px 0 !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        color: black !important;
+      }
+      
+      .items-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 10px !important;
+        color: black !important;
+      }
+      
+      .items-table th {
+        border-bottom: 1px solid #000 !important;
+        padding: 5px 2px !important;
+        text-align: center !important;
+        font-weight: bold !important;
+        color: black !important;
+      }
+      
+      .items-table td {
+        padding: 3px 2px !important;
+        text-align: center !important;
+        border-bottom: 1px dotted #ccc !important;
+        color: black !important;
+      }
+      
+      .receipt-summary {
+        margin: 20px 0 !important;
+        border-top: 1px dashed #000 !important;
+        padding-top: 15px !important;
+      }
+      
+      .summary-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        margin: 8px 0 !important;
+        font-size: 12px !important;
+        color: black !important;
+      }
+      
+      .summary-row.total {
+        font-weight: bold !important;
+        font-size: 14px !important;
+        border-top: 1px solid #000 !important;
+        padding-top: 8px !important;
+        margin-top: 15px !important;
+      }
+      
+      .receipt-footer {
+        text-align: center !important;
+        margin-top: 25px !important;
+        border-top: 1px dashed #000 !important;
+        padding-top: 15px !important;
+      }
+      
+      .receipt-footer p {
+        margin: 5px 0 !important;
+        font-size: 11px !important;
+        color: black !important;
+      }
+      
+      .receipt-header, .receipt-items, .receipt-summary, .receipt-footer {
+        page-break-inside: avoid !important;
+      }
+    }
+    
+    @media print {
+      @page {
+        size: 80mm auto !important;
+        margin: 5mm !important;
+      }
+      
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+      }
+      
+      * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
     }
   </style>
 </head>
 <body>
 
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-shopping-cart"></i> تفاصيل عملية البيع</h2>
-    <div>
-      <a href="list_sales.html" class="btn btn-secondary me-2">
-        <i class="fas fa-arrow-left"></i> العودة لقائمة المبيعات
-      </a>
-      <a href="dashboard.html" class="btn btn-primary">
-        <i class="fas fa-home"></i> لوحة التحكم
-      </a>
-    </div>
-  </div>
+  <!-- شريط التنقل -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">الصقري للاتصالات</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-  <!-- معلومات العملية -->
-  <div class="row">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="fas fa-info-circle"></i> معلومات العملية</h5>
-        </div>
-        <div class="card-body">
-          <table class="table table-borderless mb-0">
-            <tr><td><strong>رقم العملية:</strong></td><td><span id="sale_number_badge" class="badge bg-primary fs-6">—</span></td></tr>
-            <tr><td><strong>تاريخ الإنشاء:</strong></td><td id="sale_date">—</td></tr>
-            <tr><td><strong>الحالة:</strong></td><td id="sale_status">—</td></tr>
-            <tr><td><strong>طريقة الدفع:</strong></td><td id="sale_payment">—</td></tr>
-          </table>
-        </div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-boxes"></i> إدارة المخزون
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="inventory_summary.html"><i class="fas fa-chart-bar"></i> ملخص المخزون</a></li>
+              <li><a class="dropdown-item" href="add_new_phone.html"><i class="fas fa-mobile-alt"></i> إضافة هاتف جديد</a></li>
+              <li><a class="dropdown-item" href="add_used_phone.html"><i class="fas fa-mobile-alt"></i> إضافة هاتف مستعمل</a></li>
+              <li><a class="dropdown-item" href="add_accessory.html"><i class="fas fa-headphones"></i> إضافة إكسسوار</a></li>
+              <li><a class="dropdown-item" href="list_accessories_simple.html"><i class="fas fa-box"></i> مخزون الأكسسوارات</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-shopping-cart"></i> المبيعات
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="create_sale.html"><i class="fas fa-plus"></i> إنشاء عملية بيع جديدة</a></li>
+              <li><a class="dropdown-item" href="list_sales.html"><i class="fas fa-list"></i> قائمة المبيعات</a></li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="search.html"><i class="fas fa-search"></i> البحث</a>
+          </li>
+        </ul>
+
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="fas fa-shopping-cart"></i> تفاصيل عملية البيع</h2>
+      <div>
+        <a href="list_sales.html" class="btn btn-secondary me-2">
+          <i class="fas fa-arrow-left"></i> العودة لقائمة المبيعات
+        </a>
+        <a href="dashboard.html" class="btn btn-primary">
+          <i class="fas fa-home"></i> لوحة التحكم
+        </a>
       </div>
     </div>
 
-    <!-- معلومات العميل -->
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0"><i class="fas fa-user"></i> معلومات العميل</h5>
-        </div>
-        <div class="card-body">
-          <table class="table table-borderless mb-0">
-            <tr><td><strong>اسم العميل:</strong></td><td id="cust_name">—</td></tr>
-            <tr><td><strong>رقم الهاتف:</strong></td><td id="cust_phone">غير محدد</td></tr>
-            <tr><td><strong>البريد الإلكتروني:</strong></td><td id="cust_email">غير محدد</td></tr>
-            <tr><td><strong>العنوان:</strong></td><td id="cust_address">غير محدد</td></tr>
-          </table>
+    <!-- Sale Information -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> معلومات العملية</h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-borderless">
+              <tr>
+                <td><strong>رقم العملية:</strong></td>
+                <td><span class="badge bg-primary fs-6" id="sale_number">-</span></td>
+              </tr>
+              <tr>
+                <td><strong>تاريخ الإنشاء:</strong></td>
+                <td id="date_created">-</td>
+              </tr>
+              <tr>
+                <td><strong>الحالة:</strong></td>
+                <td id="status">-</td>
+              </tr>
+              <tr>
+                <td><strong>طريقة الدفع:</strong></td>
+                <td id="payment_method">-</td>
+              </tr>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- المنتجات -->
-  <div class="row mt-4">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header bg-info text-white">
-          <h5 class="mb-0"><i class="fas fa-box"></i> المنتجات المباعة</h5>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped align-middle mb-0">
-              <thead class="table-dark">
-                <tr>
-                  <th>نوع المنتج</th>
-                  <th>اسم المنتج</th>
-                  <th>الوصف</th>
-                  <th>الرقم التسلسلي</th>
-                  <th>سعر الوحدة</th>
-                  <th>الكمية</th>
-                  <th>السعر الإجمالي</th>
-                </tr>
-              </thead>
-              <tbody id="items_tbody">
-                <tr class="text-muted"><td colspan="7" class="text-center">—</td></tr>
-              </tbody>
+      
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-user"></i> معلومات العميل</h5>
+          </div>
+          <div class="card-body">
+            <table class="table table-borderless">
+              <tr>
+                <td><strong>اسم العميل:</strong></td>
+                <td id="customer_name">-</td>
+              </tr>
+              <tr>
+                <td><strong>رقم الهاتف:</strong></td>
+                <td id="customer_phone">-</td>
+              </tr>
+              <tr>
+                <td><strong>البريد الإلكتروني:</strong></td>
+                <td id="customer_email">-</td>
+              </tr>
+              <tr>
+                <td><strong>العنوان:</strong></td>
+                <td id="customer_address">-</td>
+              </tr>
             </table>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- الملخص المالي -->
-  <div class="row mt-4">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header bg-warning text-white">
-          <h5 class="mb-0"><i class="fas fa-calculator"></i> الملخص المالي</h5>
+    <!-- Sale Items -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-box"></i> المنتجات المباعة</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead class="table-dark">
+                  <tr>
+                    <th>نوع المنتج</th>
+                    <th>اسم المنتج</th>
+                    <th>الوصف</th>
+                    <th>الرقم التسلسلي</th>
+                    <th>سعر الوحدة</th>
+                    <th>الكمية</th>
+                    <th>السعر الإجمالي</th>
+                  </tr>
+                </thead>
+                <tbody id="sale_items">
+                  <!-- Items will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="row g-3">
-            <div class="col-md-4 text-center">
-              <div class="border rounded p-3">
-                <h6 class="text-muted">المجموع قبل الضريبة</h6>
-                <h4 class="text-primary" id="sum_subtotal">0.00 ريال</h4>
+      </div>
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header bg-warning text-white">
+            <h5 class="mb-0"><i class="fas fa-calculator"></i> الملخص المالي</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4 text-center">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted">المجموع قبل الضريبة</h6>
+                  <h4 class="text-primary" id="subtotal">0.00 ريال</h4>
+                </div>
               </div>
-            </div>
-            <div class="col-md-4 text-center">
-              <div class="border rounded p-3">
-                <h6 class="text-muted">مبلغ الضريبة (15%)</h6>
-                <h4 class="text-warning" id="sum_vat">0.00 ريال</h4>
+              <div class="col-md-4 text-center">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted">مبلغ الضريبة (15%)</h6>
+                  <h4 class="text-warning" id="vat_amount">0.00 ريال</h4>
+                </div>
               </div>
-            </div>
-            <div class="col-md-4 text-center">
-              <div class="border rounded p-3">
-                <h6 class="text-muted">المبلغ الإجمالي</h6>
-                <h4 class="text-success fw-bold" id="sum_total">0.00 ريال</h4>
+              <div class="col-md-4 text-center">
+                <div class="border rounded p-3">
+                  <h6 class="text-muted">المبلغ الإجمالي</h6>
+                  <h4 class="text-success fw-bold" id="total_amount">0.00 ريال</h4>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- الملاحظات (تظهر فقط إن وُجدت) -->
-  <div id="notes_card" class="row mt-4 d-none">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header bg-secondary text-white">
-          <h5 class="mb-0"><i class="fas fa-sticky-note"></i> الملاحظات</h5>
+    <!-- Notes -->
+    <div class="row mt-4" id="notes_section" style="display: none;">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0"><i class="fas fa-sticky-note"></i> الملاحظات</h5>
+          </div>
+          <div class="card-body">
+            <p class="mb-0" id="notes">-</p>
+          </div>
         </div>
-        <div class="card-body">
-          <p id="sale_notes" class="mb-0"></p>
-        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+      <div class="col-md-12 text-center">
+        <button class="btn btn-success btn-lg me-3" onclick="printReceipt()">
+          <i class="fas fa-print"></i> طباعة الفاتورة
+        </button>
+        <a href="create_sale.html" class="btn btn-primary btn-lg">
+          <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
+        </a>
       </div>
     </div>
   </div>
 
-  <!-- أزرار الإجراءات -->
-  <div class="row mt-4">
-    <div class="col-md-12 text-center">
-      <button class="btn btn-success btn-lg me-3" onclick="printReceipt()">
-        <i class="fas fa-print"></i> طباعة الفاتورة
-      </button>
-      <a href="create_sale.html" class="btn btn-primary btn-lg">
-        <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
-      </a>
+  <!-- Receipt Roll Printer Template -->
+  <div id="receipt-roll-template" class="receipt-template">
+    <div class="receipt-container">
+      <div class="receipt-header">
+        <div class="company-info">
+          <h1>الصقري للإتصالات</h1>
+          <p>AL SAQRI TELECOM</p>
+          <p>الجوال: 0505663222</p>
+          <p>الرقم الضريبي: 310105614500003</p>
+          <p>السجل التجاري: 1131281064</p>
+          <p>العنوان: القصيم بريده الصفراء</p>
+          <p>اسواق النافوره</p>
+        </div>
+        
+        <div class="sale-info">
+          <h2>فاتورة ضريبية مبسطة</h2>
+          <p>فاتورة: <span id="receipt_sale_number">-</span></p>
+          <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
+        </div>
+        
+        <div class="customer-info" id="receipt_customer_info" style="display: none;">
+          <h3>معلومات العميل</h3>
+          <p id="receipt_customer_name">-</p>
+          <p id="receipt_customer_phone">-</p>
+          <p>الرقم الضريبي: </p>
+        </div>
+      </div>
+      
+      <div class="receipt-items">
+        <h3>تفاصيل المنتجات</h3>
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>الكمية</th>
+              <th>المنتج</th>
+              <th>السعر غير شامل الضريبة</th>
+              <th>السعر شامل الضريبة</th>
+            </tr>
+          </thead>
+          <tbody id="receipt_items">
+            <!-- Items will be loaded here -->
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="receipt-summary">
+        <div class="summary-row">
+          <span>الاجمالي غير شامل الضريبة:</span>
+          <span id="receipt_subtotal">0.00 ريال</span>
+        </div>
+        <div class="summary-row">
+          <span>ضريبة القيمة المضافة 15%:</span>
+          <span id="receipt_vat">0.00 ريال</span>
+        </div>
+        <div class="summary-row total">
+          <span>الاجمالي شامل الضريبة:</span>
+          <span id="receipt_total">0.00 ريال</span>
+        </div>
+      </div>
+      
+      <div class="seller-info">
+        <p>اسم البائع: لؤي</p>
+      </div>
+      
+      <div class="receipt-footer">
+        <h4>سياسة الاستبدال والاسترجاع</h4>
+        <p>1) الاجهزة الجديدة ضمانها عند الوكيل</p>
+        <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
+        <p>في حال وجود عطل داخلي يشمل ضمان</p>
+        <p>المستخدم في حال وجود كامل الملحقات</p>
+        <div class="qr-placeholder">
+          <p>[QR Code]</p>
+        </div>
+        <p>شكرا لزيارتكم الصقري للإتصالات</p>
+        <p>تاريخ الطباعة: <span id="print-date"></span></p>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- قالب القسيمة (يُملأ من JS ويظهر فقط عند الطباعة) -->
-<div id="receipt-roll-template" class="receipt-template">
-  <div class="receipt-header">
-    <div class="company-info">
-      <h1 id="rc_company_name">—</h1>
-      <p>الرقم الضريبي: <span id="rc_company_vat">—</span></p>
-      <p id="rc_company_address">—</p>
-      <p>هاتف: <span id="rc_company_phone">—</span></p>
-    </div>
+  <!-- مكتبات JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <div class="sale-info">
-      <h2>فاتورة مبيعات</h2>
-      <p>رقم العملية: <span id="rc_sale_num">—</span></p>
-      <p>التاريخ: <span id="rc_sale_date">—</span></p>
-      <p>طريقة الدفع: <span id="rc_payment">—</span></p>
-    </div>
+  <!-- Firebase Configuration -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-database.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
 
-    <div id="rc_customer_block" class="customer-info" style="display:none;">
-      <h3>معلومات العميل</h3>
-      <p id="rc_cust_name" style="display:none;"></p>
-      <p id="rc_cust_phone" style="display:none;"></p>
-      <p id="rc_cust_address" style="display:none;"></p>
-    </div>
-  </div>
+  <script>
+    let currentSale = null;
 
-  <div class="receipt-items">
-    <h3>المنتجات المباعة</h3>
-    <table class="items-table" id="rc_items_table">
-      <thead>
-        <tr><th>المنتج</th><th>السعر</th><th>الكمية</th><th>المجموع</th></tr>
-      </thead>
-      <tbody id="rc_items_tbody"></tbody>
-    </table>
-  </div>
-
-  <div class="receipt-summary">
-    <div class="summary-row"><span>المجموع قبل الضريبة:</span><span id="rc_subtotal">0.00 ريال</span></div>
-    <div class="summary-row"><span>الضريبة (15%):</span><span id="rc_vat">0.00 ريال</span></div>
-    <div class="summary-row total"><span>المبلغ الإجمالي:</span><span id="rc_total">0.00 ريال</span></div>
-  </div>
-
-  <div class="receipt-footer">
-    <p>شكراً لزيارتكم</p>
-    <p>نتمنى لكم تجربة تسوق ممتعة</p>
-    <p>تاريخ الطباعة: <span id="print-date">—</span></p>
-  </div>
-</div>
-
-<!-- مكتبات JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- منطق الواجهة فقط -->
-<script>
-  // ==== بيانات تجريبية (واجهة فقط) — بدّلها لاحقاً ببيانات API ====
-  const demoSale = {
-    id: "S-1003",
-    sale_number: "S-1003",
-    date_created: "2025-09-01T14:20:00",
-    status: "مكتمل",            // مكتمل | ملغي | معلق
-    payment_method: "تحويل بنكي",
-    customer_name: "شركة الواصل",
-    customer_phone: "0555555555",
-    customer_email: "contact@wasel.sa",
-    customer_address: "الرياض - حي الملز",
-    items: [
-      { product_type:"phone", product_name:"Samsung S23", product_description:"256GB Black", serial_number:"SN456", unit_price:2200.00, quantity:1, total_price:2200.00 },
-      { product_type:"accessory", product_name:"غطاء شفاف", product_description:"", serial_number:"", unit_price:165.00, quantity:2, total_price:330.00 }
-    ],
-    subtotal: 2530.00 - 379.50, // 2150.50
-    vat_amount: 379.50,
-    total_amount: 2530.00,
-    notes: "تسليم خلال 24 ساعة",
-    company_name: "الصقري للاتصالات",
-    company_vat_number: "1234567890",
-    company_address: "الرياض، المملكة العربية السعودية",
-    company_phone: "011-0000000"
-  };
-
-  // قراءة بارامترات العنوان إن وُجدت (مثلاً ?id=...)
-  function getQueryParams(){
-    const p = new URLSearchParams(window.location.search);
-    return Object.fromEntries(p.entries());
-  }
-
-  const fmtMoney = n => (Number(n)||0).toFixed(2);
-  const formatDateTime = iso => {
-    const d = new Date(iso);
-    const pad = x => String(x).padStart(2,'0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  };
-
-  function badgeForStatus(status){
-    let cls = 'bg-warning';
-    if (status === 'مكتمل') cls = 'bg-success';
-    else if (status === 'ملغي') cls = 'bg-danger';
-    return `<span class="badge ${cls}">${status}</span>`;
-  }
-
-  function renderSale(sale){
-    // رأس معلومات العملية
-    document.getElementById('sale_number_badge').textContent = sale.sale_number || '—';
-    document.getElementById('sale_date').textContent = sale.date_created ? formatDateTime(sale.date_created) : '—';
-    document.getElementById('sale_status').innerHTML = badgeForStatus(sale.status || '-');
-    document.getElementById('sale_payment').textContent = sale.payment_method || '—';
-
-    // العميل
-    document.getElementById('cust_name').textContent = sale.customer_name || 'عميل نقدي';
-    document.getElementById('cust_phone').textContent = sale.customer_phone || 'غير محدد';
-    document.getElementById('cust_email').textContent = sale.customer_email || 'غير محدد';
-    document.getElementById('cust_address').textContent = sale.customer_address || 'غير محدد';
-
-    // العناصر
-    const tbody = document.getElementById('items_tbody');
-    tbody.innerHTML = '';
-    (sale.items || []).forEach(item => {
-      const tr = document.createElement('tr');
-      const typeBadge =
-        item.product_type === 'phone' ? '<span class="badge bg-primary">هاتف</span>' :
-        item.product_type === 'accessory' ? '<span class="badge bg-success">إكسسوار</span>' :
-        item.product_type === 'charger' ? '<span class="badge bg-warning">شاحن</span>' :
-        item.product_type === 'case' ? '<span class="badge bg-info">غلاف</span>' :
-        item.product_type === 'screen_protector' ? '<span class="badge bg-secondary">حماية شاشة</span>' :
-        `<span class="badge bg-dark">${item.product_type||'-'}</span>`;
-
-      tr.innerHTML = `
-        <td>${typeBadge}</td>
-        <td>${item.product_name||'-'}</td>
-        <td>${(item.product_description||'لا يوجد وصف') || '-'}</td>
-        <td>${item.serial_number || 'لا يوجد'}</td>
-        <td>${fmtMoney(item.unit_price)} ريال</td>
-        <td>${item.quantity||0}</td>
-        <td class="fw-bold text-success">${fmtMoney(item.total_price)} ريال</td>
-      `;
-      tbody.appendChild(tr);
+    // تحميل بيانات البيع من URL أو localStorage
+    document.addEventListener('DOMContentLoaded', async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const saleId = urlParams.get('id');
+      
+      if (saleId) {
+        await loadSaleData(saleId);
+      } else {
+        const lastSale = localStorage.getItem('lastSale');
+        if (lastSale) {
+          currentSale = JSON.parse(lastSale);
+          displaySaleData();
+        } else {
+          showAlert('warning', 'لم يتم العثور على بيانات البيع');
+        }
+      }
     });
 
-    // ملخص مالي
-    document.getElementById('sum_subtotal').textContent = `${fmtMoney(sale.subtotal)} ريال`;
-    document.getElementById('sum_vat').textContent = `${fmtMoney(sale.vat_amount)} ريال`;
-    document.getElementById('sum_total').textContent = `${fmtMoney(sale.total_amount)} ريال`;
-
-    // ملاحظات
-    const notesCard = document.getElementById('notes_card');
-    if (sale.notes && sale.notes.trim()){
-      document.getElementById('sale_notes').textContent = sale.notes;
-      notesCard.classList.remove('d-none');
-    } else {
-      notesCard.classList.add('d-none');
+    // تحميل بيانات البيع من Firebase
+    async function loadSaleData(saleId) {
+      try {
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const sales = await window.storage.getSales();
+          currentSale = sales.find(sale => sale.id === saleId);
+        } else {
+          const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+          currentSale = sales.find(sale => sale.id === saleId);
+        }
+        
+        if (currentSale) {
+          displaySaleData();
+        } else {
+          showAlert('danger', 'لم يتم العثور على عملية البيع المطلوبة');
+        }
+      } catch (error) {
+        console.error('خطأ في تحميل بيانات البيع:', error);
+        showAlert('danger', 'حدث خطأ في تحميل بيانات البيع');
+      }
     }
 
-    // تعبئة القسيمة للطباعة
-    fillReceiptTemplate(sale);
-  }
+    // عرض بيانات البيع
+    function displaySaleData() {
+      if (!currentSale) return;
 
-  function fillReceiptTemplate(sale){
-    // الشركة
-    document.getElementById('rc_company_name').textContent = sale.company_name || '';
-    document.getElementById('rc_company_vat').textContent = sale.company_vat_number || '';
-    document.getElementById('rc_company_address').textContent = sale.company_address || '';
-    document.getElementById('rc_company_phone').textContent = sale.company_phone || '';
+      document.getElementById('sale_number').textContent = currentSale.sale_number || currentSale.id;
+      document.getElementById('date_created').textContent = formatDate(currentSale.date_created || currentSale.date_added);
+      document.getElementById('status').innerHTML = getStatusBadge(currentSale.status || 'مكتمل');
+      document.getElementById('payment_method').textContent = currentSale.payment_method || 'نقدي';
 
-    // البيع
-    document.getElementById('rc_sale_num').textContent = sale.sale_number || '';
-    document.getElementById('rc_sale_date').textContent = sale.date_created ? formatDateTime(sale.date_created) : '';
-    document.getElementById('rc_payment').textContent = sale.payment_method || '';
+      document.getElementById('customer_name').textContent = currentSale.customer_name || 'عميل نقدي';
+      document.getElementById('customer_phone').textContent = currentSale.customer_phone || 'غير محدد';
+      document.getElementById('customer_email').textContent = currentSale.customer_email || 'غير محدد';
+      document.getElementById('customer_address').textContent = currentSale.customer_address || 'غير محدد';
 
-    // العميل (إظهار فقط إذا فيه بيانات مفيدة وليست "عميل نقدي")
-    const showCustomer = (sale.customer_name && sale.customer_name !== 'عميل نقدي') || sale.customer_phone || sale.customer_address;
-    const block = document.getElementById('rc_customer_block');
-    block.style.display = showCustomer ? 'block' : 'none';
+      displaySaleItems();
 
-    const nameEl = document.getElementById('rc_cust_name');
-    const phoneEl = document.getElementById('rc_cust_phone');
-    const addrEl = document.getElementById('rc_cust_address');
+      const subtotal = currentSale.subtotal || 0;
+      const vatAmount = currentSale.vat_amount || 0;
+      const totalAmount = currentSale.total_amount || 0;
 
-    if (sale.customer_name && sale.customer_name !== 'عميل نقدي'){ nameEl.style.display='block'; nameEl.textContent = `الاسم: ${sale.customer_name}`; } else { nameEl.style.display='none'; }
-    if (sale.customer_phone){ phoneEl.style.display='block'; phoneEl.textContent = `الهاتف: ${sale.customer_phone}`; } else { phoneEl.style.display='none'; }
-    if (sale.customer_address){ addrEl.style.display='block'; addrEl.textContent = `العنوان: ${sale.customer_address}`; } else { addrEl.style.display='none'; }
+      document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' ريال';
+      document.getElementById('vat_amount').textContent = vatAmount.toFixed(2) + ' ريال';
+      document.getElementById('total_amount').textContent = totalAmount.toFixed(2) + ' ريال';
 
-    // العناصر
-    const rcBody = document.getElementById('rc_items_tbody');
-    rcBody.innerHTML = '';
-    (sale.items || []).forEach(it => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${it.product_name||'-'}</td>
-        <td>${fmtMoney(it.unit_price)}</td>
-        <td>${it.quantity||0}</td>
-        <td>${fmtMoney(it.total_price)}</td>
+      if (currentSale.notes) {
+        document.getElementById('notes').textContent = currentSale.notes;
+        document.getElementById('notes_section').style.display = 'block';
+      }
+    }
+
+    // عرض منتجات البيع
+    function displaySaleItems() {
+      const itemsContainer = document.getElementById('sale_items');
+      itemsContainer.innerHTML = '';
+
+      if (currentSale.items && currentSale.items.length > 0) {
+        currentSale.items.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${getProductTypeBadge(item.product_type || item.type)}</td>
+            <td>${item.product_name || item.name}</td>
+            <td>${item.product_description || item.description || 'لا يوجد وصف'}</td>
+            <td>${item.serial_number || item.barcode || 'لا يوجد'}</td>
+            <td>${(item.unit_price || 0).toFixed(2)} ريال</td>
+            <td>${item.quantity || 1}</td>
+            <td class="fw-bold text-success">${(item.total_price || 0).toFixed(2)} ريال</td>
+          `;
+          itemsContainer.appendChild(row);
+        });
+      } else {
+        itemsContainer.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا توجد منتجات</td></tr>';
+      }
+    }
+
+    // الحصول على شارة نوع المنتج
+    function getProductTypeBadge(type) {
+      const badges = {
+        'phone': '<span class="badge bg-primary">هاتف</span>',
+        'accessory': '<span class="badge bg-success">إكسسوار</span>',
+        'charger': '<span class="badge bg-warning">شاحن</span>',
+        'case': '<span class="badge bg-info">غلاف</span>',
+        'screen_protector': '<span class="badge bg-secondary">حماية شاشة</span>'
+      };
+      return badges[type] || `<span class="badge bg-dark">${type}</span>`;
+    }
+
+    // الحصول على شارة الحالة
+    function getStatusBadge(status) {
+      if (status === 'مكتمل') {
+        return '<span class="badge bg-success">مكتمل</span>';
+      } else if (status === 'ملغي') {
+        return '<span class="badge bg-danger">ملغي</span>';
+      } else {
+        return '<span class="badge bg-warning">' + status + '</span>';
+      }
+    }
+
+    // تنسيق التاريخ
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleString('ar-SA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    // طباعة الفاتورة
+    function printReceipt() {
+      if (!currentSale) {
+        showAlert('warning', 'لا توجد بيانات للطباعة');
+        return;
+      }
+
+      setPrintDate();
+      populateReceiptTemplate();
+      
+      const printWindow = window.open('', '_blank');
+      const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
+      
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head>
+          <meta charset="UTF-8">
+          <title>فاتورة مبيعات</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              font-family: 'Arial', 'Tahoma', sans-serif;
+              font-size: 12px;
+              line-height: 1.4;
+              color: black;
+              background: white;
+              direction: rtl;
+              text-align: right;
+            }
+            
+            .receipt-container {
+              width: 80mm;
+              max-width: 80mm;
+              margin: 0 10mm 0 auto;
+              padding: 5mm;
+              box-sizing: border-box;
+            }
+            
+            .receipt-header {
+              text-align: center;
+              margin-bottom: 15px;
+              border-bottom: 1px solid #000;
+              padding-bottom: 10px;
+            }
+            
+            .company-info h1 {
+              font-size: 18px;
+              margin: 0 0 8px 0;
+              font-weight: bold;
+              text-align: center;
+            }
+            
+            .company-info p {
+              margin: 2px 0;
+              font-size: 11px;
+              text-align: center;
+            }
+            
+            .sale-info h2 {
+              font-size: 16px;
+              margin: 12px 0 8px 0;
+              font-weight: bold;
+              text-align: center;
+            }
+            
+            .sale-info p {
+              margin: 2px 0;
+              font-size: 11px;
+              text-align: center;
+            }
+            
+            .customer-info h3 {
+              font-size: 14px;
+              margin: 12px 0 6px 0;
+              font-weight: bold;
+              text-align: right;
+            }
+            
+            .customer-info p {
+              margin: 1px 0;
+              font-size: 11px;
+              text-align: right;
+            }
+            
+            .receipt-items {
+              margin: 15px 0;
+            }
+            
+            .receipt-items h3 {
+              font-size: 14px;
+              margin: 0 0 8px 0;
+              font-weight: bold;
+              text-align: center;
+            }
+            
+            .items-table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 9px;
+              margin: 8px 0;
+            }
+            
+            .items-table th {
+              border-bottom: 1px solid #000;
+              padding: 3px 1px;
+              text-align: center;
+              font-weight: bold;
+              font-size: 9px;
+            }
+            
+            .items-table td {
+              padding: 2px 1px;
+              text-align: center;
+              border-bottom: 1px dotted #ccc;
+              font-size: 9px;
+            }
+            
+            .receipt-summary {
+              margin: 15px 0;
+              border-top: 1px solid #000;
+              padding-top: 10px;
+            }
+            
+            .summary-row {
+              display: flex;
+              justify-content: space-between;
+              margin: 6px 0;
+              font-size: 11px;
+            }
+            
+            .seller-info {
+              margin: 10px 0;
+              text-align: right;
+              font-size: 11px;
+            }
+            
+            .seller-info p {
+              margin: 2px 0;
+            }
+            
+            .summary-row.total {
+              font-weight: bold;
+              font-size: 14px;
+              border-top: 1px solid #000;
+              padding-top: 8px;
+              margin-top: 15px;
+            }
+            
+            .receipt-footer {
+              text-align: center;
+              margin-top: 20px;
+              border-top: 1px solid #000;
+              padding-top: 10px;
+            }
+            
+            .receipt-footer h4 {
+              font-size: 12px;
+              margin: 0 0 8px 0;
+              font-weight: bold;
+            }
+            
+            .receipt-footer p {
+              margin: 3px 0;
+              font-size: 10px;
+            }
+            
+            .qr-placeholder {
+              text-align: center;
+              margin: 10px 0;
+              padding: 10px;
+              border: 1px dashed #000;
+            }
+            
+            .qr-placeholder p {
+              margin: 0;
+              font-size: 9px;
+            }
+            
+            @media print {
+              @page {
+                size: 80mm auto;
+                margin: 5mm;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${receiptContent}
+        </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      printWindow.focus();
+      
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 500);
+    }
+
+    // تعبئة قالب الفاتورة
+    function populateReceiptTemplate() {
+      if (!currentSale) return;
+
+      document.getElementById('receipt_sale_number').textContent = currentSale.sale_number || currentSale.id;
+      document.getElementById('receipt_date').textContent = formatDate(currentSale.date_created || currentSale.date_added);
+
+      const customerInfo = document.getElementById('receipt_customer_info');
+      if (currentSale.customer_name && currentSale.customer_name !== 'عميل نقدي') {
+        document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + currentSale.customer_name;
+        customerInfo.style.display = 'block';
+      }
+      if (currentSale.customer_phone) {
+        document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + currentSale.customer_phone;
+        customerInfo.style.display = 'block';
+      }
+
+      const receiptItems = document.getElementById('receipt_items');
+      receiptItems.innerHTML = '';
+      
+      if (currentSale.items && currentSale.items.length > 0) {
+        currentSale.items.forEach(item => {
+          const row = document.createElement('tr');
+          const unitPriceWithoutVAT = (item.unit_price || 0) / 1.15;
+          row.innerHTML = `
+            <td>${item.quantity || 1}</td>
+            <td>${item.product_name || item.name}</td>
+            <td>${unitPriceWithoutVAT.toFixed(2)}</td>
+            <td>${(item.unit_price || 0).toFixed(2)}</td>
+          `;
+          receiptItems.appendChild(row);
+        });
+      }
+
+      const subtotal = currentSale.subtotal || 0;
+      const vatAmount = currentSale.vat_amount || 0;
+      const totalAmount = currentSale.total_amount || 0;
+
+      document.getElementById('receipt_subtotal').textContent = subtotal.toFixed(2) + ' ريال';
+      document.getElementById('receipt_vat').textContent = vatAmount.toFixed(2) + ' ريال';
+      document.getElementById('receipt_total').textContent = totalAmount.toFixed(2) + ' ريال';
+    }
+
+    // تعيين تاريخ الطباعة
+    function setPrintDate() {
+      const now = new Date();
+      const dateStr = now.toLocaleString('ar-SA');
+      document.getElementById('print-date').textContent = dateStr;
+    }
+
+    // عرض التنبيهات
+    function showAlert(type, message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px;';
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
       `;
-      rcBody.appendChild(tr);
-    });
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.parentNode.removeChild(alertDiv);
+        }
+      }, 5000);
+    }
 
-    // المجاميع
-    document.getElementById('rc_subtotal').textContent = `${fmtMoney(sale.subtotal)} ريال`;
-    document.getElementById('rc_vat').textContent = `${fmtMoney(sale.vat_amount)} ريال`;
-    document.getElementById('rc_total').textContent = `${fmtMoney(sale.total_amount)} ريال`;
-  }
-
-  function setPrintDate() {
-    const now = new Date();
-    document.getElementById('print-date').textContent = now.toLocaleString('ar-SA');
-  }
-
-  function printReceipt(){
-    // نضبط تاريخ الطباعة ونستدعي نافذة الطباعة للصفحة الحالية (تُظهر القالب المطبوع فقط)
-    setPrintDate();
-    window.print();
-  }
-
-  // تهيئة
-  document.addEventListener('DOMContentLoaded', () => {
-    // في المستقبل: اجلب من API حسب ?id=...
-    const qp = getQueryParams();
-    // الآن نعرض البيانات التجريبية
-    renderSale(demoSale);
-  });
-</script>
+    // تسجيل الخروج
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        localStorage.removeItem('current_user');
+        window.location.href = 'login.html';
+      }
+    }
+  </script>
 </body>
 </html>
