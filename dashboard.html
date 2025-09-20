@@ -329,13 +329,10 @@
         sales = JSON.parse(localStorage.getItem('sales') || '[]');
       }
 
-      // تحديث إحصائيات الهواتف (فقط المتاحة)
-      const availablePhones = phones.filter(phone => (phone.status || 'available') === 'available');
-      const soldPhones = phones.filter(phone => phone.status === 'sold');
-      
-      const totalPhones = availablePhones.length;
-      const totalPurchaseValue = availablePhones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
-      const totalSellingValue = availablePhones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
+      // تحديث إحصائيات الهواتف
+      const totalPhones = phones.length;
+      const totalPurchaseValue = phones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
+      const totalSellingValue = phones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
       const totalExpectedProfit = totalSellingValue - totalPurchaseValue;
 
       document.getElementById('total_phones').textContent = totalPhones;
