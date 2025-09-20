@@ -142,6 +142,20 @@
             <h5 class="mb-0"><i class="fas fa-box"></i> إضافة المنتجات</h5>
           </div>
           <div class="card-body">
+            <!-- البحث بالباركود -->
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label for="barcode_search" class="form-label">البحث بالباركود (اختياري)</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="barcode_search" placeholder="أدخل رقم الباركود للبحث السريع" onkeypress="if(event.key==='Enter') searchByBarcode()">
+                  <button class="btn btn-outline-primary" type="button" onclick="searchByBarcode()">
+                    <i class="fas fa-search"></i> بحث
+                  </button>
+                </div>
+                <div id="barcode_search_result" class="mt-2" style="display: none;"></div>
+              </div>
+            </div>
+
             <!-- اختيار النوع والمنتج والكمية -->
             <div class="row mb-3">
               <div class="col-md-4">
@@ -289,11 +303,15 @@
       if (productType === 'phone') {
         phones.forEach(phone => {
           const option = document.createElement('option');
-          option.value = phone.id;
-          option.textContent = `${phone.brand} ${phone.model} - ${phone.serial_number}`;
+          option.value = phone.id || phone.phone_number;
+          const manufacturer = phone.manufacturer || phone.brand;
+          const model = phone.model;
+          const barcode = phone.phone_number || phone.serial_number;
+          option.textContent = `${manufacturer} ${model} - باركود: ${barcode}`;
           option.setAttribute('data-price', phone.selling_price);
-          option.setAttribute('data-name', `${phone.brand} ${phone.model}`);
+          option.setAttribute('data-name', `${manufacturer} ${model}`);
           option.setAttribute('data-description', phone.description || '');
+          option.setAttribute('data-barcode', barcode);
           productSelect.appendChild(option);
         });
       } else {
@@ -449,6 +467,79 @@
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCartDisplay();
+    }
+
+    // البحث بالباركود
+    function searchByBarcode() {
+      const barcode = document.getElementById('barcode_search').value.trim();
+      const resultDiv = document.getElementById('barcode_search_result');
+      
+      if (!barcode) {
+        resultDiv.style.display = 'none';
+        return;
+      }
+
+      // البحث في الهواتف
+      const foundPhone = phones.find(phone => {
+        const phoneBarcode = phone.phone_number || phone.serial_number;
+        return phoneBarcode && phoneBarcode.toString() === barcode;
+      });
+
+      if (foundPhone) {
+        const manufacturer = foundPhone.manufacturer || foundPhone.brand;
+        const model = foundPhone.model;
+        const price = foundPhone.selling_price;
+        
+        resultDiv.innerHTML = `
+          <div class="alert alert-success">
+            <h6><i class="fas fa-mobile-alt"></i> تم العثور على الهاتف:</h6>
+            <p><strong>${manufacturer} ${model}</strong></p>
+            <p>الباركود: ${barcode} | السعر: ${price} ريال</p>
+            <button class="btn btn-sm btn-primary" onclick="selectPhoneByBarcode('${foundPhone.id || foundPhone.phone_number}')">
+              <i class="fas fa-plus"></i> إضافة للسلة
+            </button>
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+      } else {
+        resultDiv.innerHTML = `
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> لم يتم العثور على هاتف بالباركود: ${barcode}
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+      }
+    }
+
+    // اختيار الهاتف بالباركود
+    function selectPhoneByBarcode(phoneId) {
+      const foundPhone = phones.find(phone => (phone.id || phone.phone_number) === phoneId);
+      if (!foundPhone) return;
+
+      const manufacturer = foundPhone.manufacturer || foundPhone.brand;
+      const model = foundPhone.model;
+      const barcode = foundPhone.phone_number || foundPhone.serial_number;
+      
+      // إضافة مباشرة للسلة
+      const product = {
+        id: phoneId,
+        type: 'phone',
+        name: `${manufacturer} ${model}`,
+        description: foundPhone.description || '',
+        unitPrice: parseFloat(foundPhone.selling_price),
+        quantity: 1,
+        totalPrice: parseFloat(foundPhone.selling_price)
+      };
+
+      cart.push(product);
+      updateCartDisplay();
+      
+      // إخفاء نتيجة البحث
+      document.getElementById('barcode_search_result').style.display = 'none';
+      document.getElementById('barcode_search').value = '';
+      
+      // إظهار رسالة نجاح
+      alert(`تم إضافة ${manufacturer} ${model} (باركود: ${barcode}) للسلة بنجاح!`);
     }
 
     // إعداد دعم الأرقام العربية
