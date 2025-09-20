@@ -268,20 +268,33 @@
             // phoneTypes is already in the correct object format from storage manager
             brandsData = phoneTypes;
             console.log('🏭 البيانات المحولة:', brandsData);
+          } else {
+            console.log('⚠️ لا توجد أنواع هواتف في قاعدة البيانات');
           }
         }
       }catch(e){ 
-        console.log('Fallback brands (no Firebase)', e); 
+        console.log('❌ خطأ في تحميل أنواع الهواتف من Firebase:', e); 
       }
 
       const brandSelect = document.getElementById('brand');
       const keep = Array.from(brandSelect.options).filter(o=>o.value===""||o.value==="other");
       brandSelect.innerHTML=''; keep.forEach(o=>brandSelect.appendChild(o));
-      Object.keys(brandsData).forEach(brand=>{
-        const opt=document.createElement('option'); opt.value=brand; opt.textContent=brand;
+      
+      if(Object.keys(brandsData).length > 0){
+        Object.keys(brandsData).forEach(brand=>{
+          const opt=document.createElement('option'); opt.value=brand; opt.textContent=brand;
+          brandSelect.insertBefore(opt, brandSelect.querySelector('option[value="other"]'));
+        });
+        console.log('✅ تم تحميل الشركات المصنعة بنجاح');
+      } else {
+        // إضافة رسالة توضيحية إذا لم توجد بيانات
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'لا توجد شركات مصنعة - اضغط "إضافة" لإضافة شركة جديدة';
+        opt.disabled = true;
         brandSelect.insertBefore(opt, brandSelect.querySelector('option[value="other"]'));
-      });
-      console.log('✅ تم تحميل الشركات المصنعة بنجاح');
+        console.log('ℹ️ لا توجد شركات مصنعة متاحة - يجب إضافتها يدوياً');
+      }
     }
     function updateModelOptions(){
       const brand=document.getElementById('brand').value;
@@ -291,6 +304,13 @@
         brandsData[brand].forEach(m=>{
           const o=document.createElement('option'); o.value=m; o.textContent=m; modelSelect.appendChild(o);
         });
+      } else if(brand && brand!=='other' && (!brandsData[brand] || brandsData[brand].length === 0)){
+        // إضافة رسالة توضيحية إذا لم توجد موديلات للشركة المختارة
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'لا توجد موديلات لهذه الشركة - اضغط "إضافة" لإضافة موديل جديد';
+        opt.disabled = true;
+        modelSelect.appendChild(opt);
       }
     }
     async function addPhoneType(){

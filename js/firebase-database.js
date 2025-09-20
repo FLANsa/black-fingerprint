@@ -396,44 +396,8 @@ class FirebaseDatabase {
   // ===== تهيئة البيانات الافتراضية =====
   async initializeDefaultData() {
     try {
-      // تهيئة أنواع الهواتف الافتراضية
-      const defaultPhoneTypes = [
-        { brand: 'Apple', model: 'iPhone 13' },
-        { brand: 'Apple', model: 'iPhone 14' },
-        { brand: 'Apple', model: 'iPhone 15' },
-        { brand: 'Apple', model: 'iPhone 15 Pro' },
-        { brand: 'Apple', model: 'iPhone 15 Pro Max' },
-        { brand: 'Samsung', model: 'Galaxy S22' },
-        { brand: 'Samsung', model: 'Galaxy S23' },
-        { brand: 'Samsung', model: 'Galaxy S24' },
-        { brand: 'Samsung', model: 'Galaxy S24 Ultra' },
-        { brand: 'Samsung', model: 'Galaxy A54' },
-        { brand: 'Samsung', model: 'Galaxy A34' },
-        { brand: 'Xiaomi', model: 'Redmi Note 12' },
-        { brand: 'Xiaomi', model: 'Redmi Note 13' },
-        { brand: 'Xiaomi', model: 'Mi 13' },
-        { brand: 'Xiaomi', model: 'Mi 14' },
-        { brand: 'Huawei', model: 'P60' },
-        { brand: 'Huawei', model: 'P60 Pro' },
-        { brand: 'Huawei', model: 'Mate 60' },
-        { brand: 'OnePlus', model: '11' },
-        { brand: 'OnePlus', model: '12' },
-        { brand: 'Google', model: 'Pixel 7' },
-        { brand: 'Google', model: 'Pixel 8' },
-        { brand: 'Oppo', model: 'Find X6' },
-        { brand: 'Oppo', model: 'Reno 10' },
-        { brand: 'Vivo', model: 'X90' },
-        { brand: 'Vivo', model: 'V29' }
-      ];
-
-      // التحقق من وجود أنواع الهواتف
-      const existingPhoneTypes = await this.getPhoneTypes();
-      if (existingPhoneTypes.length === 0) {
-        for (const phoneType of defaultPhoneTypes) {
-          await this.addPhoneType(phoneType);
-        }
-        console.log('✅ تم إضافة أنواع الهواتف الافتراضية');
-      }
+      // لا نضيف أنواع هواتف افتراضية - يجب إضافتها يدوياً من قاعدة البيانات
+      console.log('ℹ️ لا توجد أنواع هواتف افتراضية - يجب إضافتها يدوياً من قاعدة البيانات');
 
       // تهيئة فئات الأكسسوارات
       const defaultCategories = [
