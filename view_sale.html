@@ -9,8 +9,36 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   
-  <!-- QRCode.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- QRCode.js CDN - Multiple fallbacks -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" 
+          onerror="loadQRCodeFallback()"></script>
+  <script>
+    function loadQRCodeFallback() {
+      console.log('Loading QR code fallback...');
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      script.onload = function() {
+        console.log('QRCode fallback loaded successfully');
+        // Retry QR generation after fallback loads
+        setTimeout(generateTaxQR, 100);
+      };
+      script.onerror = function() {
+        console.error('Both QR code libraries failed to load');
+        showQRCodeError();
+      };
+      document.head.appendChild(script);
+    }
+    
+    function showQRCodeError() {
+      const container = document.getElementById('tax-qr');
+      const fallback = document.getElementById('tax-qr-fallback');
+      if (container && fallback) {
+        container.innerHTML = '';
+        fallback.classList.remove('d-none');
+        fallback.textContent = 'تعذر تحميل مكتبة QR Code';
+      }
+    }
+  </script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -436,8 +464,8 @@
   <!-- Receipt Roll Printer Template -->
 <div id="receipt-roll-template" class="receipt-template">
   <div class="receipt-container">
-    <div class="receipt-header">
-      <div class="company-info">
+  <div class="receipt-header">
+    <div class="company-info">
         <h1>الصقري للإتصالات</h1>
         <p>AL SAQRI TELECOM</p>
         <p>الجوال: 0505663222</p>
@@ -445,40 +473,40 @@
         <p>السجل التجاري: 1131281064</p>
         <p>العنوان: القصيم بريده الصفراء</p>
         <p>اسواق النافوره</p>
-      </div>
+    </div>
 
-      <div class="sale-info">
+    <div class="sale-info">
         <h2>فاتورة ضريبية مبسطة</h2>
         <p>فاتورة: <span id="receipt_sale_number">-</span></p>
         <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
-      </div>
+    </div>
 
       <div class="customer-info" id="receipt_customer_info" style="display: none;">
-        <h3>معلومات العميل</h3>
+      <h3>معلومات العميل</h3>
         <p id="receipt_customer_name">-</p>
         <p id="receipt_customer_phone">-</p>
         <p>الرقم الضريبي: </p>
-      </div>
     </div>
+  </div>
 
-    <div class="receipt-items">
+  <div class="receipt-items">
       <h3>تفاصيل المنتجات</h3>
       <table class="items-table">
-        <thead>
+      <thead>
           <tr>
             <th>الكمية</th>
             <th>المنتج</th>
             <th>السعر غير شامل الضريبة</th>
             <th>السعر شامل الضريبة</th>
           </tr>
-        </thead>
+      </thead>
         <tbody id="receipt_items">
           <!-- Items will be loaded here -->
         </tbody>
-      </table>
-    </div>
+    </table>
+  </div>
 
-    <div class="receipt-summary">
+  <div class="receipt-summary">
       <div class="summary-row">
         <span>الاجمالي غير شامل الضريبة:</span>
         <span id="receipt_subtotal">0.00 ريال</span>
@@ -495,9 +523,9 @@
       
     <div class="seller-info">
       <p>اسم البائع: لؤي</p>
-    </div>
+  </div>
 
-    <div class="receipt-footer">
+  <div class="receipt-footer">
       <h4>سياسة الاستبدال والاسترجاع</h4>
       <p>1) الاجهزة الجديدة ضمانها عند الوكيل</p>
       <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
@@ -507,7 +535,14 @@
         <div id="tax-qr" aria-label="QR code for tax number"></div>
         <div class="qr-caption">الرقم الضريبي: <span id="tax-number-text">310105614500003</span></div>
         <div class="qr-fallback d-none text-danger" id="tax-qr-fallback">
-          تعذّر إنشاء رمز QR — الرقم الضريبي: 310105614500003
+          <div class="text-center">
+            <i class="fas fa-qrcode fa-3x text-muted mb-2"></i>
+            <div class="small">تعذر إنشاء رمز QR</div>
+            <div class="small text-muted">الرقم الضريبي: 310105614500003</div>
+            <button class="btn btn-sm btn-outline-primary mt-2" onclick="retryQRGeneration()">
+              <i class="fas fa-redo"></i> إعادة المحاولة
+            </button>
+          </div>
         </div>
       </div>
       <p>شكرا لزيارتكم الصقري للإتصالات</p>
@@ -595,7 +630,7 @@
           customer_name: 'عميل تجريبي',
           customer_phone: '0501234567',
           payment_method: 'نقدي',
-          items: [
+    items: [
             { type: 'phone', name: 'iPhone 15', unitPrice: 4000, quantity: 1, totalPrice: 4000 }
           ],
           subtotal: 3478.26,
@@ -938,7 +973,7 @@
   // --- QR: constants ---
   const TAX_NUMBER = "310105614500003";
 
-  // Generate the QR into #tax-qr using the qrcode library
+  // Generate the QR into #tax-qr using available QR library
   function generateTaxQR() {
     const container = document.getElementById('tax-qr');
     const fallback  = document.getElementById('tax-qr-fallback');
@@ -949,21 +984,33 @@
       return;
     }
 
-    // Check if QRCode library is loaded
-    if (typeof QRCode === 'undefined') {
-      console.error('QRCode library not loaded');
-      if (fallback) fallback.classList.remove('d-none');
-      return;
+    // reset
+    container.innerHTML = '';
+    if (fallback) fallback.classList.add('d-none');
+    if (caption)  caption.textContent = TAX_NUMBER;
+
+    console.log('Generating QR code for:', TAX_NUMBER);
+
+    // Try different QR libraries
+    if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
+      // Use qrcode library (preferred)
+      console.log('Using qrcode library');
+      generateQRWithQRCodeLibrary(container, fallback);
+    } else if (typeof QRCode !== 'undefined' && QRCode.prototype) {
+      // Use QRCode.js library (fallback)
+      console.log('Using QRCode.js library');
+      generateQRWithQRCodeJS(container, fallback);
+    } else {
+      console.error('No QR code library available');
+      if (fallback) {
+        fallback.classList.remove('d-none');
+        fallback.textContent = 'تعذر تحميل مكتبة QR Code';
+      }
     }
+  }
 
+  function generateQRWithQRCodeLibrary(container, fallback) {
     try {
-      // reset
-      container.innerHTML = '';
-      if (fallback) fallback.classList.add('d-none');
-      if (caption)  caption.textContent = TAX_NUMBER;
-
-      console.log('Generating QR code for:', TAX_NUMBER);
-
       // Create canvas element
       const canvas = document.createElement('canvas');
       container.appendChild(canvas);
@@ -979,10 +1026,13 @@
         }
       }, function (error) {
         if (error) {
-          console.error('QR code generation failed:', error);
-          if (fallback) fallback.classList.remove('d-none');
+          console.error('QR code generation failed with qrcode library:', error);
+          if (fallback) {
+            fallback.classList.remove('d-none');
+            fallback.textContent = 'تعذر إنشاء رمز QR: ' + error.message;
+          }
         } else {
-          console.log('QR code generated successfully');
+          console.log('QR code generated successfully with qrcode library');
           // Convert canvas to image for better print compatibility
           const png = canvas.toDataURL('image/png');
           const imgEl = document.createElement('img');
@@ -994,11 +1044,80 @@
           container.appendChild(imgEl);
         }
       });
-
     } catch (err) {
-      console.error('QR generation failed:', err);
-      if (fallback) fallback.classList.remove('d-none');
+      console.error('QR generation failed with qrcode library:', err);
+      if (fallback) {
+        fallback.classList.remove('d-none');
+        fallback.textContent = 'تعذر إنشاء رمز QR: ' + err.message;
+      }
     }
+  }
+
+  function generateQRWithQRCodeJS(container, fallback) {
+    try {
+      // Use QRCode.js library
+      const qr = new QRCode(container, {
+        text: TAX_NUMBER,
+        width: 120,
+        height: 120,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      // Wait for QR to be generated, then convert to image
+      setTimeout(() => {
+        try {
+          const canvas = container.querySelector('canvas');
+          const img = container.querySelector('img');
+
+          if (img) {
+            console.log('QR code generated successfully with QRCode.js (as image)');
+            return;
+          }
+          if (canvas) {
+            console.log('Converting QRCode.js canvas to image');
+            const png = canvas.toDataURL('image/png');
+            const imgEl = document.createElement('img');
+            imgEl.src = png;
+            imgEl.alt = 'Tax QR';
+            imgEl.width = 120;
+            imgEl.height = 120;
+            container.innerHTML = '';
+            container.appendChild(imgEl);
+            console.log('QR code converted to image successfully');
+          } else {
+            console.warn('No canvas or img found after QRCode.js generation');
+            if (fallback) {
+              fallback.classList.remove('d-none');
+              fallback.textContent = 'تعذر إنشاء رمز QR - لم يتم العثور على العنصر';
+            }
+          }
+        } catch (innerErr) {
+          console.warn('QR canvas->img conversion failed:', innerErr);
+          if (fallback) {
+            fallback.classList.remove('d-none');
+            fallback.textContent = 'تعذر تحويل QR إلى صورة';
+          }
+        }
+      }, 200);
+    } catch (err) {
+      console.error('QR generation failed with QRCode.js:', err);
+      if (fallback) {
+        fallback.classList.remove('d-none');
+        fallback.textContent = 'تعذر إنشاء رمز QR: ' + err.message;
+      }
+    }
+  }
+
+  // Retry QR generation function
+  function retryQRGeneration() {
+    console.log('Retrying QR generation...');
+    const fallback = document.getElementById('tax-qr-fallback');
+    if (fallback) {
+      fallback.classList.add('d-none');
+    }
+    generateTaxQR();
   }
 
   // Ensure we have an <img> in the QR container before we clone HTML into the print window
