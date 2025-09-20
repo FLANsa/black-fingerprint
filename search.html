@@ -122,6 +122,9 @@
               <button type="submit" class="btn btn-primary btn-lg px-4">
                 <i class="fas fa-search"></i> بحث
               </button>
+              <button type="button" class="btn btn-secondary btn-lg px-4 ms-2" onclick="loadAllData()">
+                <i class="fas fa-list"></i> عرض الكل
+              </button>
             </div>
           </form>
         </div>
@@ -188,13 +191,18 @@
         console.log('🔥 تحميل البيانات من Firebase للبحث...');
         allPhones = await window.storage.getPhones();
         allAccessories = await window.storage.getAccessories();
+        console.log('📱 الهواتف المحملة:', allPhones);
+        console.log('📦 الأكسسوارات المحملة:', allAccessories);
       } else {
         console.log('💾 Firebase غير متاح، تحميل من localStorage...');
         allPhones = JSON.parse(localStorage.getItem('phones') || '[]');
         allAccessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        console.log('📱 الهواتف من localStorage:', allPhones);
+        console.log('📦 الأكسسوارات من localStorage:', allAccessories);
       }
 
       const tokens = term.toLowerCase().split(/\s+/);
+      console.log('🔤 الرموز المطلوب البحث عنها:', tokens);
 
       let phones = [];
       let accessories = [];
@@ -202,6 +210,7 @@
       if (type === 'all' || type === 'phones') {
         phones = allPhones.filter(p => {
           const searchText = `${p.phone_number || ''} ${p.manufacturer || p.brand || ''} ${p.model || ''} ${p.condition || p.phone_type || ''}`.toLowerCase();
+          console.log('🔍 البحث في الهاتف:', p.phone_number, 'النص:', searchText);
           return tokens.some(token => searchText.includes(token));
         });
       }
@@ -209,11 +218,14 @@
       if (type === 'all' || type === 'accessories') {
         accessories = allAccessories.filter(a => {
           const searchText = `${a.name || ''} ${a.arabic_name || ''} ${a.category || ''}`.toLowerCase();
+          console.log('🔍 البحث في الأكسسوار:', a.name || a.arabic_name, 'النص:', searchText);
           return tokens.some(token => searchText.includes(token));
         });
       }
 
       console.log('📊 نتائج البحث:', { phones: phones.length, accessories: accessories.length });
+      console.log('📱 الهواتف المطابقة:', phones);
+      console.log('📦 الأكسسوارات المطابقة:', accessories);
       renderResults(phones, accessories);
 
     } catch (error) {
@@ -459,6 +471,32 @@
     }
   }
 
+  // ===== تحميل جميع البيانات عند فتح الصفحة =====
+  async function loadAllData() {
+    try {
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        console.log('🔥 تحميل جميع البيانات من Firebase...');
+        allPhones = await window.storage.getPhones();
+        allAccessories = await window.storage.getAccessories();
+        console.log('📱 جميع الهواتف:', allPhones);
+        console.log('📦 جميع الأكسسوارات:', allAccessories);
+      } else {
+        console.log('💾 Firebase غير متاح، تحميل من localStorage...');
+        allPhones = JSON.parse(localStorage.getItem('phones') || '[]');
+        allAccessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        console.log('📱 الهواتف من localStorage:', allPhones);
+        console.log('📦 الأكسسوارات من localStorage:', allAccessories);
+      }
+      
+      // عرض جميع البيانات
+      renderResults(allPhones, allAccessories);
+      
+    } catch (error) {
+      console.error('❌ خطأ في تحميل البيانات:', error);
+      showAlert('danger', 'حدث خطأ في تحميل البيانات');
+    }
+  }
+
   // تهيئة الصفحة
   document.addEventListener('DOMContentLoaded', async function() {
     // التحقق من تسجيل الدخول أولاً
@@ -472,6 +510,9 @@
     } else {
       console.log('⚠️ Firebase غير متاح، استخدام localStorage');
     }
+    
+    // تحميل جميع البيانات عند فتح الصفحة
+    await loadAllData();
   });
 </script>
 </body>
