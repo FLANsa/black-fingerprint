@@ -277,7 +277,8 @@
         phones = await window.storage.getPhones();
         accessories = await window.storage.getAccessories();
         accessoryCategories = await window.storage.getAccessoryCategories();
-        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length });
+        sales = await window.storage.getSales();
+        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length, sales: sales.length });
         
         // تحديث قائمة أنواع المنتجات
         updateProductTypeDropdown();
@@ -293,13 +294,26 @@
         phones = JSON.parse(localStorage.getItem('phones') || '[]');
         accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
         accessoryCategories = JSON.parse(localStorage.getItem('accessory_categories') || '[]');
-        console.log('💾 تم تحميل البيانات من localStorage:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length });
+        sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        console.log('💾 تم تحميل البيانات من localStorage:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length, sales: sales.length });
         
         // تحديث قائمة أنواع المنتجات
         updateProductTypeDropdown();
       } catch (error) {
         console.error('❌ خطأ في تحميل البيانات من localStorage:', error);
       }
+    }
+
+    // فحص ما إذا كان الهاتف تم بيعه
+    function isPhoneSold(phoneId) {
+      if (!sales || sales.length === 0) return false;
+      
+      return sales.some(sale => {
+        if (!sale.items || !Array.isArray(sale.items)) return false;
+        return sale.items.some(item => {
+          return item.type === 'phone' && (item.id === phoneId || item.phone_id === phoneId);
+        });
+      });
     }
 
     // تحديث قائمة أنواع المنتجات من قاعدة البيانات
@@ -342,14 +356,20 @@
       productSelect.innerHTML = '<option value="">اختر المنتج</option>';
 
       if (productType === 'phone') {
-        if (phones.length === 0) {
+        // فلترة الهواتف غير المباعة
+        const availablePhones = phones.filter(phone => {
+          const phoneId = phone.id || phone.phone_number;
+          return !isPhoneSold(phoneId);
+        });
+        
+        if (availablePhones.length === 0) {
           const option = document.createElement('option');
           option.value = '';
           option.textContent = 'لا توجد هواتف متاحة للبيع';
           option.disabled = true;
           productSelect.appendChild(option);
         } else {
-          phones.forEach(phone => {
+          availablePhones.forEach(phone => {
             const option = document.createElement('option');
             option.value = phone.id || phone.phone_number;
             const manufacturer = phone.manufacturer || phone.brand;
@@ -607,11 +627,12 @@
         return;
       }
 
-        // البحث في الهواتف
+        // البحث في الهواتف غير المباعة
         const foundPhone = phones.find(phone => {
-        const phoneBarcode = phone.phone_number || phone.serial_number;
-        return phoneBarcode && phoneBarcode.toString() === barcode;
-      });
+          const phoneBarcode = phone.phone_number || phone.serial_number;
+          const phoneId = phone.id || phone.phone_number;
+          return phoneBarcode && phoneBarcode.toString() === barcode && !isPhoneSold(phoneId);
+        });
 
       if (foundPhone) {
         const manufacturer = foundPhone.manufacturer || foundPhone.brand;
@@ -630,11 +651,25 @@
         `;
         resultDiv.style.display = 'block';
       } else {
-        resultDiv.innerHTML = `
-          <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle"></i> لم يتم العثور على هاتف بالباركود: ${barcode}
-          </div>
-        `;
+        // التحقق من وجود الهاتف في القائمة الكاملة (مباع أم لا)
+        const allPhones = phones.find(phone => {
+          const phoneBarcode = phone.phone_number || phone.serial_number;
+          return phoneBarcode && phoneBarcode.toString() === barcode;
+        });
+        
+        if (allPhones && isPhoneSold(allPhones.id || allPhones.phone_number)) {
+          resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="fas fa-times-circle"></i> هذا الهاتف تم بيعه مسبقاً ولا يمكن بيعه مرة أخرى
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i> لم يتم العثور على هاتف بالباركود: ${barcode}
+            </div>
+          `;
+        }
         resultDiv.style.display = 'block';
       }
     }
