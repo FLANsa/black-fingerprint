@@ -367,7 +367,10 @@ class FirebaseDatabase {
    */
   async seedCommonPhoneTypes(force = false) {
     try {
-      const existingArr = await this.getPhoneTypes(); // مصفوفة كائنات {id, brand|manufacturer, model}
+      // نقرأ مباشرة من مجموعة phone_types للتأكد من القراءة من Firestore وليس تحويل لاحق
+      const snap = await getDocs(collection(this.db, 'phone_types'));
+      const existingArr = [];
+      snap.forEach(d => existingArr.push({ id: d.id, ...(d.data()||{}) }));
       const existingSet = new Set(
         (existingArr || []).map(t => `${(t.brand || t.manufacturer || '').trim()}|${(t.model || '').trim()}`.toLowerCase())
       );
@@ -526,8 +529,13 @@ window.firebaseDatabase.initializeDefaultData()
     // إجراء دمج لمرة واحدة حتى لو كانت المجموعة غير فارغة (مع تجنّب التكرار)
     const FLAG = 'seed_common_phone_types_v1';
     if (!localStorage.getItem(FLAG)) {
-      await window.firebaseDatabase.seedCommonPhoneTypes(true);
-      localStorage.setItem(FLAG, '1');
+      const seeded = await window.firebaseDatabase.seedCommonPhoneTypes(true);
+      if (seeded) {
+        localStorage.setItem(FLAG, '1');
+      } else {
+        // إذا لم يتم الإدراج (أو فشل)، جرب فقط في حال كانت المجموعة فارغة
+        await window.firebaseDatabase.seedCommonPhoneTypesIfEmpty();
+      }
     } else {
       // على الأقل ضمَّن السلوك القديم إذا كانت فارغة تماماً
       await window.firebaseDatabase.seedCommonPhoneTypesIfEmpty();
