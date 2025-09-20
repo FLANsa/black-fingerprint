@@ -362,9 +362,10 @@
             const option = document.createElement('option');
             option.value = acc.id;
             const stock = acc.quantity_in_stock || acc.quantity || 0;
-            option.textContent = `${acc.name} (المخزون: ${stock})`;
+            const displayName = acc.arabic_name || acc.name; // Use Arabic name if available
+            option.textContent = `${displayName} (المخزون: ${stock})`;
             option.setAttribute('data-price', acc.selling_price || acc.price);
-            option.setAttribute('data-name', acc.name);
+            option.setAttribute('data-name', displayName);
             option.setAttribute('data-description', acc.description || '');
             option.setAttribute('data-stock', stock);
             productSelect.appendChild(option);
