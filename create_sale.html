@@ -221,6 +221,16 @@
                       <h6>المجموع قبل الضريبة: <span id="cart_subtotal" class="text-primary">0.00</span> ريال</h6>
                       <h6>مبلغ الضريبة (15%): <span id="cart_vat" class="text-warning">0.00</span> ريال</h6>
                       <h5>المجموع الإجمالي: <span id="cart_total" class="text-success fw-bold">0.00</span> ريال</h5>
+
+                      <!-- الضمان (اختياري) -->
+                      <div class="mt-3">
+                        <label for="warranty_input" class="form-label">الضمان (اختياري)</label>
+                        <div class="input-group">
+                          <input list="warranty_options" id="warranty_input" class="form-control" placeholder="اكتب أو اختر الضمان">
+                          <datalist id="warranty_options"></datalist>
+                          <button class="btn btn-outline-secondary" type="button" onclick="addWarrantyOption()">حفظ كخيار</button>
+                        </div>
+                      </div>
                     </div>
                     <div class="col-md-6 text-end">
                       <button type="button" class="btn btn-success btn-lg" onclick="completeSale()" id="complete_sale_btn" disabled>
@@ -298,6 +308,7 @@
       }
       updateProductTypeDropdown();
       setupArabicNumberSupport();
+      loadWarrantyOptions();
       loadProducts(); // أول تحميل
     });
   
@@ -811,6 +822,7 @@
         customer_address: document.getElementById('customer_address').value || '',
         payment_method: document.getElementById('payment_method').value,
         notes: document.getElementById('notes').value || '',
+        warranty: document.getElementById('warranty_input')?.value?.trim() || '',
         items: cart,
         subtotal, vat_amount: vat, total_amount: totalWithVAT,
         total_purchase_cost: totalPurchaseCost,
@@ -841,6 +853,7 @@
         cart = [];
         updateCartDisplay();
         document.getElementById('customerForm')?.reset?.();
+        document.getElementById('warranty_input').value = '';
   
         setTimeout(() => {
           window.location.href = `view_sale.html?id=${saleData.id}`;
@@ -848,6 +861,43 @@
       } catch (err) {
         console.error('❌ حفظ البيع:', err);
         alert('حدث خطأ في حفظ عملية البيع. حاول مرة أخرى.');
+      }
+    }
+
+    // ====== خيارات الضمان (قابلة للإضافة محلياً) ======
+    function loadWarrantyOptions() {
+      try {
+        const list = document.getElementById('warranty_options');
+        if (!list) return;
+        list.innerHTML = '';
+        const options = JSON.parse(localStorage.getItem('warranty_options') || '[]');
+        if (Array.isArray(options)) {
+          options.forEach(val => {
+            if (!val) return;
+            const opt = document.createElement('option');
+            opt.value = val;
+            list.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function addWarrantyOption() {
+      const input = document.getElementById('warranty_input');
+      if (!input) return;
+      const val = (input.value || '').trim();
+      if (!val) return;
+      try {
+        const options = JSON.parse(localStorage.getItem('warranty_options') || '[]');
+        if (!options.includes(val)) {
+          options.push(val);
+          localStorage.setItem('warranty_options', JSON.stringify(options));
+          loadWarrantyOptions();
+        }
+      } catch (e) {
+        // ignore
       }
     }
   

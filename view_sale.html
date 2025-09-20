@@ -546,6 +546,14 @@
               </div>
             </div>
           </div>
+        <div class="row mt-3">
+          <div class="col-md-12">
+            <div class="border rounded p-3">
+              <h6 class="text-muted mb-1">الضمان (إن وجد)</h6>
+              <div id="warranty_display" class="fw-bold">-</div>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -596,6 +604,7 @@
         <h2>فاتورة ضريبية مبسطة</h2>
         <p>فاتورة: <span id="receipt_sale_number">-</span></p>
         <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
+        <p id="receipt_warranty" style="display:none;">الضمان: -</p>
     </div>
 
       <div class="customer-info" id="receipt_customer_info" style="display: none;">
@@ -778,6 +787,13 @@
     document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' ريال';
     document.getElementById('vat_amount').textContent = vatAmount.toFixed(2) + ' ريال';
     document.getElementById('total_amount').textContent = totalAmount.toFixed(2) + ' ريال';
+
+    // عرض الضمان إن وجد
+    const warrantyEl = document.getElementById('warranty_display');
+    if (warrantyEl) {
+      const w = (currentSale.warranty || '').trim();
+      warrantyEl.textContent = w ? w : '-';
+    }
 
     if (currentSale.notes) {
       document.getElementById('notes').textContent = currentSale.notes;
@@ -1030,6 +1046,18 @@
     const receiptDateElement = document.getElementById('receipt_date');
     if (receiptDateElement) {
       receiptDateElement.textContent = todayRiyadh();
+    }
+
+    // الضمان في الفاتورة (إن وجد)
+    const w = (currentSale.warranty || '').trim();
+    const rWe = document.getElementById('receipt_warranty');
+    if (rWe) {
+      if (w) {
+        rWe.textContent = 'الضمان: ' + w;
+        rWe.style.display = 'block';
+      } else {
+        rWe.style.display = 'none';
+      }
     }
 
     // معلومات العميل (اختياري)
