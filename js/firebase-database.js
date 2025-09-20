@@ -306,6 +306,45 @@ class FirebaseDatabase {
     }
   }
 
+  // ===== تهيئة أشهر أنواع الهواتف (خصوصاً الآيفون) إن كانت القائمة فارغة =====
+  async seedCommonPhoneTypesIfEmpty() {
+    try {
+      const existing = await this.getPhoneTypes();
+      if (existing && existing.length > 0) {
+        console.log('ℹ️ phone_types already has data, skipping seed. count =', existing.length);
+        return false;
+      }
+
+      console.log('🌱 Seeding common phone types (Apple focus) ...');
+      const commonTypes = [
+        // Apple iPhone family (popular models)
+        ['Apple','iPhone 6'], ['Apple','iPhone 6s'], ['Apple','iPhone 7'], ['Apple','iPhone 7 Plus'],
+        ['Apple','iPhone 8'], ['Apple','iPhone 8 Plus'], ['Apple','iPhone X'], ['Apple','iPhone XR'],
+        ['Apple','iPhone XS'], ['Apple','iPhone XS Max'],
+        ['Apple','iPhone 11'], ['Apple','iPhone 11 Pro'], ['Apple','iPhone 11 Pro Max'],
+        ['Apple','iPhone SE (1st)'], ['Apple','iPhone SE (2nd)'], ['Apple','iPhone SE (3rd)'],
+        ['Apple','iPhone 12'], ['Apple','iPhone 12 Mini'], ['Apple','iPhone 12 Pro'], ['Apple','iPhone 12 Pro Max'],
+        ['Apple','iPhone 13'], ['Apple','iPhone 13 Mini'], ['Apple','iPhone 13 Pro'], ['Apple','iPhone 13 Pro Max'],
+        ['Apple','iPhone 14'], ['Apple','iPhone 14 Plus'], ['Apple','iPhone 14 Pro'], ['Apple','iPhone 14 Pro Max'],
+        ['Apple','iPhone 15'], ['Apple','iPhone 15 Plus'], ['Apple','iPhone 15 Pro'], ['Apple','iPhone 15 Pro Max'],
+
+        // (Optional) A few Samsung popular models
+        ['Samsung','S20'], ['Samsung','S21'], ['Samsung','S22'], ['Samsung','S23'], ['Samsung','S24'],
+        ['Samsung','A12'], ['Samsung','A13'], ['Samsung','A32'], ['Samsung','A52']
+      ];
+
+      for (const [brand, model] of commonTypes) {
+        await this.addPhoneType({ brand, model });
+      }
+
+      console.log('✅ Seeded common phone types successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error seeding common phone types:', error);
+      return false;
+    }
+  }
+
   // ===== البحث =====
   async searchPhones(searchTerm) {
     try {
@@ -430,8 +469,11 @@ class FirebaseDatabase {
 window.firebaseDatabase = new FirebaseDatabase();
 
 // تهيئة البيانات الافتراضية عند تحميل Firebase
-window.firebaseDatabase.initializeDefaultData().then(() => {
-  console.log('🔥 Firebase Database Manager initialized successfully!');
-}).catch(error => {
-  console.error('❌ Error initializing Firebase Database:', error);
-});
+window.firebaseDatabase.initializeDefaultData()
+  .then(() => window.firebaseDatabase.seedCommonPhoneTypesIfEmpty())
+  .then(() => {
+    console.log('🔥 Firebase Database Manager initialized successfully!');
+  })
+  .catch(error => {
+    console.error('❌ Error initializing Firebase Database:', error);
+  });
