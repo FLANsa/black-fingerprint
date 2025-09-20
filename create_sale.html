@@ -362,7 +362,10 @@
             const option = document.createElement('option');
             option.value = acc.id;
             const stock = acc.quantity_in_stock || acc.quantity || 0;
-            const displayName = acc.arabic_name || acc.name; // Use Arabic name if available
+            
+            // Use arabic_name if it exists and is different from name, otherwise use name
+            const displayName = (acc.arabic_name && acc.arabic_name !== acc.name) ? acc.arabic_name : acc.name;
+            
             option.textContent = `${displayName} (المخزون: ${stock})`;
             option.setAttribute('data-price', acc.selling_price || acc.price);
             option.setAttribute('data-name', displayName);
