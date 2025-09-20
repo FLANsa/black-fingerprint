@@ -217,23 +217,30 @@ class FirebaseStorageManager {
   }
 
   async addAccessory(accessory) {
+    console.log('📦 Storage Manager: محاولة إضافة أكسسوار:', accessory);
+    
     if (this.isFirebaseAvailable) {
       try {
+        console.log('🔥 Storage Manager: Firebase متاح، إرسال إلى Firebase...');
         accessory.date_added = new Date();
         const accessoryId = await this.firebaseDB.addAccessory(accessory);
+        console.log('✅ Storage Manager: تم إضافة الأكسسوار في Firebase، ID:', accessoryId);
         return accessoryId;
       } catch (error) {
-        console.error('Error adding accessory to Firebase:', error);
+        console.error('❌ Storage Manager: خطأ في إضافة الأكسسوار إلى Firebase:', error);
         return false;
       }
     }
     
+    console.log('💾 Storage Manager: Firebase غير متاح، حفظ في localStorage...');
     // LocalStorage fallback
     const accessories = this.getAccessories();
     accessory.id = this.generateId();
     accessory.date_added = new Date().toISOString();
     accessories.push(accessory);
-    return this.setAccessories(accessories);
+    const result = this.setAccessories(accessories);
+    console.log('✅ Storage Manager: تم حفظ الأكسسوار في localStorage');
+    return result;
   }
 
   async updateAccessory(accessoryId, updatedAccessory) {

@@ -77,15 +77,19 @@ class FirebaseDatabase {
   // ===== إدارة الأكسسوارات =====
   async addAccessory(accessoryData) {
     try {
+      console.log('🔥 Firebase: محاولة إضافة أكسسوار:', accessoryData);
+      
       const docRef = await addDoc(collection(this.db, 'accessories'), {
         ...accessoryData,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      console.log('✅ Accessory added with ID:', docRef.id);
+      
+      console.log('✅ Firebase: تم إضافة الأكسسوار بنجاح! ID:', docRef.id);
+      console.log('📂 Firebase: الفئة المحفوظة:', accessoryData.category);
       return docRef.id;
     } catch (error) {
-      console.error('❌ Error adding accessory:', error);
+      console.error('❌ Firebase: خطأ في إضافة الأكسسوار:', error);
       throw error;
     }
   }
