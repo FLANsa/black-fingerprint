@@ -718,6 +718,55 @@
       alert(`تم إضافة ${manufacturer} ${model} (باركود: ${barcode}) للسلة.\nسعر البيع: ${sellingPrice} ريال\nسعر الشراء: ${purchasePrice} ريال`);
     }
   
+    // ====== تقليل مخزون الأكسسوارات ======
+    async function updateAccessoryStock() {
+      try {
+        console.log('📦 تحديث مخزون الأكسسوارات...');
+        
+        for (const item of cart) {
+          if (item.type !== 'phone') {
+            // البحث عن الأكسسوار في قاعدة البيانات
+            const accessory = accessories.find(acc => 
+              (acc.id === item.id) || (acc.sku === item.id)
+            );
+            
+            if (accessory) {
+              const currentStock = Number(accessory.quantity_in_stock ?? accessory.quantity ?? 0);
+              const newStock = Math.max(0, currentStock - item.quantity);
+              
+              console.log(`📱 تحديث مخزون ${accessory.name}: ${currentStock} → ${newStock}`);
+              
+              // تحديث البيانات المحلية
+              accessory.quantity_in_stock = newStock;
+              accessory.quantity = newStock;
+              
+              // حفظ في Firebase أو localStorage
+              if (window.storage && window.storage.isFirebaseAvailable) {
+                await window.storage.updateAccessory?.(accessory.id, accessory);
+                console.log('✅ تم تحديث المخزون في Firebase');
+              } else {
+                // تحديث localStorage
+                const updatedAccessories = accessories.map(acc => 
+                  acc.id === accessory.id ? accessory : acc
+                );
+                localStorage.setItem('accessories', JSON.stringify(updatedAccessories));
+                console.log('✅ تم تحديث المخزون في localStorage');
+              }
+            } else {
+              console.warn(`⚠️ لم يتم العثور على الأكسسوار: ${item.name} (ID: ${item.id})`);
+            }
+          }
+        }
+        
+        // إعادة تحميل البيانات
+        await loadDataFromFirebase();
+        console.log('✅ تم تحديث مخزون الأكسسوارات بنجاح');
+      } catch (error) {
+        console.error('❌ خطأ في تحديث مخزون الأكسسوارات:', error);
+        throw error;
+      }
+    }
+
     // ====== إتمام عملية البيع (يحفظ في Firebase إن توفرت) ======
     async function completeSale() {
       if (cart.length === 0) { alert('السلة فارغة'); return; }
@@ -747,6 +796,9 @@
       };
   
       try {
+        // تقليل مخزون الأكسسوارات المباعة
+        await updateAccessoryStock();
+
         if (window.storage && window.storage.isFirebaseAvailable) {
           const saleId = await window.storage.addSale?.(saleData);
           if (!saleId) throw new Error('فشل حفظ البيع في Firebase');
@@ -757,7 +809,7 @@
           sales.push(saleData);
           localStorage.setItem('sales', JSON.stringify(sales));
         }
-  
+
         localStorage.setItem('lastSale', JSON.stringify(saleData));
         alert(`تم إنشاء عملية البيع!\nرقم العملية: ${saleNumber}\nقبل الضريبة: ${subtotal.toFixed(2)}\nالضريبة: ${vat.toFixed(2)}\nالإجمالي: ${totalWithVAT.toFixed(2)}\nسعر الشراء: ${totalPurchaseCost.toFixed(2)}`);
   
