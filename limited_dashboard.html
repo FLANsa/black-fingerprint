@@ -263,28 +263,38 @@
   <script src="js/firebase-storage-manager.js"></script>
 
   <script>
-    // Simple access control - you can modify this
-    const ALLOWED_USERS = ['employee', 'staff', 'user', 'موظف', 'عامل'];
-    
     // Check access on page load
     document.addEventListener('DOMContentLoaded', function() {
-      // Check if user has access (simple prompt for demo)
-      const currentUser = localStorage.getItem('currentUser') || prompt('أدخل اسم المستخدم:');
+      // Check if user is logged in through the login system
+      const currentUser = localStorage.getItem('current_user');
       
-      if (!currentUser || !ALLOWED_USERS.includes(currentUser.toLowerCase())) {
-        alert('ليس لديك صلاحية للوصول إلى هذه الصفحة');
-        window.location.href = 'index.html';
+      if (!currentUser) {
+        alert('يرجى تسجيل الدخول أولاً');
+        window.location.href = 'login.html';
         return;
       }
       
-      // Store current user
-      localStorage.setItem('currentUser', currentUser);
-      
-      // Show welcome message
-      document.querySelector('h2').innerHTML = `مرحباً ${currentUser} في نظام إدارة الهواتف`;
-      
-      // Initialize dashboard
-      initializeDashboard();
+      try {
+        const userData = JSON.parse(currentUser);
+        
+        // Check if user has limited access (not admin)
+        if (userData.role === 'admin') {
+          alert('هذه الصفحة مخصصة للمستخدمين المحدودين فقط');
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        
+        // Show welcome message with user's name
+        document.querySelector('h2').innerHTML = `مرحباً ${userData.name} في نظام إدارة الهواتف`;
+        
+        // Initialize dashboard
+        initializeDashboard();
+        
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('current_user');
+        window.location.href = 'login.html';
+      }
     });
 
     async function initializeDashboard() {
@@ -451,8 +461,8 @@
 
     function logout() {
       if (confirm('هل تريد تسجيل الخروج؟')) {
-        localStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+        localStorage.removeItem('current_user');
+        window.location.href = 'login.html';
       }
     }
   </script>

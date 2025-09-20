@@ -297,7 +297,24 @@
       window.location.href = 'login.html';
       return false;
     }
-    return true;
+    
+    try {
+      const userData = JSON.parse(currentUser);
+      
+      // التحقق من أن المستخدم مدير
+      if (userData.role !== 'admin') {
+        alert('هذه الصفحة مخصصة للمديرين فقط');
+        window.location.href = 'limited_dashboard.html';
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      localStorage.removeItem('current_user');
+      window.location.href = 'login.html';
+      return false;
+    }
   }
 
   // تسجيل الخروج

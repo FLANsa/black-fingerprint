@@ -115,8 +115,8 @@
 
     // بيانات المستخدمين الافتراضية (يمكن تطويرها لاحقاً)
     const validUsers = [
-      { username: 'admin', password: 'admin123', name: 'مدير النظام', role: 'admin' },
-      { username: 'user', password: 'user123', name: 'موظف المبيعات', role: 'user' }
+      { username: 'admin', password: 'admin123', name: 'مدير النظام', role: 'admin', dashboard: 'dashboard.html' },
+      { username: 'user', password: 'user123', name: 'موظف المبيعات', role: 'user', dashboard: 'limited_dashboard.html' }
     ];
 
     // البحث عن المستخدم
@@ -133,11 +133,14 @@
       
       localStorage.setItem('current_user', JSON.stringify(sessionData));
       
-      showAlert('success', `مرحباً ${user.name}! جاري التحويل...`);
+      // تحديد نوع لوحة التحكم حسب دور المستخدم
+      const dashboardType = user.role === 'admin' ? 'لوحة التحكم الكاملة' : 'لوحة التحكم المحدودة';
       
-      // التحويل لصفحة لوحة التحكم بعد ثانيتين
+      showAlert('success', `مرحباً ${user.name}! جاري التحويل إلى ${dashboardType}...`);
+      
+      // التحويل لصفحة لوحة التحكم المناسبة بعد ثانيتين
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = user.dashboard;
       }, 2000);
       
     } else {
@@ -147,10 +150,18 @@
 
   // التحقق من تسجيل الدخول عند تحميل الصفحة
   document.addEventListener('DOMContentLoaded', function() {
-    // إذا كان المستخدم مسجل دخول بالفعل، اتجه للوحة التحكم
+    // إذا كان المستخدم مسجل دخول بالفعل، اتجه للوحة التحكم المناسبة
     const currentUser = localStorage.getItem('current_user');
     if (currentUser) {
-      window.location.href = 'dashboard.html';
+      try {
+        const userData = JSON.parse(currentUser);
+        const dashboardUrl = userData.role === 'admin' ? 'dashboard.html' : 'limited_dashboard.html';
+        window.location.href = dashboardUrl;
+      } catch (error) {
+        // في حالة وجود خطأ في البيانات، احذف الجلسة وأعد التحميل
+        localStorage.removeItem('current_user');
+        location.reload();
+      }
     }
   });
 </script>
