@@ -262,47 +262,82 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- واجهة فقط: استبدال Jinja ببيانات محلية + منطق تصفية وعرض -->
+<!-- Firebase Configuration -->
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/firebase-database.js"></script>
+<script type="module" src="js/firebase-storage-manager.js"></script>
+
+<!-- Firebase Integration: Load sales from database -->
 <script>
-  // ---------- بيانات تجريبية (واجهة فقط) ----------
-  const salesAll = [
-    {
-      id: "S-1001",
-      sale_number: "S-1001",
-      date_created: "2025-01-12T10:35:00",
-      customer_name: "عميل نقدي",
-      items: [{},{},{}], // 3 منتجات
-      subtotal: 1000.00,
-      vat_amount: 150.00,
-      total_amount: 1150.00,
-      payment_method: "نقدي",
-      status: "مكتمل"
-    },
-    {
-      id: "S-1002",
-      sale_number: "S-1002",
-      date_created: "2025-02-05T18:10:00",
-      customer_name: "أحمد علي",
-      items: [{}], // 1 منتج
-      subtotal: 350.00,
-      vat_amount: 52.50,
-      total_amount: 402.50,
-      payment_method: "بطاقة ائتمان",
-      status: "معلق"
-    },
-    {
-      id: "S-1003",
-      sale_number: "S-1003",
-      date_created: "2025-09-01T14:20:00",
-      customer_name: "شركة الواصل",
-      items: [{},{}], // 2 منتج
-      subtotal: 2200.00,
-      vat_amount: 330.00,
-      total_amount: 2530.00,
-      payment_method: "تحويل بنكي",
-      status: "مكتمل"
+  // ---------- متغيرات عامة ----------
+  let salesAll = [];
+  let currentFilteredSales = [];
+
+  // ---------- تحميل البيانات من Firebase ----------
+  async function loadSalesFromFirebase() {
+    try {
+      console.log('🔄 تحميل قائمة المبيعات من Firebase...');
+      
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        // تحميل من Firebase
+        const sales = await window.storage.getSales();
+        if (sales && Array.isArray(sales)) {
+          salesAll = sales;
+          console.log('✅ تم تحميل المبيعات من Firebase:', salesAll.length);
+        } else {
+          salesAll = [];
+          console.log('⚠️ لا توجد مبيعات في Firebase');
+        }
+      } else {
+        // تحميل من localStorage كبديل
+        console.log('💾 تحميل المبيعات من localStorage...');
+        const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        salesAll = sales;
+        console.log('✅ تم تحميل المبيعات من localStorage:', salesAll.length);
+      }
+      
+      // تطبيق التصفية الحالية
+      applyCurrentFilter();
+      
+    } catch (error) {
+      console.error('❌ خطأ في تحميل المبيعات:', error);
+      salesAll = [];
+      showAlert('danger', 'حدث خطأ في تحميل قائمة المبيعات');
     }
-  ];
+  }
+
+  // ---------- تطبيق التصفية الحالية ----------
+  function applyCurrentFilter() {
+    const type = document.getElementById('filter_type').value;
+    let filtered = [...salesAll];
+    let summaryText = '';
+    let emptyHint = 'لم يتم إنشاء أي مبيعات بعد';
+
+    if (type==='day') {
+      const val = document.getElementById('filter_date').value;
+      if (val) {
+        const [y,m,d] = val.split('-').map(Number);
+        filtered = salesAll.filter(s => sameDay(s.date_created, y, m, d));
+        summaryText = `مبيعات يوم ${val}`;
+      }
+    } else if (type==='month') {
+      const year = parseInt(document.getElementById('filter_month_year').value);
+      const month = parseInt(document.getElementById('filter_month_month').value);
+      if (year && month) {
+        filtered = salesAll.filter(s => sameMonth(s.date_created, year, month));
+        summaryText = `مبيعات شهر ${month}/${year}`;
+      }
+    } else if (type==='year') {
+      const year = parseInt(document.getElementById('filter_year').value);
+      if (year) {
+        filtered = salesAll.filter(s => sameYear(s.date_created, year));
+        summaryText = `مبيعات سنة ${year}`;
+      }
+    }
+
+    currentFilteredSales = filtered;
+    renderSales(filtered, type, summaryText, emptyHint);
+  }
 
   // ---------- أدوات ----------
   const fmtMoney = n => (Number(n)||0).toFixed(2);
@@ -352,43 +387,13 @@
 
   // ---------- تطبيق/إعادة التصفية ----------
   function applyFilter() {
-    const type = document.getElementById('filter_type').value;
-    let filtered = [...salesAll];
-    let summaryText = '';
-    let emptyHint = 'لم يتم إنشاء أي مبيعات بعد';
-
-    if (type==='day') {
-      const val = document.getElementById('filter_date').value; // YYYY-MM-DD
-      if (val) {
-        const [y,m,d] = val.split('-').map(Number);
-        filtered = salesAll.filter(s => sameDay(s.date_created, y, m, d));
-        summaryText = `يوم ${val}`;
-        emptyHint = 'لا توجد مبيعات تطابق معايير التصفية المحددة';
-      }
-    } else if (type==='month') {
-      const y = parseInt(document.getElementById('filter_month_year').value);
-      const m = parseInt(document.getElementById('filter_month_month').value);
-      if (y && m) {
-        filtered = salesAll.filter(s => sameMonth(s.date_created, y, m));
-        summaryText = `شهر ${String(m).padStart(2,'0')}/${y}`;
-        emptyHint = 'لا توجد مبيعات تطابق معايير التصفية المحددة';
-      }
-    } else if (type==='year') {
-      const y = parseInt(document.getElementById('filter_year').value);
-      if (y) {
-        filtered = salesAll.filter(s => sameYear(s.date_created, y));
-        summaryText = `سنة ${y}`;
-        emptyHint = 'لا توجد مبيعات تطابق معايير التصفية المحددة';
-      }
-    }
-
-    renderSales(filtered, type, summaryText, emptyHint);
+    applyCurrentFilter();
   }
 
   function resetFilter() {
     document.getElementById('filterForm').reset();
     toggleDateInput();
-    renderSales(salesAll, 'all', '', 'لم يتم إنشاء أي مبيعات بعد');
+    applyCurrentFilter();
   }
 
   // ---------- العرض ----------
@@ -500,6 +505,27 @@
     document.getElementById('sum_total_vat_amount').textContent = fmtMoney(totalVat);
   }
 
+  // ---------- عرض التنبيهات ----------
+  function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // إدراج التنبيه في أعلى الصفحة
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // إزالة التنبيه تلقائياً بعد 5 ثوان
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.remove();
+      }
+    }, 5000);
+  }
+
   // ---------- تهيئة ----------
   // تسجيل الخروج
   function logout() {
@@ -510,11 +536,12 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     populateYears();
     toggleDateInput();
-    // افتراضيًا: عرض جميع المبيعات
-    renderSales(salesAll, 'all', '', 'لم يتم إنشاء أي مبيعات بعد');
+    
+    // تحميل البيانات من Firebase
+    await loadSalesFromFirebase();
   });
 </script>
 </body>
