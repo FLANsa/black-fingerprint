@@ -557,7 +557,20 @@
       // تعيين تاريخ الإنشاء مع معالجة أفضل للأخطاء
       const dateCreatedElement = document.getElementById('date_created');
       if (dateCreatedElement) {
-        const saleDate = currentSale.date_created || currentSale.date_added;
+        let saleDate = currentSale.date_created || currentSale.date_added;
+        
+        // إذا لم يوجد تاريخ، استخدم التاريخ الحالي
+        if (!saleDate) {
+          console.warn('⚠️ No date found in sale data, using current date');
+          saleDate = new Date().toISOString();
+        }
+        
+        console.log('🔍 Sale data for date:', {
+          date_created: currentSale.date_created,
+          date_added: currentSale.date_added,
+          selectedDate: saleDate,
+          fullSale: currentSale
+        });
         const formattedDate = formatDate(saleDate);
         dateCreatedElement.textContent = formattedDate;
         console.log('✅ تم تعيين تاريخ الإنشاء:', formattedDate);
@@ -640,15 +653,25 @@
 
     // تنسيق التاريخ
     function formatDate(dateString) {
-      if (!dateString) return '-';
+      console.log('🔍 formatDate called with:', dateString);
+      
+      if (!dateString) {
+        console.warn('⚠️ No date string provided');
+        return '-';
+      }
       
       try {
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return '-';
+        console.log('📅 Parsed date:', date);
+        
+        if (isNaN(date.getTime())) {
+          console.warn('⚠️ Invalid date:', dateString);
+          return '-';
+        }
         
         // محاولة التنسيق العربي أولاً
         try {
-          return date.toLocaleString('ar-SA', {
+          const formatted = date.toLocaleString('ar-SA', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -656,10 +679,12 @@
             minute: '2-digit',
             hour12: false
           });
+          console.log('✅ Arabic format result:', formatted);
+          return formatted;
         } catch (error) {
           // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
           console.warn('Arabic locale not supported for formatDate, using English format');
-          return date.toLocaleString('en-US', {
+          const formatted = date.toLocaleString('en-US', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit',
@@ -667,9 +692,11 @@
             minute: '2-digit',
             hour12: false
           });
+          console.log('✅ English format result:', formatted);
+          return formatted;
         }
       } catch (error) {
-        console.error('Error formatting date:', error);
+        console.error('❌ Error formatting date:', error, 'Input:', dateString);
         return '-';
       }
     }
@@ -885,7 +912,14 @@
       // تعيين تاريخ الفاتورة مع معالجة أفضل للأخطاء
       const receiptDateElement = document.getElementById('receipt_date');
       if (receiptDateElement) {
-        const saleDate = currentSale.date_created || currentSale.date_added;
+        let saleDate = currentSale.date_created || currentSale.date_added;
+        
+        // إذا لم يوجد تاريخ، استخدم التاريخ الحالي
+        if (!saleDate) {
+          console.warn('⚠️ No date found for receipt, using current date');
+          saleDate = new Date().toISOString();
+        }
+        
         const formattedDate = formatDate(saleDate);
         receiptDateElement.textContent = formattedDate;
         console.log('✅ تم تعيين تاريخ الفاتورة:', formattedDate);
@@ -931,8 +965,8 @@
     }
 
     // تعيين تاريخ الطباعة
-    function setPrintDate() {
-      const now = new Date();
+  function setPrintDate() {
+    const now = new Date();
       
       // تنسيق التاريخ باللغة العربية مع دعم أفضل للمتصفحات
       const options = {
