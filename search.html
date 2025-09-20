@@ -164,12 +164,30 @@
   // ===== متغيرات البيانات =====
   let allPhones = [];
   let allAccessories = [];
+  let allSales = [];
+  let soldPhonesSet = new Set();
 
   // ===== الأدوات =====
   const fmtMoney = n => (Number(n)||0).toFixed(2);
   function includesAny(str, arr) {
     const s = (str || '').toString().toLowerCase();
     return arr.some(x => s.includes((x||'').toString().toLowerCase()));
+  }
+
+  // تجميع أرقام الأجهزة/الباركود المباعة من المبيعات
+  function buildSoldPhonesSet(sales){
+    const set = new Set();
+    (sales||[]).forEach(sale => {
+      (sale.items||[]).forEach(item => {
+        // نحاول العثور على رقم الجهاز/الباركود في أكثر من حقل محتمل
+        const phoneNum = item.barcode || item.phone_number || item.device_number || item.serial_number || null;
+        const productType = item.product_type || item.type || '';
+        if (phoneNum && (productType === 'phone' || productType === 'هاتف' || !productType)) {
+          set.add(String(phoneNum));
+        }
+      });
+    });
+    return set;
   }
 
   // (تمت إزالة عناصر نوع البحث وحالة الهاتف من واجهة البحث)
@@ -194,15 +212,21 @@
         console.log('🔥 تحميل البيانات من Firebase للبحث...');
         allPhones = await window.storage.getPhones();
         allAccessories = await window.storage.getAccessories();
+        allSales = await window.storage.getSales();
         console.log('📱 الهواتف المحملة:', allPhones);
         console.log('📦 الأكسسوارات المحملة:', allAccessories);
+        console.log('🧾 المبيعات المحملة:', allSales);
       } else {
         console.log('💾 Firebase غير متاح، تحميل من localStorage...');
         allPhones = JSON.parse(localStorage.getItem('phones') || '[]');
         allAccessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        allSales = JSON.parse(localStorage.getItem('sales') || '[]');
         console.log('📱 الهواتف من localStorage:', allPhones);
         console.log('📦 الأكسسوارات من localStorage:', allAccessories);
+        console.log('🧾 المبيعات من localStorage:', allSales);
       }
+
+      soldPhonesSet = buildSoldPhonesSet(allSales);
 
       const tokens = term.toLowerCase().split(/\s+/);
       console.log('🔤 الرموز المطلوب البحث عنها:', tokens);
@@ -288,9 +312,9 @@
                     <td>${p.manufacturer || p.brand || 'غير محدد'}</td>
                     <td>${p.model || 'غير محدد'}</td>
                     <td>
-                      ${(p.condition === 'new' || p.phone_type === 'new')
-                        ? '<span class="badge bg-success">جديد</span>'
-                        : '<span class="badge bg-warning">مستعمل</span>'}
+                      ${ (p.phone_number && soldPhonesSet.has(String(p.phone_number)))
+                          ? '<span class="badge bg-danger">مباع</span>'
+                          : '<span class="badge bg-success">متاح</span>' }
                     </td>
                     <td><span class="text-success">${fmtMoney(p.purchase_price || 0)} ريال</span></td>
                     <td><span class="text-primary">${fmtMoney(p.selling_price || p.price || 0)} ريال</span></td>
