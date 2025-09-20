@@ -269,6 +269,9 @@
         console.log('⚠️ Firebase غير متاح، استخدام البيانات المحلية');
         await loadDataFromLocalStorage();
       }
+      
+      // تحميل المنتجات بعد تحميل البيانات
+      loadProducts();
     });
 
     // تحميل البيانات من Firebase
@@ -346,14 +349,25 @@
       }
       
       console.log('✅ تم تحديث قائمة أنواع المنتجات:', accessoryCategories.length, 'فئة');
+      
+      // تحميل المنتجات بعد تحديث قائمة الأنواع
+      loadProducts();
     }
 
     function loadProducts() {
       const productType = document.getElementById('product_type').value;
       const productSelect = document.getElementById('product_select');
 
+      console.log('🔄 تحميل المنتجات:', { productType, phonesCount: phones.length, accessoriesCount: accessories.length });
+
       // تفريغ الاختيارات السابقة
       productSelect.innerHTML = '<option value="">اختر المنتج</option>';
+
+      // إذا لم يتم اختيار نوع المنتج، اترك القائمة فارغة
+      if (!productType) {
+        console.log('ℹ️ لم يتم اختيار نوع المنتج');
+        return;
+      }
 
       if (productType === 'phone') {
         // فلترة الهواتف غير المباعة
@@ -361,6 +375,8 @@
           const phoneId = phone.id || phone.phone_number;
           return !isPhoneSold(phoneId);
         });
+        
+        console.log('📱 الهواتف المتاحة:', { total: phones.length, available: availablePhones.length });
         
         if (availablePhones.length === 0) {
           const option = document.createElement('option');
@@ -390,6 +406,8 @@
           const stock = acc.quantity_in_stock || acc.quantity || 0;
           return acc.category === productType && stock > 0;
         });
+        
+        console.log('🔧 الأكسسوارات المتاحة:', { total: accessories.length, category: productType, available: availableAccessories.length });
         
         if (availableAccessories.length === 0) {
           const option = document.createElement('option');
