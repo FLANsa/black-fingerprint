@@ -208,27 +208,7 @@
       other: "أخرى"
     };
 
-    // قراءة البيانات من التخزين المحلي
-    function getFromStorage(key, defaultValue = []) {
-      try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : defaultValue;
-      } catch (error) {
-        console.error('خطأ في قراءة البيانات:', error);
-        return defaultValue;
-      }
-    }
-
-    // حفظ البيانات في التخزين المحلي
-    function saveToStorage(key, data) {
-      try {
-        localStorage.setItem(key, JSON.stringify(data));
-        return true;
-      } catch (error) {
-        console.error('خطأ في حفظ البيانات:', error);
-        return false;
-      }
-    }
+    // دوال مساعدة (تم إزالتها - النظام الآن يعتمد على Firebase بالكامل)
 
   // تحويل الأرقام العربية إلى إنجليزية
   function convertArabicToEnglishNumbers(str) {
@@ -286,14 +266,15 @@
         
         let accessories = [];
         
-        // محاولة تحميل من Firebase أولاً
+        // تحميل من Firebase
         if (window.storage && window.storage.isFirebaseAvailable) {
           console.log('🔥 تحميل من Firebase...');
           accessories = await window.storage.getAccessories();
           console.log('✅ تم تحميل الأكسسوارات من Firebase:', accessories.length);
         } else {
-          console.log('💾 Firebase غير متاح، تحميل من localStorage...');
-          accessories = getFromStorage('accessories', []);
+          console.log('❌ Firebase غير متاح - يرجى التحقق من الاتصال');
+          showAlert('danger', 'Firebase غير متاح - يرجى التحقق من الاتصال');
+          return;
         }
         
         if (accessories.length === 0) {
@@ -394,13 +375,13 @@
       try {
         console.log('✏️ تعديل الأكسسوار:', accessoryId);
         
-        // تحميل الأكسسوارات أولاً
-        let accessories = [];
-        if (window.storage && window.storage.isFirebaseAvailable) {
-          accessories = await window.storage.getAccessories();
-        } else {
-          accessories = getFromStorage('accessories', []);
+        // تحميل الأكسسوارات من Firebase
+        if (!window.storage || !window.storage.isFirebaseAvailable) {
+          showAlert('danger', 'Firebase غير متاح - يرجى التحقق من الاتصال');
+          return;
         }
+        
+        const accessories = await window.storage.getAccessories();
         
         // البحث عن الأكسسوار
         const accessory = accessories.find(acc => acc.id === accessoryId || acc.id === parseInt(accessoryId));
@@ -496,13 +477,13 @@
       try {
         console.log('🗑️ حذف الأكسسوار:', accessoryId);
         
-        // تحميل الأكسسوارات أولاً
-        let accessories = [];
-        if (window.storage && window.storage.isFirebaseAvailable) {
-          accessories = await window.storage.getAccessories();
-        } else {
-          accessories = getFromStorage('accessories', []);
+        // تحميل الأكسسوارات من Firebase
+        if (!window.storage || !window.storage.isFirebaseAvailable) {
+          showAlert('danger', 'Firebase غير متاح - يرجى التحقق من الاتصال');
+          return;
         }
+        
+        const accessories = await window.storage.getAccessories();
         
         // البحث عن الأكسسوار
         const accessory = accessories.find(acc => acc.id === accessoryId || acc.id === parseInt(accessoryId));
@@ -547,14 +528,13 @@
       try {
         console.log('📤 تصدير البيانات من قاعدة البيانات...');
         
-        let accessories = [];
-        
-        // تحميل من Firebase أو localStorage
-        if (window.storage && window.storage.isFirebaseAvailable) {
-          accessories = await window.storage.getAccessories();
-        } else {
-          accessories = getFromStorage('accessories', []);
+        // تحميل من Firebase
+        if (!window.storage || !window.storage.isFirebaseAvailable) {
+          showAlert('danger', 'Firebase غير متاح - يرجى التحقق من الاتصال');
+          return;
         }
+        
+        const accessories = await window.storage.getAccessories();
         
         if (accessories.length === 0) {
           showAlert('warning', 'لا توجد بيانات لتصديرها');
@@ -586,18 +566,17 @@
       try {
         console.log('🗑️ مسح جميع الأكسسوارات من قاعدة البيانات...');
         
-        if (window.storage && window.storage.isFirebaseAvailable) {
-          // حذف جميع الأكسسوارات من Firebase
-          const accessories = await window.storage.getAccessories();
-          for (const accessory of accessories) {
-            await window.storage.deleteAccessory(accessory.id);
-          }
-          showAlert('success', `تم مسح ${accessories.length} أكسسوار من قاعدة البيانات`);
-        } else {
-          // مسح من localStorage
-          localStorage.removeItem('accessories');
-          showAlert('success', 'تم مسح جميع البيانات من التخزين المحلي');
+        if (!window.storage || !window.storage.isFirebaseAvailable) {
+          showAlert('danger', 'Firebase غير متاح - يرجى التحقق من الاتصال');
+          return;
         }
+        
+        // حذف جميع الأكسسوارات من Firebase
+        const accessories = await window.storage.getAccessories();
+        for (const accessory of accessories) {
+          await window.storage.deleteAccessory(accessory.id);
+        }
+        showAlert('success', `تم مسح ${accessories.length} أكسسوار من قاعدة البيانات`);
         
         await loadAccessories();
         
@@ -623,11 +602,23 @@
     
     if (window.storage && window.storage.isFirebaseAvailable) {
       console.log('✅ Firebase متاح في صفحة مخزون الأكسسوارات');
+      await loadAccessories();
     } else {
-      console.log('⚠️ Firebase غير متاح، استخدام localStorage');
+      console.log('❌ Firebase غير متاح - يرجى التحقق من الاتصال');
+      showAlert('danger', 'Firebase غير متاح - يرجى التحقق من الاتصال بالإنترنت');
+      document.getElementById('accessories-table').classList.add('d-none');
+      document.getElementById('empty-state').classList.remove('d-none');
+      document.getElementById('empty-state').innerHTML = `
+        <div class="text-center py-5">
+          <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+          <h4 class="text-warning">Firebase غير متاح</h4>
+          <p class="text-muted">يرجى التحقق من الاتصال بالإنترنت وإعادة تحميل الصفحة</p>
+          <button class="btn btn-primary" onclick="location.reload()">
+            <i class="fas fa-refresh"></i> إعادة تحميل الصفحة
+          </button>
+        </div>
+      `;
     }
-    
-    await loadAccessories();
   });
   </script>
 
