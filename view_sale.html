@@ -303,8 +303,8 @@
     @media print {
       @page {
         size: 80mm auto !important;
-        /* Move receipt 20mm to the right by increasing left margin */
-        margin: 5mm 5mm 5mm 25mm !important;
+        /* Reduce left margin by 5mm (move 0.5cm left) */
+        margin: 5mm 5mm 5mm 20mm !important;
       }
       
       body {
@@ -957,11 +957,11 @@
           /* Page = 80mm roll; no extra margins */
           @media print { @page { size: 80mm auto; margin: 0; } }
 
-          /* Make content narrower (58mm) and shift exactly 20mm right */
+          /* Make content narrower (58mm) and shift exactly 15mm right */
           .receipt-container {
             width: 58mm !important;
             max-width: 58mm !important;
-            margin: 0 0 0 15mm !important;   /* was 20mm → now 15mm (0.5cm left) */
+            margin: 0 0 0 10mm !important;   /* −5mm → 0.5cm further left */
             padding: 0 !important;           /* avoid extra width */
             box-sizing: border-box;
           }
