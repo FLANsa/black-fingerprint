@@ -342,6 +342,48 @@
         color-adjust: exact !important;
       }
     }
+
+    /* === Center QR (screen + print) — overrides === */
+    .qr-block{
+      text-align:center;
+      margin:8px 0 0 0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;      /* center horizontally */
+      justify-content:center;  /* center vertically within the block */
+      padding-left:0;          /* remove left offset */
+    }
+    #tax-qr{
+      width:120px; height:120px;
+      margin:0 auto 6px;       /* center the box itself */
+      display:block;
+    }
+    #tax-qr img, #tax-qr canvas{
+      width:120px; height:120px;
+      display:block;
+      margin:0 auto;           /* center QR bitmap */
+      max-width:100%; max-height:100%;
+    }
+    .qr-caption{ font-size:11px; text-align:center; }
+
+    /* kill previous print-left overrides and center in print too */
+    @media print{
+      .qr-block,
+      .receipt-template .qr-block{
+        text-align:center !important;
+        align-items:center !important;
+        justify-content:center !important;
+        padding-left:0 !important;
+        margin:8px 0 !important;
+        width:100% !important;
+      }
+      #tax-qr, #tax-qr img, #tax-qr canvas{
+        width:120px !important; height:120px !important;
+        display:block !important;
+        margin:0 auto !important;   /* center in print */
+      }
+      .qr-caption{ font-size:11px !important; text-align:center !important; margin:0 !important; }
+    }
   </style>
 </head>
 <body>
@@ -998,6 +1040,23 @@
           .receipt-footer p { margin: 3px 0; font-size: 10px; }
           .qr-placeholder { text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed #000; }
           .qr-placeholder p { margin: 0; font-size: 9px; }
+          
+          /* QR centering for print window */
+          .qr-block{
+            text-align:center;
+            margin:10px 0;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+          }
+          #tax-qr, #tax-qr img, #tax-qr canvas{
+            width:120px; height:120px;
+            display:block;
+            margin:0 auto 6px;
+          }
+          .qr-caption{ font-size:10px; text-align:center; }
+          
           @media print { @page { size: 80mm auto; margin: 5mm; } }
         </style>
       </head>
