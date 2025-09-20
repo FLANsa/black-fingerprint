@@ -309,24 +309,15 @@
       const name = prompt('أدخل اسم الفئة الجديدة:');
       if (!name || !name.trim()) return;
       
-      const categoryValue = name.trim().toLowerCase().replace(/\s+/g, '_').replace(/[أ-ي]/g, (char) => {
-        const arabicToEnglish = {
-          'أ': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h',
-          'خ': 'kh', 'د': 'd', 'ذ': 'th', 'ر': 'r', 'ز': 'z', 'س': 's',
-          'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'z', 'ع': 'a',
-          'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm',
-          'ن': 'n', 'ه': 'h', 'و': 'w', 'ي': 'y', 'ة': 'h'
-        };
-        return arabicToEnglish[char] || char;
-      });
+      const categoryName = name.trim();
 
       try {
         // إضافة الفئة إلى Firebase
         if (window.storage && window.storage.isFirebaseAvailable) {
           const categoryData = {
-            name: categoryValue,
-            arabic_name: name.trim(),
-            description: `فئة ${name.trim()}`
+            name: categoryName,
+            arabic_name: categoryName,
+            description: `فئة ${categoryName}`
           };
           
           const categoryId = await window.storage.addAccessoryCategory(categoryData);
@@ -338,12 +329,12 @@
         // إضافة للقائمة المنسدلة
         const sel = document.getElementById('category');
         const opt = document.createElement('option');
-        opt.value = categoryValue;
-        opt.textContent = name.trim();
+        opt.value = categoryName;
+        opt.textContent = categoryName;
         sel.appendChild(opt);
-        sel.value = categoryValue;
+        sel.value = categoryName;
         
-        showAlert('success', `تم إضافة فئة "${name.trim()}" بنجاح!`);
+        showAlert('success', `تم إضافة فئة "${categoryName}" بنجاح!`);
         
         // إعادة تحميل الفئات من قاعدة البيانات
         await loadCategories();
