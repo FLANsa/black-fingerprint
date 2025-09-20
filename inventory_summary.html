@@ -311,6 +311,20 @@
     }
   }
 
+  // التحقق من بيع الهاتف
+  function isPhoneSold(phoneId, salesData = []) {
+    try {
+      const sales = salesData.length > 0 ? salesData : JSON.parse(localStorage.getItem('sales') || '[]');
+      return sales.some(sale =>
+        Array.isArray(sale.items) &&
+        sale.items.some(item => item.type === 'phone' && (item.id === phoneId || item.phone_id === phoneId))
+      );
+    } catch (error) {
+      console.error('❌ خطأ في التحقق من بيع الهاتف:', error);
+      return false;
+    }
+  }
+
   // تحديث ملخص المخزون من قاعدة البيانات
   async function updateInventorySummary() {
     try {
@@ -318,27 +332,38 @@
       
       let phones = [];
       let accessories = [];
+      let sales = [];
       
       // تحميل البيانات من Firebase أو localStorage
       if (window.storage && window.storage.isFirebaseAvailable) {
         console.log('🔥 تحميل البيانات من Firebase...');
         phones = await window.storage.getPhones();
         accessories = await window.storage.getAccessories();
-        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length });
+        sales = await window.storage.getSales();
+        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length, sales: sales.length });
       } else {
         console.log('💾 Firebase غير متاح، تحميل من localStorage...');
         phones = JSON.parse(localStorage.getItem('phones') || '[]');
         accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        sales = JSON.parse(localStorage.getItem('sales') || '[]');
       }
 
-      // فصل الهواتف الجديدة والمستعملة
-      const newPhones = phones.filter(p => p.condition === 'new' || p.phone_type === 'new');
-      const usedPhones = phones.filter(p => p.condition === 'used' || p.phone_type === 'used');
+      // تصفية الهواتف المباعة - إبقاء الهواتف المتاحة فقط
+      const availablePhones = phones.filter(phone => {
+        const phoneId = phone.id || phone.phone_number;
+        return phoneId && !isPhoneSold(phoneId, sales);
+      });
 
-      // حساب الإحصائيات الأساسية للهواتف
-      const totalPhones = phones.length;
-      const totalPurchaseValue = phones.reduce((sum, p) => sum + (p.purchase_price || p.price || 0), 0);
-      const totalSellingValue = phones.reduce((sum, p) => sum + (p.selling_price || p.price || 0), 0);
+      console.log('📱 الهواتف المتاحة:', availablePhones.length, 'من أصل', phones.length);
+
+      // فصل الهواتف الجديدة والمستعملة (من الهواتف المتاحة فقط)
+      const newPhones = availablePhones.filter(p => p.condition === 'new' || p.phone_type === 'new');
+      const usedPhones = availablePhones.filter(p => p.condition === 'used' || p.phone_type === 'used');
+
+      // حساب الإحصائيات الأساسية للهواتف (الهواتف المتاحة فقط)
+      const totalPhones = availablePhones.length;
+      const totalPurchaseValue = availablePhones.reduce((sum, p) => sum + (p.purchase_price || p.price || 0), 0);
+      const totalSellingValue = availablePhones.reduce((sum, p) => sum + (p.selling_price || p.price || 0), 0);
       const totalProfit = totalSellingValue - totalPurchaseValue;
 
       // إحصائيات الهواتف الجديدة
