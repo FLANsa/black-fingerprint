@@ -454,15 +454,59 @@
       const totalSalesSubtotal = sales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
       const totalVatAmount = sales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
 
+      // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة
+      let totalActualProfit = 0;
+      let totalPurchaseCostAfterTax = 0;
+      
+      sales.forEach(sale => {
+        if (sale.items && Array.isArray(sale.items)) {
+          sale.items.forEach(item => {
+            // سعر البيع بعد الضريبة (من المبيعات)
+            const sellingPriceAfterTax = item.unitPrice || item.unit_price || 0;
+            const quantity = item.quantity || 1;
+            const totalSellingPriceAfterTax = sellingPriceAfterTax * quantity;
+            
+            // سعر الشراء بعد الضريبة (من قاعدة البيانات)
+            let purchasePriceAfterTax = 0;
+            if (item.type === 'phone') {
+              // البحث عن الهاتف في قاعدة البيانات
+              const phone = phones.find(p => (p.id === item.id || p.phone_id === item.id || p.phone_number === item.id));
+              if (phone) {
+                purchasePriceAfterTax = (phone.purchase_price || 0) * 1.15; // إضافة 15% ضريبة
+              }
+            } else {
+              // البحث عن الأكسسوار في قاعدة البيانات
+              const accessory = accessories.find(a => (a.id === item.id || a.sku === item.id));
+              if (accessory) {
+                purchasePriceAfterTax = (accessory.purchase_price || 0) * 1.15; // إضافة 15% ضريبة
+              }
+            }
+            
+            const totalPurchasePriceAfterTax = purchasePriceAfterTax * quantity;
+            const itemProfit = totalSellingPriceAfterTax - totalPurchasePriceAfterTax;
+            
+            totalActualProfit += itemProfit;
+            totalPurchaseCostAfterTax += totalPurchasePriceAfterTax;
+          });
+        }
+      });
+
+      // حساب نسبة الربح الفعلية
+      const actualProfitRatio = totalPurchaseCostAfterTax > 0 ? (totalActualProfit / totalPurchaseCostAfterTax) * 100 : 0;
+
+      console.log('💰 إجمالي سعر البيع بعد الضريبة:', totalSalesAmount);
+      console.log('💰 إجمالي سعر الشراء بعد الضريبة:', totalPurchaseCostAfterTax);
+      console.log('💰 الربح الفعلي:', totalActualProfit);
+      console.log('💰 نسبة الربح الفعلية:', actualProfitRatio.toFixed(2) + '%');
+
       document.getElementById('total_sales_count').textContent = convertToLatinNumbers(totalSales);
       document.getElementById('total_sales_amount').textContent = convertToLatinNumbers(totalSalesAmount.toFixed(0));
       document.getElementById('total_sales_subtotal').textContent = convertToLatinNumbers(totalSalesSubtotal.toFixed(2)) + ' ريال';
       document.getElementById('total_vat_amount').textContent = convertToLatinNumbers(totalVatAmount.toFixed(2)) + ' ريال';
-      document.getElementById('total_actual_profit').textContent = convertToLatinNumbers((totalSalesSubtotal * 0.2).toFixed(2)) + ' ريال'; // تقدير 20% ربح
+      document.getElementById('total_actual_profit').textContent = convertToLatinNumbers(totalActualProfit.toFixed(2)) + ' ريال';
 
       // حساب نسبة الربح
-      const profitRatio = totalSalesSubtotal > 0 ? 20 : 0; // نسبة تقديرية
-      document.getElementById('profit_ratio').textContent = convertToLatinNumbers(profitRatio.toFixed(1)) + '%';
+      document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
 
     } catch (error) {
       console.error('خطأ في تحديث لوحة التحكم:', error);
