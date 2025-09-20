@@ -554,7 +554,16 @@
       if (!currentSale) return;
 
       document.getElementById('sale_number').textContent = currentSale.sale_number || currentSale.id;
-      document.getElementById('date_created').textContent = formatDate(currentSale.date_created || currentSale.date_added);
+      // تعيين تاريخ الإنشاء مع معالجة أفضل للأخطاء
+      const dateCreatedElement = document.getElementById('date_created');
+      if (dateCreatedElement) {
+        const saleDate = currentSale.date_created || currentSale.date_added;
+        const formattedDate = formatDate(saleDate);
+        dateCreatedElement.textContent = formattedDate;
+        console.log('✅ تم تعيين تاريخ الإنشاء:', formattedDate);
+      } else {
+        console.error('❌ عنصر تاريخ الإنشاء غير موجود');
+      }
       document.getElementById('status').innerHTML = getStatusBadge(currentSale.status || 'مكتمل');
       document.getElementById('payment_method').textContent = currentSale.payment_method || 'نقدي';
 
@@ -632,14 +641,37 @@
     // تنسيق التاريخ
     function formatDate(dateString) {
       if (!dateString) return '-';
-      const date = new Date(dateString);
-      return date.toLocaleString('ar-SA', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return '-';
+        
+        // محاولة التنسيق العربي أولاً
+        try {
+          return date.toLocaleString('ar-SA', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          });
+        } catch (error) {
+          // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
+          console.warn('Arabic locale not supported for formatDate, using English format');
+          return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          });
+        }
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        return '-';
+      }
     }
 
     // طباعة الفاتورة
@@ -850,7 +882,16 @@
       if (!currentSale) return;
 
       document.getElementById('receipt_sale_number').textContent = currentSale.sale_number || currentSale.id;
-      document.getElementById('receipt_date').textContent = formatDate(currentSale.date_created || currentSale.date_added);
+      // تعيين تاريخ الفاتورة مع معالجة أفضل للأخطاء
+      const receiptDateElement = document.getElementById('receipt_date');
+      if (receiptDateElement) {
+        const saleDate = currentSale.date_created || currentSale.date_added;
+        const formattedDate = formatDate(saleDate);
+        receiptDateElement.textContent = formattedDate;
+        console.log('✅ تم تعيين تاريخ الفاتورة:', formattedDate);
+      } else {
+        console.error('❌ عنصر تاريخ الفاتورة غير موجود');
+      }
 
       const customerInfo = document.getElementById('receipt_customer_info');
       if (currentSale.customer_name && currentSale.customer_name !== 'عميل نقدي') {
@@ -890,51 +931,54 @@
     }
 
     // تعيين تاريخ الطباعة
-  function setPrintDate() {
-    const now = new Date();
-    
-    // تنسيق التاريخ باللغة العربية مع دعم أفضل للمتصفحات
-    const options = {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    };
-    
-    let dateStr;
-    try {
-      // محاولة استخدام التنسيق العربي
-      dateStr = now.toLocaleString('ar-SA', options);
-    } catch (error) {
-      // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
-      console.warn('Arabic locale not supported, using English format');
+    function setPrintDate() {
+      const now = new Date();
+      
+      // تنسيق التاريخ باللغة العربية مع دعم أفضل للمتصفحات
+      const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      };
+      
+      let dateStr;
       try {
-        dateStr = now.toLocaleString('en-US', options);
-      } catch (fallbackError) {
-        // في حالة فشل جميع التنسيقات، استخدم التنسيق اليدوي
-        console.warn('All locale formats failed, using manual format');
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        dateStr = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+        // محاولة استخدام التنسيق العربي
+        dateStr = now.toLocaleString('ar-SA', options);
+        console.log('✅ تم استخدام التنسيق العربي للتاريخ');
+      } catch (error) {
+        // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
+        console.warn('Arabic locale not supported, using English format');
+        try {
+          dateStr = now.toLocaleString('en-US', options);
+          console.log('✅ تم استخدام التنسيق الإنجليزي للتاريخ');
+        } catch (fallbackError) {
+          // في حالة فشل جميع التنسيقات، استخدم التنسيق اليدوي
+          console.warn('All locale formats failed, using manual format');
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const day = String(now.getDate()).padStart(2, '0');
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+          dateStr = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+          console.log('✅ تم استخدام التنسيق اليدوي للتاريخ');
+        }
+      }
+      
+      // التأكد من وجود العنصر قبل التحديث
+      const printDateElement = document.getElementById('print-date');
+      if (printDateElement) {
+        printDateElement.textContent = dateStr;
+        console.log('✅ تم تعيين تاريخ الطباعة:', dateStr);
+      } else {
+        console.error('❌ عنصر تاريخ الطباعة غير موجود');
       }
     }
-    
-    // التأكد من وجود العنصر قبل التحديث
-    const printDateElement = document.getElementById('print-date');
-    if (printDateElement) {
-      printDateElement.textContent = dateStr;
-      console.log('✅ تم تعيين تاريخ الطباعة:', dateStr);
-    } else {
-      console.error('❌ عنصر تاريخ الطباعة غير موجود');
-    }
-  }
 
     // عرض التنبيهات
     function showAlert(type, message) {
