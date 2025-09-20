@@ -8,6 +8,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- QRCode.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+          integrity="sha512-2Nt6BqPCwFpkRkQm+KxZ6mUXz2X5/C/PObbIVdQydb9h9NP7VDaRao7IhiHBpjz2uVH54camzatoorktr1cG4g=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -27,6 +32,31 @@
     /* Receipt roll printer styles */
     .receipt-template {
       display: none;
+    }
+    
+    /* QR block for receipt */
+    .qr-block {
+      text-align: center;
+      margin: 8px 0 0 0;
+    }
+    #tax-qr {
+      width: 120px; height: 120px;
+      margin: 0 auto 6px auto;
+    }
+    #tax-qr img, #tax-qr canvas {
+      width: 120px; height: 120px; /* lock size for thermal printers */
+      display: block; margin: 0 auto;
+    }
+    .qr-caption {
+      font-size: 11px;
+    }
+
+    /* Ensure visible in print */
+    @media print {
+      #tax-qr, #tax-qr img, #tax-qr canvas {
+        width: 120px !important; height: 120px !important;
+      }
+      .qr-caption { font-size: 11px !important; }
     }
     
     @media print {
@@ -475,8 +505,12 @@
       <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
       <p>في حال وجود عطل داخلي يشمل ضمان</p>
       <p>المستخدم في حال وجود كامل الملحقات</p>
-      <div class="qr-placeholder">
-        <p>[QR Code]</p>
+      <div class="qr-block">
+        <div id="tax-qr" aria-label="QR code for tax number"></div>
+        <div class="qr-caption">الرقم الضريبي: <span id="tax-number-text">310105614500003</span></div>
+        <div class="qr-fallback d-none text-danger" id="tax-qr-fallback">
+          تعذّر إنشاء رمز QR — الرقم الضريبي: 310105614500003
+        </div>
       </div>
       <p>شكرا لزيارتكم الصقري للإتصالات</p>
       <p>تاريخ الطباعة: <span id="print-date"></span></p>
@@ -534,6 +568,9 @@
     
     // تعيين تاريخ الطباعة عند تحميل الصفحة (اليوم فقط)
     setPrintDate();
+    
+    // إنشاء QR Code للرقم الضريبي
+    generateTaxQR();
     
     const urlParams = new URLSearchParams(window.location.search);
     const saleId = urlParams.get('id');
@@ -782,6 +819,9 @@
     setPrintDate();
     populateReceiptTemplate();
     
+    // التأكد من جاهزية QR Code للطباعة
+    ensureQrReadyForPrint();
+    
     const printWindow = window.open('', '_blank');
     const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
     
@@ -892,6 +932,94 @@
     const printDateElement = document.getElementById('print-date');
     if (printDateElement) {
       printDateElement.textContent = todayRiyadh();
+    }
+  }
+
+  // --- QR: constants ---
+  const TAX_NUMBER = "310105614500003";
+
+  // Generate the QR into #tax-qr, then convert canvas -> <img> so it survives innerHTML cloning for print
+  function generateTaxQR() {
+    const container = document.getElementById('tax-qr');
+    const fallback  = document.getElementById('tax-qr-fallback');
+    const caption   = document.getElementById('tax-number-text');
+
+    if (!container) return;
+
+    try {
+      // reset
+      container.innerHTML = '';
+      if (fallback) fallback.classList.add('d-none');
+      if (caption)  caption.textContent = TAX_NUMBER;
+
+      // create QR (black/white, 120x120)
+      // QRCode.js may render <canvas> or <img>; we'll force an <img> for printing
+      const qr = new QRCode(container, {
+        text: TAX_NUMBER,
+        width: 120,
+        height: 120,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      // After a tick, if canvas exists, convert it to <img> data URL so printing works in a new window
+      setTimeout(() => {
+        try {
+          const canvas = container.querySelector('canvas');
+          const img    = container.querySelector('img');
+
+          if (img) {
+            // already an <img>, nothing to do
+            return;
+          }
+          if (canvas) {
+            const png = canvas.toDataURL('image/png');
+            const imgEl = document.createElement('img');
+            imgEl.src = png;
+            imgEl.alt = 'Tax QR';
+            imgEl.width = 120; imgEl.height = 120;
+            container.innerHTML = '';
+            container.appendChild(imgEl);
+          }
+        } catch (innerErr) {
+          console.warn('QR canvas->img conversion failed:', innerErr);
+          if (fallback) fallback.classList.remove('d-none');
+        }
+      }, 0);
+
+    } catch (err) {
+      console.error('QR generation failed:', err);
+      if (fallback) fallback.classList.remove('d-none');
+    }
+  }
+
+  // Ensure we have an <img> in the QR container before we clone HTML into the print window
+  function ensureQrReadyForPrint() {
+    const container = document.getElementById('tax-qr');
+    if (!container) return;
+
+    const img = container.querySelector('img');
+    const canvas = container.querySelector('canvas');
+    if (img) return; // good to go
+
+    try {
+      if (canvas) {
+        const png = canvas.toDataURL('image/png');
+        const imgEl = document.createElement('img');
+        imgEl.src = png;
+        imgEl.alt = 'Tax QR';
+        imgEl.width = 120; imgEl.height = 120;
+        container.innerHTML = '';
+        container.appendChild(imgEl);
+      } else {
+        // maybe generation didn't run yet
+        generateTaxQR();
+      }
+    } catch (err) {
+      console.warn('Preparing QR for print failed:', err);
+      const fallback  = document.getElementById('tax-qr-fallback');
+      if (fallback) fallback.classList.remove('d-none');
     }
   }
 
