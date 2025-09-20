@@ -223,44 +223,6 @@
       </div>
     </div>
 
-    <!-- Recent Items -->
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h5><i class="fas fa-mobile-alt"></i> أحدث الهواتف المضافة</h5>
-          </div>
-          <div class="card-body">
-            <div id="recent_phones">
-              <div class="text-center">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">جاري التحميل...</span>
-                </div>
-                <p class="mt-2">جاري تحميل البيانات...</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
-            <h5><i class="fas fa-headphones"></i> أحدث الأكسسوارات المضافة</h5>
-          </div>
-          <div class="card-body">
-            <div id="recent_accessories">
-              <div class="text-center">
-                <div class="spinner-border text-success" role="status">
-                  <span class="visually-hidden">جاري التحميل...</span>
-                </div>
-                <p class="mt-2">جاري تحميل البيانات...</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Bootstrap JS -->
@@ -330,9 +292,6 @@
         // Update statistics
         updateStatistics(phones, accessories, sales);
         
-        // Update recent items
-        updateRecentPhones(phones);
-        updateRecentAccessories(accessories);
         
       } catch (error) {
         console.error('Error updating limited dashboard:', error);
@@ -352,101 +311,6 @@
       document.getElementById('total_items').textContent = convertToLatinNumbers(totalItems.toString());
     }
 
-    function updateRecentPhones(phones) {
-      const container = document.getElementById('recent_phones');
-      
-      if (!phones || phones.length === 0) {
-        container.innerHTML = '<p class="text-muted text-center">لا توجد هواتف مضافة بعد.</p>';
-        return;
-      }
-
-      // Get last 5 phones
-      const recentPhones = phones.slice(-5).reverse();
-      
-      let html = `
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>العلامة التجارية</th>
-                <th>الموديل</th>
-                <th>الحالة</th>
-                <th>الرقم التسلسلي</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      recentPhones.forEach(phone => {
-        const condition = phone.condition === 'new' ? 'جديد' : 'مستعمل';
-        const badgeClass = phone.condition === 'new' ? 'bg-success' : 'bg-warning';
-        
-        html += `
-          <tr>
-            <td>${phone.manufacturer || phone.brand || 'غير محدد'}</td>
-            <td>${phone.model || 'غير محدد'}</td>
-            <td><span class="badge ${badgeClass}">${condition}</span></td>
-            <td>${phone.serial_number || phone.phone_number || 'غير محدد'}</td>
-          </tr>
-        `;
-      });
-
-      html += `
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      container.innerHTML = html;
-    }
-
-    function updateRecentAccessories(accessories) {
-      const container = document.getElementById('recent_accessories');
-      
-      if (!accessories || accessories.length === 0) {
-        container.innerHTML = '<p class="text-muted text-center">لا توجد أكسسوارات مضافة بعد.</p>';
-        return;
-      }
-
-      // Get last 5 accessories
-      const recentAccessories = accessories.slice(-5).reverse();
-      
-      let html = `
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>الفئة</th>
-                <th>الكمية</th>
-                <th>السعر</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      recentAccessories.forEach(accessory => {
-        const sellingPrice = parseFloat(accessory.selling_price || 0);
-        const formattedPrice = sellingPrice.toFixed(2);
-        
-        html += `
-          <tr>
-            <td>${accessory.name || 'غير محدد'}</td>
-            <td>${accessory.category || 'غير محدد'}</td>
-            <td>${convertToLatinNumbers((accessory.quantity_in_stock || accessory.quantity || 0).toString())}</td>
-            <td>${convertToLatinNumbers(formattedPrice)} ريال</td>
-          </tr>
-        `;
-      });
-
-      html += `
-            </tbody>
-          </table>
-        </div>
-      `;
-
-      container.innerHTML = html;
-    }
 
     function convertToLatinNumbers(str) {
       const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
