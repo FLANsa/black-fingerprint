@@ -242,27 +242,27 @@
     </div>
   </nav>
 
-  <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2><i class="fas fa-shopping-cart"></i> تفاصيل عملية البيع</h2>
-      <div>
-        <a href="list_sales.html" class="btn btn-secondary me-2">
-          <i class="fas fa-arrow-left"></i> العودة لقائمة المبيعات
-        </a>
-        <a href="dashboard.html" class="btn btn-primary">
-          <i class="fas fa-home"></i> لوحة التحكم
-        </a>
-      </div>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-shopping-cart"></i> تفاصيل عملية البيع</h2>
+    <div>
+      <a href="list_sales.html" class="btn btn-secondary me-2">
+        <i class="fas fa-arrow-left"></i> العودة لقائمة المبيعات
+      </a>
+      <a href="dashboard.html" class="btn btn-primary">
+        <i class="fas fa-home"></i> لوحة التحكم
+      </a>
     </div>
+  </div>
 
     <!-- Sale Information -->
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-info-circle"></i> معلومات العملية</h5>
-          </div>
-          <div class="card-body">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-info-circle"></i> معلومات العملية</h5>
+        </div>
+        <div class="card-body">
             <table class="table table-borderless">
               <tr>
                 <td><strong>رقم العملية:</strong></td>
@@ -280,17 +280,17 @@
                 <td><strong>طريقة الدفع:</strong></td>
                 <td id="payment_method">-</td>
               </tr>
-            </table>
-          </div>
+          </table>
         </div>
       </div>
-      
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="fas fa-user"></i> معلومات العميل</h5>
-          </div>
-          <div class="card-body">
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-user"></i> معلومات العميل</h5>
+        </div>
+        <div class="card-body">
             <table class="table table-borderless">
               <tr>
                 <td><strong>اسم العميل:</strong></td>
@@ -308,108 +308,108 @@
                 <td><strong>العنوان:</strong></td>
                 <td id="customer_address">-</td>
               </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Sale Items -->
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-box"></i> المنتجات المباعة</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+              <table class="table table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>نوع المنتج</th>
+                  <th>اسم المنتج</th>
+                  <th>الوصف</th>
+                  <th>الرقم التسلسلي</th>
+                  <th>سعر الوحدة</th>
+                  <th>الكمية</th>
+                  <th>السعر الإجمالي</th>
+                </tr>
+              </thead>
+                <tbody id="sale_items">
+                  <!-- Items will be loaded here -->
+              </tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Sale Items -->
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header bg-info text-white">
-            <h5 class="mb-0"><i class="fas fa-box"></i> المنتجات المباعة</h5>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-striped">
-                <thead class="table-dark">
-                  <tr>
-                    <th>نوع المنتج</th>
-                    <th>اسم المنتج</th>
-                    <th>الوصف</th>
-                    <th>الرقم التسلسلي</th>
-                    <th>سعر الوحدة</th>
-                    <th>الكمية</th>
-                    <th>السعر الإجمالي</th>
-                  </tr>
-                </thead>
-                <tbody id="sale_items">
-                  <!-- Items will be loaded here -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  </div>
 
     <!-- Financial Summary -->
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header bg-warning text-white">
-            <h5 class="mb-0"><i class="fas fa-calculator"></i> الملخص المالي</h5>
-          </div>
-          <div class="card-body">
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-warning text-white">
+          <h5 class="mb-0"><i class="fas fa-calculator"></i> الملخص المالي</h5>
+        </div>
+        <div class="card-body">
             <div class="row">
-              <div class="col-md-4 text-center">
-                <div class="border rounded p-3">
-                  <h6 class="text-muted">المجموع قبل الضريبة</h6>
+            <div class="col-md-4 text-center">
+              <div class="border rounded p-3">
+                <h6 class="text-muted">المجموع قبل الضريبة</h6>
                   <h4 class="text-primary" id="subtotal">0.00 ريال</h4>
-                </div>
               </div>
-              <div class="col-md-4 text-center">
-                <div class="border rounded p-3">
-                  <h6 class="text-muted">مبلغ الضريبة (15%)</h6>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="border rounded p-3">
+                <h6 class="text-muted">مبلغ الضريبة (15%)</h6>
                   <h4 class="text-warning" id="vat_amount">0.00 ريال</h4>
-                </div>
               </div>
-              <div class="col-md-4 text-center">
-                <div class="border rounded p-3">
-                  <h6 class="text-muted">المبلغ الإجمالي</h6>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="border rounded p-3">
+                <h6 class="text-muted">المبلغ الإجمالي</h6>
                   <h4 class="text-success fw-bold" id="total_amount">0.00 ريال</h4>
-                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="row mt-4" id="notes_section" style="display: none;">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header bg-secondary text-white">
-            <h5 class="mb-0"><i class="fas fa-sticky-note"></i> الملاحظات</h5>
-          </div>
-          <div class="card-body">
-            <p class="mb-0" id="notes">-</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Action Buttons -->
-    <div class="row mt-4">
-      <div class="col-md-12 text-center">
-        <button class="btn btn-success btn-lg me-3" onclick="printReceipt()">
-          <i class="fas fa-print"></i> طباعة الفاتورة
-        </button>
-        <a href="create_sale.html" class="btn btn-primary btn-lg">
-          <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
-        </a>
       </div>
     </div>
   </div>
 
+    <!-- Notes -->
+    <div class="row mt-4" id="notes_section" style="display: none;">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0"><i class="fas fa-sticky-note"></i> الملاحظات</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-0" id="notes">-</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Action Buttons -->
+  <div class="row mt-4">
+    <div class="col-md-12 text-center">
+      <button class="btn btn-success btn-lg me-3" onclick="printReceipt()">
+        <i class="fas fa-print"></i> طباعة الفاتورة
+      </button>
+      <a href="create_sale.html" class="btn btn-primary btn-lg">
+        <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
+      </a>
+    </div>
+  </div>
+</div>
+
   <!-- Receipt Roll Printer Template -->
-  <div id="receipt-roll-template" class="receipt-template">
+<div id="receipt-roll-template" class="receipt-template">
     <div class="receipt-container">
-      <div class="receipt-header">
-        <div class="company-info">
+  <div class="receipt-header">
+    <div class="company-info">
           <h1>الصقري للإتصالات</h1>
           <p>AL SAQRI TELECOM</p>
           <p>الجوال: 0505663222</p>
@@ -417,40 +417,40 @@
           <p>السجل التجاري: 1131281064</p>
           <p>العنوان: القصيم بريده الصفراء</p>
           <p>اسواق النافوره</p>
-        </div>
-        
-        <div class="sale-info">
+    </div>
+
+    <div class="sale-info">
           <h2>فاتورة ضريبية مبسطة</h2>
           <p>فاتورة: <span id="receipt_sale_number">-</span></p>
           <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
-        </div>
-        
+    </div>
+
         <div class="customer-info" id="receipt_customer_info" style="display: none;">
-          <h3>معلومات العميل</h3>
+      <h3>معلومات العميل</h3>
           <p id="receipt_customer_name">-</p>
           <p id="receipt_customer_phone">-</p>
           <p>الرقم الضريبي: </p>
-        </div>
-      </div>
-      
-      <div class="receipt-items">
+    </div>
+  </div>
+
+  <div class="receipt-items">
         <h3>تفاصيل المنتجات</h3>
         <table class="items-table">
-          <thead>
+      <thead>
             <tr>
               <th>الكمية</th>
               <th>المنتج</th>
               <th>السعر غير شامل الضريبة</th>
               <th>السعر شامل الضريبة</th>
             </tr>
-          </thead>
+      </thead>
           <tbody id="receipt_items">
             <!-- Items will be loaded here -->
           </tbody>
-        </table>
-      </div>
-      
-      <div class="receipt-summary">
+    </table>
+  </div>
+
+  <div class="receipt-summary">
         <div class="summary-row">
           <span>الاجمالي غير شامل الضريبة:</span>
           <span id="receipt_subtotal">0.00 ريال</span>
@@ -467,9 +467,9 @@
       
       <div class="seller-info">
         <p>اسم البائع: لؤي</p>
-      </div>
-      
-      <div class="receipt-footer">
+  </div>
+
+  <div class="receipt-footer">
         <h4>سياسة الاستبدال والاسترجاع</h4>
         <p>1) الاجهزة الجديدة ضمانها عند الوكيل</p>
         <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
@@ -481,11 +481,11 @@
         <p>شكرا لزيارتكم الصقري للإتصالات</p>
         <p>تاريخ الطباعة: <span id="print-date"></span></p>
       </div>
-    </div>
   </div>
+</div>
 
-  <!-- مكتبات JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- مكتبات JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- Firebase Configuration -->
@@ -493,7 +493,7 @@
   <script type="module" src="js/firebase-database.js"></script>
   <script type="module" src="js/firebase-storage-manager.js"></script>
 
-  <script>
+<script>
     let currentSale = null;
 
     // تحميل بيانات البيع من URL أو localStorage
@@ -519,13 +519,21 @@
     // تحميل بيانات البيع من Firebase
     async function loadSaleData(saleId) {
       try {
+        console.log('🔍 البحث عن عملية البيع:', saleId);
+        
         if (window.storage && window.storage.isFirebaseAvailable) {
+          console.log('🔥 تحميل من Firebase...');
           const sales = await window.storage.getSales();
+          console.log('📊 جميع عمليات البيع:', sales);
           currentSale = sales.find(sale => sale.id === saleId);
         } else {
+          console.log('💾 تحميل من localStorage...');
           const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+          console.log('📊 جميع عمليات البيع:', sales);
           currentSale = sales.find(sale => sale.id === saleId);
         }
+        
+        console.log('✅ عملية البيع الموجودة:', currentSale);
         
         if (currentSale) {
           displaySaleData();
@@ -573,17 +581,20 @@
       const itemsContainer = document.getElementById('sale_items');
       itemsContainer.innerHTML = '';
 
+      console.log('🔍 عرض منتجات البيع:', currentSale);
+      console.log('📦 عناصر البيع:', currentSale?.items);
+
       if (currentSale.items && currentSale.items.length > 0) {
         currentSale.items.forEach(item => {
           const row = document.createElement('tr');
           row.innerHTML = `
-            <td>${getProductTypeBadge(item.product_type || item.type)}</td>
-            <td>${item.product_name || item.name}</td>
-            <td>${item.product_description || item.description || 'لا يوجد وصف'}</td>
+            <td>${getProductTypeBadge(item.type || item.product_type)}</td>
+            <td>${item.name || item.product_name}</td>
+            <td>${item.description || item.product_description || 'لا يوجد وصف'}</td>
             <td>${item.serial_number || item.barcode || 'لا يوجد'}</td>
-            <td>${(item.unit_price || 0).toFixed(2)} ريال</td>
+            <td>${(item.unitPrice || item.unit_price || 0).toFixed(2)} ريال</td>
             <td>${item.quantity || 1}</td>
-            <td class="fw-bold text-success">${(item.total_price || 0).toFixed(2)} ريال</td>
+            <td class="fw-bold text-success">${(item.totalPrice || item.total_price || 0).toFixed(2)} ريال</td>
           `;
           itemsContainer.appendChild(row);
         });
@@ -854,12 +865,13 @@
       if (currentSale.items && currentSale.items.length > 0) {
         currentSale.items.forEach(item => {
           const row = document.createElement('tr');
-          const unitPriceWithoutVAT = (item.unit_price || 0) / 1.15;
+          const unitPrice = item.unitPrice || item.unit_price || 0;
+          const unitPriceWithoutVAT = unitPrice / 1.15;
           row.innerHTML = `
             <td>${item.quantity || 1}</td>
-            <td>${item.product_name || item.name}</td>
+            <td>${item.name || item.product_name}</td>
             <td>${unitPriceWithoutVAT.toFixed(2)}</td>
-            <td>${(item.unit_price || 0).toFixed(2)}</td>
+            <td>${unitPrice.toFixed(2)}</td>
           `;
           receiptItems.appendChild(row);
         });
@@ -875,8 +887,8 @@
     }
 
     // تعيين تاريخ الطباعة
-    function setPrintDate() {
-      const now = new Date();
+  function setPrintDate() {
+    const now = new Date();
       const dateStr = now.toLocaleString('ar-SA');
       document.getElementById('print-date').textContent = dateStr;
     }
@@ -906,6 +918,6 @@
         window.location.href = 'login.html';
       }
     }
-  </script>
+</script>
 </body>
 </html>
