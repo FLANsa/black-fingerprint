@@ -23,7 +23,7 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-edit"></i> تعديل الأكسسوار</h2>
     <div>
-      <a href="list_accessories.html" class="btn btn-secondary">
+      <a href="list_accessories_simple.html" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> العودة لقائمة الأكسسوارات
       </a>
     </div>
@@ -109,7 +109,7 @@
           <button type="submit" class="btn btn-primary" onclick="saveAccessory()">
             <i class="fas fa-save"></i> حفظ التعديلات
           </button>
-          <a href="list_accessories.html" class="btn btn-secondary">
+          <a href="list_accessories_simple.html" class="btn btn-secondary">
             <i class="fas fa-times"></i> إلغاء
           </a>
         </div>
@@ -297,7 +297,7 @@
           console.log('✅ تم تحديث الأكسسوار في Firebase:', accessoryId);
           alert('تم تحديث الأكسسوار بنجاح!');
           // إعادة توجيه إلى صفحة قائمة الأكسسوارات
-          window.location.href = 'list_accessories.html';
+          window.location.href = 'list_accessories_simple.html';
         }
       } else {
         alert('Firebase غير متاح. تأكد من الاتصال بالإنترنت.');

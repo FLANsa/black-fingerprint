@@ -503,7 +503,7 @@ window.PhoneStoreApp = {
                 UIUtils.showAlert('success', result.message);
                 this.clearAutoSave();
                 setTimeout(() => {
-                    window.location.href = 'list_accessories.html';
+                    window.location.href = 'list_accessories_simple.html';
                 }, 1500);
             } else {
                 UIUtils.showAlert('error', result.error);

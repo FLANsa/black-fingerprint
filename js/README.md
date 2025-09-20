@@ -64,7 +64,7 @@ Replace the existing inline JavaScript in your HTML templates with the new modul
     accessoryManager.addAccessory(accessoryData).then(result => {
       if (result.success) {
         UIUtils.showAlert('success', result.message);
-        setTimeout(() => window.location.href = 'list_accessories.html', 1500);
+        setTimeout(() => window.location.href = 'list_accessories_simple.html', 1500);
       } else {
         UIUtils.showAlert('error', result.error);
       }
@@ -281,7 +281,7 @@ Edit `config.js` to modify:
     const result = await accessoryManager.addAccessory(data);
     if (result.success) {
       UIUtils.showAlert('success', result.message);
-      window.location.href = 'list_accessories.html';
+      window.location.href = 'list_accessories_simple.html';
     } else {
       UIUtils.showAlert('error', result.error);
     }
