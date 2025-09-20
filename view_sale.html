@@ -500,6 +500,9 @@
     document.addEventListener('DOMContentLoaded', async () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // تعيين تاريخ الطباعة عند تحميل الصفحة
+      setPrintDate();
+      
       const urlParams = new URLSearchParams(window.location.search);
       const saleId = urlParams.get('id');
       
@@ -889,9 +892,49 @@
     // تعيين تاريخ الطباعة
   function setPrintDate() {
     const now = new Date();
-      const dateStr = now.toLocaleString('ar-SA');
-      document.getElementById('print-date').textContent = dateStr;
+    
+    // تنسيق التاريخ باللغة العربية مع دعم أفضل للمتصفحات
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    };
+    
+    let dateStr;
+    try {
+      // محاولة استخدام التنسيق العربي
+      dateStr = now.toLocaleString('ar-SA', options);
+    } catch (error) {
+      // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
+      console.warn('Arabic locale not supported, using English format');
+      try {
+        dateStr = now.toLocaleString('en-US', options);
+      } catch (fallbackError) {
+        // في حالة فشل جميع التنسيقات، استخدم التنسيق اليدوي
+        console.warn('All locale formats failed, using manual format');
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        dateStr = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+      }
     }
+    
+    // التأكد من وجود العنصر قبل التحديث
+    const printDateElement = document.getElementById('print-date');
+    if (printDateElement) {
+      printDateElement.textContent = dateStr;
+      console.log('✅ تم تعيين تاريخ الطباعة:', dateStr);
+    } else {
+      console.error('❌ عنصر تاريخ الطباعة غير موجود');
+    }
+  }
 
     // عرض التنبيهات
     function showAlert(type, message) {
