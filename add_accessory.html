@@ -99,19 +99,13 @@
             <!-- واجهة فقط: لا إرسال للخادم -->
             <form action="#" onsubmit="return false;">
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="name" class="form-label">اسم الأكسسوار (إنجليزي) *</label>
-                    <input type="text" class="form-control" id="name" required placeholder="مثال: Phone Case">
+                    <label for="name" class="form-label">اسم الأكسسوار *</label>
+                    <input type="text" class="form-control" id="name" required placeholder="مثال: غلاف الهاتف">
                   </div>
                 </div>
-                <div class="col-md-4">
-                  <div class="mb-3">
-                    <label for="arabic_name" class="form-label">اسم الأكسسوار (عربي) *</label>
-                    <input type="text" class="form-control" id="arabic_name" required placeholder="مثال: غلاف الهاتف">
-                  </div>
-                </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="mb-3">
                     <label for="category" class="form-label">الفئة *</label>
                     <div class="input-group">
@@ -447,7 +441,7 @@
         
         const accessoryData = {
           name: document.getElementById('name').value.trim(),
-          arabic_name: document.getElementById('arabic_name').value.trim(), // الاسم العربي من الحقل المنفصل
+          arabic_name: document.getElementById('name').value.trim(), // استخدام نفس الاسم
           category: document.getElementById('category').value,
           quantity: parseInt(convertArabicToEnglishNumbers(quantityRaw)) || 0,
           quantity_in_stock: parseInt(convertArabicToEnglishNumbers(quantityRaw)) || 0, // إضافة quantity_in_stock
@@ -461,12 +455,7 @@
 
         // التحقق من البيانات المطلوبة
         if (!accessoryData.name) {
-          showAlert('danger', 'يرجى إدخال اسم الأكسسوار (إنجليزي)');
-          return false;
-        }
-
-        if (!accessoryData.arabic_name) {
-          showAlert('danger', 'يرجى إدخال اسم الأكسسوار (عربي)');
+          showAlert('danger', 'يرجى إدخال اسم الأكسسوار');
           return false;
         }
 
@@ -500,7 +489,7 @@
           if (accessoryId) {
             console.log('✅ تم حفظ الأكسسوار في Firebase بنجاح! ID:', accessoryId);
             console.log('📂 الفئة:', accessoryData.category);
-            showAlert('success', `تم إضافة الأكسسوار "${accessoryData.arabic_name}" بنجاح!`);
+            showAlert('success', `تم إضافة الأكسسوار "${accessoryData.name}" بنجاح!`);
             return true;
           } else {
             console.log('❌ فشل في حفظ الأكسسوار في Firebase - لم يتم إرجاع ID');
@@ -554,7 +543,7 @@
       }
       
       // تركيز على الحقل الأول
-      document.getElementById('arabic_name').focus();
+      document.getElementById('name').focus();
     });
   </script>
 </body>
