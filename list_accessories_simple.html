@@ -42,7 +42,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
+            <a class="nav-link" href="index.html">الصقري للاتصالات</a>
           </li>
 
           <li class="nav-item dropdown">
@@ -595,8 +595,29 @@
     }
   }
 
+  // تحديث التنقل حسب دور المستخدم (إظهار الرئيسية/تسجيل الخروج للمستخدم المحدود)
+  function updateNavigationForUser() {
+    const currentUser = localStorage.getItem('current_user');
+    if (!currentUser) return;
+    try {
+      const userData = JSON.parse(currentUser);
+      if (userData && userData.role === 'user') {
+        const navbar = document.querySelector('.navbar-nav.me-auto');
+        if (navbar) {
+          navbar.innerHTML = `
+            <li class="nav-item"><a class="nav-link" href="limited_dashboard.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+          `;
+        }
+        const backBtn = document.querySelector('a.btn.btn-secondary[href="dashboard.html"]');
+        if (backBtn) backBtn.setAttribute('href', 'limited_dashboard.html');
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   // تهيئة الصفحة
   document.addEventListener('DOMContentLoaded', async function() {
+    updateNavigationForUser();
     // انتظار تهيئة Firebase
     await new Promise(resolve => setTimeout(resolve, 1000));
     
