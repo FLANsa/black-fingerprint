@@ -983,7 +983,13 @@
             margin:0 auto 6px;
           }
           
-          @media print { @page { size: 80mm auto; margin: 5mm; } }
+          @media print {
+            /* left margin = 25mm = 5mm default + 20mm shift */
+            @page { size: 80mm auto; margin: 5mm 5mm 5mm 25mm; }
+          }
+
+          /* shift the receipt content 20mm to the right */
+          .receipt-container { margin-left: 20mm !important; }
         </style>
       </head>
       <body>
