@@ -9,21 +9,59 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   
-  <!-- QRCode.js CDN - Multiple fallbacks -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" 
-          onerror="loadQRCodeFallback()"></script>
+  <!-- QRCode.js CDN - Multiple fallbacks with better error handling -->
   <script>
-    function loadQRCodeFallback() {
-      console.log('Loading QR code fallback...');
+    let qrLibrariesLoaded = 0;
+    const maxRetries = 3;
+    
+    function loadQRCodeLibrary() {
+      console.log('Loading QR code library...');
+      
+      // Try multiple CDN sources
+      const cdnSources = [
+        'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+        'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
+      ];
+      
+      let currentSource = 0;
+      
+      function tryNextSource() {
+        if (currentSource >= cdnSources.length) {
+          console.error('All QR code CDN sources failed, trying fallback library...');
+          loadQRCodeJSFallback();
+          return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = cdnSources[currentSource];
+        script.onload = function() {
+          console.log('QR code library loaded from:', cdnSources[currentSource]);
+          qrLibrariesLoaded++;
+          setTimeout(generateTaxQR, 100);
+        };
+        script.onerror = function() {
+          console.warn('Failed to load from:', cdnSources[currentSource]);
+          currentSource++;
+          tryNextSource();
+        };
+        document.head.appendChild(script);
+      }
+      
+      tryNextSource();
+    }
+    
+    function loadQRCodeJSFallback() {
+      console.log('Loading QRCode.js fallback...');
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
       script.onload = function() {
-        console.log('QRCode fallback loaded successfully');
-        // Retry QR generation after fallback loads
+        console.log('QRCode.js fallback loaded successfully');
+        qrLibrariesLoaded++;
         setTimeout(generateTaxQR, 100);
       };
       script.onerror = function() {
-        console.error('Both QR code libraries failed to load');
+        console.error('QRCode.js fallback also failed');
         showQRCodeError();
       };
       document.head.appendChild(script);
@@ -35,8 +73,15 @@
       if (container && fallback) {
         container.innerHTML = '';
         fallback.classList.remove('d-none');
-        fallback.textContent = 'تعذر تحميل مكتبة QR Code';
+        console.log('Showing QR code error fallback');
       }
+    }
+    
+    // Start loading when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadQRCodeLibrary);
+    } else {
+      loadQRCodeLibrary();
     }
   </script>
 
@@ -539,9 +584,14 @@
             <i class="fas fa-qrcode fa-3x text-muted mb-2"></i>
             <div class="small">تعذر إنشاء رمز QR</div>
             <div class="small text-muted">الرقم الضريبي: 310105614500003</div>
-            <button class="btn btn-sm btn-outline-primary mt-2" onclick="retryQRGeneration()">
-              <i class="fas fa-redo"></i> إعادة المحاولة
-            </button>
+            <div class="mt-2">
+              <button class="btn btn-sm btn-outline-primary me-2" onclick="retryQRGeneration()">
+                <i class="fas fa-redo"></i> إعادة المحاولة
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" onclick="showTextQR()">
+                <i class="fas fa-text-width"></i> عرض نصي
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -604,8 +654,9 @@
     
     // إنشاء QR Code للرقم الضريبي (مع تأخير للتأكد من تحميل المكتبة)
     setTimeout(() => {
+      console.log('Attempting QR generation after page load...');
       generateTaxQR();
-    }, 500);
+    }, 1000);
     
     const urlParams = new URLSearchParams(window.location.search);
     const saleId = urlParams.get('id');
@@ -1004,7 +1055,7 @@
       console.error('No QR code library available');
       if (fallback) {
         fallback.classList.remove('d-none');
-        fallback.textContent = 'تعذر تحميل مكتبة QR Code';
+        console.log('Showing fallback UI for missing QR libraries');
       }
     }
   }
@@ -1118,6 +1169,35 @@
       fallback.classList.add('d-none');
     }
     generateTaxQR();
+  }
+
+  // Show text-based QR representation
+  function showTextQR() {
+    console.log('Showing text-based QR representation...');
+    const container = document.getElementById('tax-qr');
+    const fallback = document.getElementById('tax-qr-fallback');
+    
+    if (container && fallback) {
+      fallback.classList.add('d-none');
+      
+      // Create a simple text-based representation
+      const textQR = document.createElement('div');
+      textQR.className = 'text-center';
+      textQR.innerHTML = `
+        <div class="border p-3 bg-light" style="font-family: monospace; font-size: 12px; line-height: 1.2;">
+          <div class="mb-2"><strong>QR Code (Text)</strong></div>
+          <div class="mb-2">████████████████████</div>
+          <div class="mb-2">█  ██  ██  ██  ██  █</div>
+          <div class="mb-2">████  ██  ██  ██  ██</div>
+          <div class="mb-2">█  ██  ██  ██  ██  █</div>
+          <div class="mb-2">████████████████████</div>
+          <div class="small text-muted mt-2">الرقم الضريبي: 310105614500003</div>
+        </div>
+      `;
+      
+      container.innerHTML = '';
+      container.appendChild(textQR);
+    }
   }
 
   // Ensure we have an <img> in the QR container before we clone HTML into the print window
