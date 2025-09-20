@@ -15,8 +15,6 @@
     const maxRetries = 3;
     
     function loadQRCodeLibrary() {
-      console.log('Loading QR code library...');
-      
       // Try multiple CDN sources
       const cdnSources = [
         'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
@@ -28,7 +26,6 @@
       
       function tryNextSource() {
         if (currentSource >= cdnSources.length) {
-          console.error('All QR code CDN sources failed, trying fallback library...');
           loadQRCodeJSFallback();
           return;
         }
@@ -36,12 +33,10 @@
         const script = document.createElement('script');
         script.src = cdnSources[currentSource];
         script.onload = function() {
-          console.log('QR code library loaded from:', cdnSources[currentSource]);
           qrLibrariesLoaded++;
           setTimeout(generateTaxQR, 100);
         };
         script.onerror = function() {
-          console.warn('Failed to load from:', cdnSources[currentSource]);
           currentSource++;
           tryNextSource();
         };
@@ -52,16 +47,13 @@
     }
     
     function loadQRCodeJSFallback() {
-      console.log('Loading QRCode.js fallback...');
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
       script.onload = function() {
-        console.log('QRCode.js fallback loaded successfully');
         qrLibrariesLoaded++;
         setTimeout(generateTaxQR, 100);
       };
       script.onerror = function() {
-        console.error('QRCode.js fallback also failed');
         showQRCodeError();
       };
       document.head.appendChild(script);
@@ -73,7 +65,6 @@
       if (container && fallback) {
         container.innerHTML = '';
         fallback.classList.remove('d-none');
-        console.log('Showing QR code error fallback');
       }
     }
     
@@ -752,7 +743,6 @@
     
     // إنشاء QR Code للرقم الضريبي (مع تأخير للتأكد من تحميل المكتبة)
     setTimeout(() => {
-      console.log('Attempting QR generation after page load...');
       generateTaxQR();
     }, 1000);
     
@@ -765,28 +755,9 @@
       const lastSale = localStorage.getItem('lastSale');
       if (lastSale) {
         currentSale = JSON.parse(lastSale);
-        console.log('📦 استخدام آخر عملية بيع من localStorage:', currentSale);
         displaySaleData();
       } else {
-        console.warn('⚠️ لا توجد بيانات للعرض، إنشاء بيانات تجريبية');
-        const now = new Date();
-        currentSale = {
-          id: 'test-sale-001',
-          sale_number: 'SALE-TEST001',
-          date_created: now.toISOString(),
-          date_added: now.toISOString(),
-          status: 'مكتمل',
-          customer_name: 'عميل تجريبي',
-          customer_phone: '0501234567',
-          payment_method: 'نقدي',
-    items: [
-            { type: 'phone', name: 'iPhone 15', unitPrice: 4000, quantity: 1, totalPrice: 4000 }
-          ],
-          subtotal: 3478.26,
-          vat_amount: 521.74,
-          total_amount: 4000
-        };
-        displaySaleData();
+        showAlert('warning', 'لا توجد بيانات للعرض');
       }
     }
   });
@@ -794,14 +765,10 @@
   // تحميل بيانات البيع من Firebase
   async function loadSaleData(saleId) {
     try {
-      console.log('🔍 البحث عن عملية البيع:', saleId);
-      
       if (window.storage && window.storage.isFirebaseAvailable) {
-        console.log('🔥 تحميل من Firebase...');
         const sales = await window.storage.getSales();
         currentSale = sales.find(sale => sale.id === saleId);
       } else {
-        console.log('💾 تحميل من localStorage...');
         const sales = JSON.parse(localStorage.getItem('sales') || '[]');
         currentSale = sales.find(sale => sale.id === saleId);
       }
@@ -809,11 +776,9 @@
       if (currentSale) {
         displaySaleData();
       } else {
-        console.error('❌ لم يتم العثور على عملية البيع');
         showAlert('danger', 'لم يتم العثور على عملية البيع المطلوبة');
       }
     } catch (error) {
-      console.error('خطأ في تحميل بيانات البيع:', error);
       showAlert('danger', 'حدث خطأ في تحميل بيانات البيع');
     }
   }
@@ -1146,7 +1111,6 @@
     const caption   = document.getElementById('tax-number-text');
 
     if (!container) {
-      console.error('QR container not found');
       return;
     }
 
@@ -1155,22 +1119,16 @@
     if (fallback) fallback.classList.add('d-none');
     if (caption)  caption.textContent = TAX_NUMBER;
 
-    console.log('Generating QR code for:', TAX_NUMBER);
-
     // Try different QR libraries
     if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
       // Use qrcode library (preferred)
-      console.log('Using qrcode library');
       generateQRWithQRCodeLibrary(container, fallback);
     } else if (typeof QRCode !== 'undefined' && QRCode.prototype) {
       // Use QRCode.js library (fallback)
-      console.log('Using QRCode.js library');
       generateQRWithQRCodeJS(container, fallback);
     } else {
-      console.error('No QR code library available');
       if (fallback) {
         fallback.classList.remove('d-none');
-        console.log('Showing fallback UI for missing QR libraries');
       }
     }
   }
@@ -1192,13 +1150,11 @@
         }
       }, function (error) {
         if (error) {
-          console.error('QR code generation failed with qrcode library:', error);
           if (fallback) {
             fallback.classList.remove('d-none');
             fallback.textContent = 'تعذر إنشاء رمز QR: ' + error.message;
           }
         } else {
-          console.log('QR code generated successfully with qrcode library');
           // Convert canvas to image for better print compatibility
           const png = canvas.toDataURL('image/png');
           const imgEl = document.createElement('img');
@@ -1211,7 +1167,6 @@
         }
       });
     } catch (err) {
-      console.error('QR generation failed with qrcode library:', err);
       if (fallback) {
         fallback.classList.remove('d-none');
         fallback.textContent = 'تعذر إنشاء رمز QR: ' + err.message;
@@ -1238,11 +1193,9 @@
           const img = container.querySelector('img');
 
           if (img) {
-            console.log('QR code generated successfully with QRCode.js (as image)');
             return;
           }
           if (canvas) {
-            console.log('Converting QRCode.js canvas to image');
             const png = canvas.toDataURL('image/png');
             const imgEl = document.createElement('img');
             imgEl.src = png;
@@ -1251,16 +1204,13 @@
             imgEl.height = 120;
             container.innerHTML = '';
             container.appendChild(imgEl);
-            console.log('QR code converted to image successfully');
           } else {
-            console.warn('No canvas or img found after QRCode.js generation');
             if (fallback) {
               fallback.classList.remove('d-none');
               fallback.textContent = 'تعذر إنشاء رمز QR - لم يتم العثور على العنصر';
             }
           }
         } catch (innerErr) {
-          console.warn('QR canvas->img conversion failed:', innerErr);
           if (fallback) {
             fallback.classList.remove('d-none');
             fallback.textContent = 'تعذر تحويل QR إلى صورة';
@@ -1268,7 +1218,6 @@
         }
       }, 200);
     } catch (err) {
-      console.error('QR generation failed with QRCode.js:', err);
       if (fallback) {
         fallback.classList.remove('d-none');
         fallback.textContent = 'تعذر إنشاء رمز QR: ' + err.message;
@@ -1278,7 +1227,6 @@
 
   // Retry QR generation function
   function retryQRGeneration() {
-    console.log('Retrying QR generation...');
     const fallback = document.getElementById('tax-qr-fallback');
     if (fallback) {
       fallback.classList.add('d-none');
@@ -1288,7 +1236,6 @@
 
   // Show text-based QR representation
   function showTextQR() {
-    console.log('Showing text-based QR representation...');
     const container = document.getElementById('tax-qr');
     const fallback = document.getElementById('tax-qr-fallback');
     
@@ -1338,7 +1285,7 @@
         generateTaxQR();
       }
     } catch (err) {
-      console.warn('Preparing QR for print failed:', err);
+      // QR preparation failed, continue with print
       const fallback  = document.getElementById('tax-qr-fallback');
       if (fallback) fallback.classList.remove('d-none');
     }
