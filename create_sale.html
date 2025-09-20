@@ -367,9 +367,20 @@
           });
         }
       } else {
-        // البحث عن الأكسسوارات التي تطابق الفئة المختارة
-        accessories.forEach(acc => {
-          if (acc.category === productType && (acc.quantity_in_stock || acc.quantity) > 0) {
+        // فلترة الأكسسوارات المتاحة فقط (استبعاد التي لا يوجد منها مخزون)
+        const availableAccessories = accessories.filter(acc => {
+          const stock = acc.quantity_in_stock || acc.quantity || 0;
+          return acc.category === productType && stock > 0;
+        });
+        
+        if (availableAccessories.length === 0) {
+          const option = document.createElement('option');
+          option.value = '';
+          option.textContent = 'لا توجد أكسسوارات متاحة في هذه الفئة';
+          option.disabled = true;
+          productSelect.appendChild(option);
+        } else {
+          availableAccessories.forEach(acc => {
             const option = document.createElement('option');
             option.value = acc.id;
             const stock = acc.quantity_in_stock || acc.quantity || 0;
@@ -383,8 +394,8 @@
             option.setAttribute('data-description', acc.description || '');
             option.setAttribute('data-stock', stock);
             productSelect.appendChild(option);
-          }
-        });
+          });
+        }
       }
     }
 
@@ -442,6 +453,16 @@
       }
 
       const selectedOption = productSelect.options[productSelect.selectedIndex];
+      
+      // التحقق من المخزون للأكسسوارات
+      if (productType !== 'phone') {
+        const availableStock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+        if (availableStock < quantity) {
+          alert(`الكمية المطلوبة (${quantity}) أكبر من المخزون المتاح (${availableStock})`);
+          return;
+        }
+      }
+      
       const product = {
         id: productSelect.value,
         type: productType,
@@ -629,10 +650,10 @@
       });
     }
 
-    // تحديث حالة الهواتف المباعة إلى "مباع"
+    // تحديث حالة الهواتف المباعة وتقليل مخزون الأكسسوارات
     async function updateSoldPhonesStatus(saleItems) {
       try {
-        console.log('🔄 تحديث حالة الهواتف المباعة...');
+        console.log('🔄 تحديث حالة المنتجات المباعة...');
         
         for (const item of saleItems) {
           if (item.type === 'phone') {
@@ -659,12 +680,53 @@
                 console.log(`❌ لم يتم العثور على الهاتف ${phoneId} في localStorage`);
               }
             }
+          } else {
+            // تحديث مخزون الأكسسوارات
+            const accessoryId = item.id;
+            const soldQuantity = item.quantity || 1;
+            console.log(`📦 تقليل مخزون الأكسسوار: ${accessoryId}, الكمية: ${soldQuantity}`);
+            
+            if (window.storage && window.storage.isFirebaseAvailable) {
+              // الحصول على المخزون الحالي أولاً
+              const accessories = await window.storage.getAccessories();
+              const currentAccessory = accessories.find(a => a.id === accessoryId);
+              if (currentAccessory) {
+                const currentStock = currentAccessory.quantity_in_stock || currentAccessory.quantity || 0;
+                const newStock = currentStock - soldQuantity;
+                
+                // تحديث في Firebase
+                const success = await window.storage.updateAccessory(accessoryId, { 
+                  quantity_in_stock: newStock,
+                  quantity: newStock // للتوافق مع الحقول المختلفة
+                });
+                if (success) {
+                  console.log(`✅ تم تقليل مخزون الأكسسوار ${accessoryId} من ${currentStock} إلى ${newStock} في Firebase`);
+                } else {
+                  console.log(`❌ فشل في تحديث مخزون الأكسسوار ${accessoryId} في Firebase`);
+                }
+              } else {
+                console.log(`❌ لم يتم العثور على الأكسسوار ${accessoryId} في Firebase`);
+              }
+            } else {
+              // تحديث في localStorage
+              const accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+              const accessoryIndex = accessories.findIndex(a => a.id === accessoryId);
+              if (accessoryIndex !== -1) {
+                const currentStock = accessories[accessoryIndex].quantity_in_stock || accessories[accessoryIndex].quantity || 0;
+                accessories[accessoryIndex].quantity_in_stock = currentStock - soldQuantity;
+                accessories[accessoryIndex].quantity = currentStock - soldQuantity; // للتوافق مع الحقول المختلفة
+                localStorage.setItem('accessories', JSON.stringify(accessories));
+                console.log(`✅ تم تقليل مخزون الأكسسوار ${accessoryId} في localStorage`);
+              } else {
+                console.log(`❌ لم يتم العثور على الأكسسوار ${accessoryId} في localStorage`);
+              }
+            }
           }
         }
         
-        console.log('✅ تم تحديث جميع الهواتف المباعة بنجاح');
+        console.log('✅ تم تحديث جميع المنتجات المباعة بنجاح');
       } catch (error) {
-        console.error('❌ خطأ في تحديث حالة الهواتف المباعة:', error);
+        console.error('❌ خطأ في تحديث حالة المنتجات المباعة:', error);
       }
     }
 
