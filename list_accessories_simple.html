@@ -188,6 +188,11 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+  <!-- Firebase Integration -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase-database.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
+
   <!-- نظام عرض الأكسسوارات -->
   <script>
     // إعدادات النظام
@@ -274,82 +279,109 @@
       }, 5000);
     }
 
-    // تحميل وعرض الأكسسوارات
-    function loadAccessories() {
-      const accessories = getFromStorage('accessories', []);
-      
-      if (accessories.length === 0) {
-        document.getElementById('accessories-table').classList.add('d-none');
-        document.getElementById('empty-state').classList.remove('d-none');
-        updateStatistics([]);
-        return;
-      }
-
-      document.getElementById('accessories-table').classList.remove('d-none');
-      document.getElementById('empty-state').classList.add('d-none');
-
-      const tbody = document.getElementById('accessories-tbody');
-      tbody.innerHTML = '';
-
-      accessories.forEach((accessory, index) => {
-        const profit = (accessory.selling_price || 0) - (accessory.purchase_price || 0);
-        const profitPercentage = accessory.purchase_price > 0 ? 
-          ((profit / accessory.purchase_price) * 100) : 0;
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>
-            <strong>${accessory.name}</strong>
-            ${accessory.description ? `<br><small class="text-muted">${accessory.description}</small>` : ''}
-          </td>
-          <td>
-            <span class="badge bg-primary">${categoryMap[accessory.category] || accessory.category}</span>
-          </td>
-          <td>
-            <span class="badge bg-success">${accessory.quantity_in_stock || 0}</span>
-          </td>
-          <td>
-            ${formatMoney(accessory.purchase_price)} ريال
-            <br><small class="text-muted">مع الضريبة: ${formatMoney(accessory.purchase_price_with_vat || 0)} ريال</small>
-          </td>
-          <td>
-            ${formatMoney(accessory.selling_price)} ريال
-            <br><small class="text-muted">مع الضريبة: ${formatMoney(accessory.selling_price_with_vat || 0)} ريال</small>
-          </td>
-          <td>
-            <span class="${profit >= 0 ? 'profit-positive' : 'profit-negative'}">
-              ${formatMoney(profit)} ريال
-            </span>
-            <br><small class="text-muted">${profitPercentage.toFixed(1)}%</small>
-          </td>
-          <td>${accessory.supplier || 'غير محدد'}</td>
-          <td>${formatDate(accessory.date_added)}</td>
-          <td>
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-sm btn-outline-primary" onclick="editAccessory(${index})" title="تعديل">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAccessory(${index})" title="حذف">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        `;
+    // تحميل وعرض الأكسسوارات من Firebase
+    async function loadAccessories() {
+      try {
+        console.log('📦 تحميل الأكسسوارات من قاعدة البيانات...');
         
-        tbody.appendChild(row);
-      });
+        let accessories = [];
+        
+        // محاولة تحميل من Firebase أولاً
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          console.log('🔥 تحميل من Firebase...');
+          accessories = await window.storage.getAccessories();
+          console.log('✅ تم تحميل الأكسسوارات من Firebase:', accessories.length);
+        } else {
+          console.log('💾 Firebase غير متاح، تحميل من localStorage...');
+          accessories = getFromStorage('accessories', []);
+        }
+        
+        if (accessories.length === 0) {
+          document.getElementById('accessories-table').classList.add('d-none');
+          document.getElementById('empty-state').classList.remove('d-none');
+          updateStatistics([]);
+          return;
+        }
 
-      updateStatistics(accessories);
+        document.getElementById('accessories-table').classList.remove('d-none');
+        document.getElementById('empty-state').classList.add('d-none');
+
+        const tbody = document.getElementById('accessories-tbody');
+        tbody.innerHTML = '';
+
+        accessories.forEach((accessory, index) => {
+          const profit = (accessory.selling_price || 0) - (accessory.purchase_price || 0);
+          const profitPercentage = accessory.purchase_price > 0 ? 
+            ((profit / accessory.purchase_price) * 100) : 0;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>
+              <strong>${accessory.arabic_name || accessory.name}</strong>
+              ${accessory.description ? `<br><small class="text-muted">${accessory.description}</small>` : ''}
+            </td>
+            <td>
+              <span class="badge bg-primary">${categoryMap[accessory.category] || accessory.category}</span>
+            </td>
+            <td>
+              <span class="badge bg-success">${accessory.quantity_in_stock || accessory.quantity || 0}</span>
+            </td>
+            <td>
+              ${formatMoney(accessory.purchase_price)} ريال
+              <br><small class="text-muted">مع الضريبة: ${formatMoney(accessory.purchase_price_with_vat || 0)} ريال</small>
+            </td>
+            <td>
+              ${formatMoney(accessory.selling_price)} ريال
+              <br><small class="text-muted">مع الضريبة: ${formatMoney(accessory.selling_price_with_vat || 0)} ريال</small>
+            </td>
+            <td>
+              <span class="${profit >= 0 ? 'profit-positive' : 'profit-negative'}">
+                ${formatMoney(profit)} ريال
+              </span>
+              <br><small class="text-muted">${profitPercentage.toFixed(1)}%</small>
+            </td>
+            <td>${accessory.supplier || 'غير محدد'}</td>
+            <td>${formatDate(accessory.date_added || accessory.createdAt)}</td>
+            <td>
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="editAccessory('${accessory.id || index}')" title="تعديل">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAccessory('${accessory.id || index}')" title="حذف">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          `;
+          
+          tbody.appendChild(row);
+        });
+
+        updateStatistics(accessories);
+        
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الأكسسوارات:', error);
+        showAlert('danger', 'حدث خطأ في تحميل الأكسسوارات');
+      }
     }
 
-    // تحديث الإحصائيات
+    // تحديث الإحصائيات من قاعدة البيانات
     function updateStatistics(accessories) {
+      console.log('📊 حساب الإحصائيات من قاعدة البيانات...');
+      
       const totalItems = accessories.length;
-      const totalQuantity = accessories.reduce((sum, acc) => sum + (acc.quantity_in_stock || 0), 0);
+      const totalQuantity = accessories.reduce((sum, acc) => sum + (acc.quantity_in_stock || acc.quantity || 0), 0);
       const totalPurchaseValue = accessories.reduce((sum, acc) => 
-        sum + ((acc.purchase_price || 0) * (acc.quantity_in_stock || 0)), 0);
+        sum + ((acc.purchase_price || 0) * (acc.quantity_in_stock || acc.quantity || 0)), 0);
       const totalSellingValue = accessories.reduce((sum, acc) => 
-        sum + ((acc.selling_price || 0) * (acc.quantity_in_stock || 0)), 0);
+        sum + ((acc.selling_price || 0) * (acc.quantity_in_stock || acc.quantity || 0)), 0);
+
+      console.log('📈 الإحصائيات المحسوبة:', {
+        totalItems,
+        totalQuantity,
+        totalPurchaseValue,
+        totalSellingValue
+      });
 
       document.getElementById('total-items').textContent = totalItems;
       document.getElementById('total-quantity').textContent = totalQuantity;
@@ -358,124 +390,221 @@
     }
 
     // تعديل أكسسوار
-    function editAccessory(index) {
-      const accessories = getFromStorage('accessories', []);
-      const accessory = accessories[index];
-      
-      if (!accessory) {
-        showAlert('danger', 'الأكسسوار غير موجود');
-        return;
-      }
+    async function editAccessory(accessoryId) {
+      try {
+        console.log('✏️ تعديل الأكسسوار:', accessoryId);
+        
+        // تحميل الأكسسوارات أولاً
+        let accessories = [];
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          accessories = await window.storage.getAccessories();
+        } else {
+          accessories = getFromStorage('accessories', []);
+        }
+        
+        // البحث عن الأكسسوار
+        const accessory = accessories.find(acc => acc.id === accessoryId || acc.id === parseInt(accessoryId));
+        
+        if (!accessory) {
+          showAlert('danger', 'الأكسسوار غير موجود');
+          return;
+        }
 
-      // إنشاء نموذج تعديل بسيط
-      const newName = prompt('اسم الأكسسوار:', accessory.name);
-      if (newName === null) return; // المستخدم ضغط إلغاء
-      
-      const newQuantity = prompt('الكمية:', accessory.quantity_in_stock);
-      if (newQuantity === null) return;
-      
-      const newPurchasePrice = prompt('سعر الشراء (بدون ضريبة):', accessory.purchase_price);
-      if (newPurchasePrice === null) return;
-      
-      const newSellingPrice = prompt('سعر البيع (بدون ضريبة):', accessory.selling_price);
-      if (newSellingPrice === null) return;
+        // إنشاء نموذج تعديل بسيط
+        const newName = prompt('اسم الأكسسوار:', accessory.arabic_name || accessory.name);
+        if (newName === null) return; // المستخدم ضغط إلغاء
+        
+        const newQuantity = prompt('الكمية:', accessory.quantity_in_stock || accessory.quantity);
+        if (newQuantity === null) return;
+        
+        const newPurchasePrice = prompt('سعر الشراء (بدون ضريبة):', accessory.purchase_price);
+        if (newPurchasePrice === null) return;
+        
+        const newSellingPrice = prompt('سعر البيع (بدون ضريبة):', accessory.selling_price);
+        if (newSellingPrice === null) return;
 
-      // التحقق من صحة البيانات
-      if (!newName.trim()) {
-        showAlert('danger', 'يرجى إدخال اسم الأكسسوار');
-        return;
-      }
+        // التحقق من صحة البيانات
+        if (!newName.trim()) {
+          showAlert('danger', 'يرجى إدخال اسم الأكسسوار');
+          return;
+        }
 
-      // تحويل الأرقام العربية قبل التحقق
-      const convertedQuantity = parseArabicNumber(newQuantity);
-      const convertedPurchasePrice = parseArabicNumber(newPurchasePrice);
-      const convertedSellingPrice = parseArabicNumber(newSellingPrice);
+        // تحويل الأرقام العربية قبل التحقق
+        const convertedQuantity = parseArabicNumber(newQuantity);
+        const convertedPurchasePrice = parseArabicNumber(newPurchasePrice);
+        const convertedSellingPrice = parseArabicNumber(newSellingPrice);
 
-      if (convertedQuantity < 0) {
-        showAlert('danger', 'يرجى إدخال كمية صحيحة');
-        return;
-      }
+        if (convertedQuantity < 0) {
+          showAlert('danger', 'يرجى إدخال كمية صحيحة');
+          return;
+        }
 
-      if (convertedPurchasePrice <= 0) {
-        showAlert('danger', 'يرجى إدخال سعر شراء صحيح');
-        return;
-      }
+        if (convertedPurchasePrice <= 0) {
+          showAlert('danger', 'يرجى إدخال سعر شراء صحيح');
+          return;
+        }
 
-      if (convertedSellingPrice <= 0) {
-        showAlert('danger', 'يرجى إدخال سعر بيع صحيح');
-        return;
-      }
+        if (convertedSellingPrice <= 0) {
+          showAlert('danger', 'يرجى إدخال سعر بيع صحيح');
+          return;
+        }
 
-      // تحديث البيانات
-      accessories[index] = {
-        ...accessory,
-        name: newName.trim(),
-        quantity_in_stock: convertedQuantity,
-        purchase_price: convertedPurchasePrice,
-        selling_price: convertedSellingPrice,
-        purchase_price_with_vat: convertedPurchasePrice * (1 + VAT_RATE),
-        selling_price_with_vat: convertedSellingPrice * (1 + VAT_RATE)
-      };
+        // تحديث البيانات
+        const updatedAccessory = {
+          ...accessory,
+          name: newName.trim(),
+          arabic_name: newName.trim(),
+          quantity_in_stock: convertedQuantity,
+          quantity: convertedQuantity,
+          purchase_price: convertedPurchasePrice,
+          selling_price: convertedSellingPrice,
+          purchase_price_with_vat: convertedPurchasePrice * (1 + VAT_RATE),
+          selling_price_with_vat: convertedSellingPrice * (1 + VAT_RATE),
+          date_updated: new Date().toISOString()
+        };
 
-      if (saveToStorage('accessories', accessories)) {
-        showAlert('success', 'تم تحديث الأكسسوار بنجاح');
-        loadAccessories();
-      } else {
-        showAlert('danger', 'فشل في تحديث الأكسسوار');
+        // حفظ في Firebase أو localStorage
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const success = await window.storage.updateAccessory(accessoryId, updatedAccessory);
+          if (success) {
+            showAlert('success', 'تم تحديث الأكسسوار بنجاح');
+            await loadAccessories();
+          } else {
+            showAlert('danger', 'فشل في تحديث الأكسسوار');
+          }
+        } else {
+          const index = accessories.findIndex(acc => acc.id === accessoryId || acc.id === parseInt(accessoryId));
+          if (index !== -1) {
+            accessories[index] = updatedAccessory;
+            if (saveToStorage('accessories', accessories)) {
+              showAlert('success', 'تم تحديث الأكسسوار بنجاح');
+              loadAccessories();
+            } else {
+              showAlert('danger', 'فشل في تحديث الأكسسوار');
+            }
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ خطأ في تعديل الأكسسوار:', error);
+        showAlert('danger', 'حدث خطأ في تعديل الأكسسوار');
       }
     }
 
     // حذف أكسسوار
-    function deleteAccessory(index) {
-      const accessories = getFromStorage('accessories', []);
-      const accessory = accessories[index];
-      
-      if (!accessory) {
-        showAlert('danger', 'الأكسسوار غير موجود');
-        return;
-      }
+    async function deleteAccessory(accessoryId) {
+      try {
+        console.log('🗑️ حذف الأكسسوار:', accessoryId);
+        
+        // تحميل الأكسسوارات أولاً
+        let accessories = [];
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          accessories = await window.storage.getAccessories();
+        } else {
+          accessories = getFromStorage('accessories', []);
+        }
+        
+        // البحث عن الأكسسوار
+        const accessory = accessories.find(acc => acc.id === accessoryId || acc.id === parseInt(accessoryId));
+        
+        if (!accessory) {
+          showAlert('danger', 'الأكسسوار غير موجود');
+          return;
+        }
 
-      if (!confirm(`هل أنت متأكد من حذف "${accessory.name}"؟`)) return;
+        if (!confirm(`هل أنت متأكد من حذف "${accessory.arabic_name || accessory.name}"؟`)) return;
 
-      accessories.splice(index, 1);
-
-      if (saveToStorage('accessories', accessories)) {
-        showAlert('success', 'تم حذف الأكسسوار بنجاح');
-        loadAccessories();
-      } else {
-        showAlert('danger', 'فشل في حذف الأكسسوار');
+        // حذف من Firebase أو localStorage
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const success = await window.storage.deleteAccessory(accessoryId);
+          if (success) {
+            showAlert('success', 'تم حذف الأكسسوار بنجاح');
+            await loadAccessories();
+          } else {
+            showAlert('danger', 'فشل في حذف الأكسسوار');
+          }
+        } else {
+          const index = accessories.findIndex(acc => acc.id === accessoryId || acc.id === parseInt(accessoryId));
+          if (index !== -1) {
+            accessories.splice(index, 1);
+            if (saveToStorage('accessories', accessories)) {
+              showAlert('success', 'تم حذف الأكسسوار بنجاح');
+              loadAccessories();
+            } else {
+              showAlert('danger', 'فشل في حذف الأكسسوار');
+            }
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ خطأ في حذف الأكسسوار:', error);
+        showAlert('danger', 'حدث خطأ في حذف الأكسسوار');
       }
     }
 
-    // تصدير البيانات
-    function exportData() {
-      const accessories = getFromStorage('accessories', []);
-      
-      if (accessories.length === 0) {
-        showAlert('warning', 'لا توجد بيانات لتصديرها');
-        return;
-      }
+    // تصدير البيانات من قاعدة البيانات
+    async function exportData() {
+      try {
+        console.log('📤 تصدير البيانات من قاعدة البيانات...');
+        
+        let accessories = [];
+        
+        // تحميل من Firebase أو localStorage
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          accessories = await window.storage.getAccessories();
+        } else {
+          accessories = getFromStorage('accessories', []);
+        }
+        
+        if (accessories.length === 0) {
+          showAlert('warning', 'لا توجد بيانات لتصديرها');
+          return;
+        }
 
-      const dataStr = JSON.stringify(accessories, null, 2);
-      const dataBlob = new Blob([dataStr], {type: 'application/json'});
-      
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(dataBlob);
-      link.download = `accessories_${new Date().toISOString().split('T')[0]}.json`;
-      link.click();
-      
-      showAlert('success', 'تم تصدير البيانات بنجاح');
+        const dataStr = JSON.stringify(accessories, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `accessories_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        showAlert('success', `تم تصدير ${accessories.length} أكسسوار بنجاح`);
+        
+      } catch (error) {
+        console.error('❌ خطأ في تصدير البيانات:', error);
+        showAlert('danger', 'حدث خطأ في تصدير البيانات');
+      }
     }
 
-    // مسح جميع البيانات
-    function clearAllData() {
+    // مسح جميع البيانات من قاعدة البيانات
+    async function clearAllData() {
       if (!confirm('هل أنت متأكد من مسح جميع الأكسسوارات؟\n\nهذا الإجراء لا يمكن التراجع عنه!')) return;
       
       if (!confirm('تأكيد أخير: سيتم مسح جميع البيانات نهائياً!')) return;
 
-      localStorage.removeItem('accessories');
-      showAlert('success', 'تم مسح جميع البيانات');
-      loadAccessories();
+      try {
+        console.log('🗑️ مسح جميع الأكسسوارات من قاعدة البيانات...');
+        
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          // حذف جميع الأكسسوارات من Firebase
+          const accessories = await window.storage.getAccessories();
+          for (const accessory of accessories) {
+            await window.storage.deleteAccessory(accessory.id);
+          }
+          showAlert('success', `تم مسح ${accessories.length} أكسسوار من قاعدة البيانات`);
+        } else {
+          // مسح من localStorage
+          localStorage.removeItem('accessories');
+          showAlert('success', 'تم مسح جميع البيانات من التخزين المحلي');
+        }
+        
+        await loadAccessories();
+        
+      } catch (error) {
+        console.error('❌ خطأ في مسح البيانات:', error);
+        showAlert('danger', 'حدث خطأ في مسح البيانات');
+      }
     }
 
   // تسجيل الخروج
@@ -488,8 +617,17 @@
   }
 
   // تهيئة الصفحة
-  document.addEventListener('DOMContentLoaded', function() {
-    loadAccessories();
+  document.addEventListener('DOMContentLoaded', async function() {
+    // انتظار تهيئة Firebase
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    if (window.storage && window.storage.isFirebaseAvailable) {
+      console.log('✅ Firebase متاح في صفحة مخزون الأكسسوارات');
+    } else {
+      console.log('⚠️ Firebase غير متاح، استخدام localStorage');
+    }
+    
+    await loadAccessories();
   });
   </script>
 
