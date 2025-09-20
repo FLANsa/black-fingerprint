@@ -329,7 +329,7 @@
         <option value="phone">هاتف</option>
       `;
       
-      // إضافة فئات الأكسسوارات من قاعدة البيانات
+      // إضافة فئات الأكسسوارات من قاعدة البيانات فقط
       if (accessoryCategories && accessoryCategories.length > 0) {
         accessoryCategories.forEach(category => {
           const option = document.createElement('option');
@@ -338,14 +338,12 @@
           productTypeSelect.appendChild(option);
         });
       } else {
-        // إضافة الفئات الافتراضية إذا لم تكن متوفرة في قاعدة البيانات
-        const defaultCategories = ['إكسسوار', 'شاحن', 'غلاف', 'حماية الشاشة', 'أخرى'];
-        defaultCategories.forEach(category => {
-          const option = document.createElement('option');
-          option.value = category;
-          option.textContent = category;
-          productTypeSelect.appendChild(option);
-        });
+        // إضافة رسالة توضيحية إذا لم توجد فئات في قاعدة البيانات
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'لا توجد فئات أكسسوارات - أضف فئات من صفحة إضافة الأكسسوارات';
+        option.disabled = true;
+        productTypeSelect.appendChild(option);
       }
       
       console.log('✅ تم تحديث قائمة أنواع المنتجات:', accessoryCategories.length, 'فئة');
