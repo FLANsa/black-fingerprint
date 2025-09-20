@@ -551,9 +551,9 @@
             <div class="border rounded p-3">
               <h6 class="text-muted mb-1">الضمان (إن وجد)</h6>
               <div id="warranty_display" class="fw-bold">-</div>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
@@ -711,6 +711,9 @@
 
   // تحميل بيانات البيع من URL أو localStorage
   document.addEventListener('DOMContentLoaded', async () => {
+    // تحديث شريط التنقل للمستخدم المحدود
+    updateNavigationForUser();
+
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     
@@ -1251,6 +1254,30 @@
     if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
       localStorage.removeItem('current_user');
       window.location.href = 'login.html';
+    }
+  }
+
+  // تحديث شريط التنقل للمستخدم ذو الصلاحيات المحدودة (user)
+  function updateNavigationForUser() {
+    const currentUser = localStorage.getItem('current_user');
+    if (!currentUser) return;
+    try {
+      const userData = JSON.parse(currentUser);
+      if (userData.role === 'user') {
+        const leftNav = document.querySelector('.navbar-nav.me-auto');
+        if (leftNav) {
+          leftNav.innerHTML = `
+            <li class="nav-item"><a class="nav-link" href="limited_dashboard.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+            <li class="nav-item"><a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+          `;
+        }
+        // إزالة أي قوائم يمين لتفادي التكرار
+        document.querySelectorAll('nav .navbar-nav').forEach(ul => {
+          if (ul !== leftNav) ul.innerHTML = '';
+        });
+      }
+    } catch (e) {
+      // ignore
     }
   }
 </script>
