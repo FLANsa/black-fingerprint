@@ -318,20 +318,20 @@
       if (val) {
         const [y,m,d] = val.split('-').map(Number);
         filtered = salesAll.filter(s => sameDay(s.date_created, y, m, d));
-        summaryText = `مبيعات يوم ${val}`;
+        summaryText = `مبيعات يوم ${convertToLatinNumbers(val)}`;
       }
     } else if (type==='month') {
       const year = parseInt(document.getElementById('filter_month_year').value);
       const month = parseInt(document.getElementById('filter_month_month').value);
       if (year && month) {
         filtered = salesAll.filter(s => sameMonth(s.date_created, year, month));
-        summaryText = `مبيعات شهر ${month}/${year}`;
+        summaryText = `مبيعات شهر ${convertToLatinNumbers(month)}/${convertToLatinNumbers(year)}`;
       }
     } else if (type==='year') {
       const year = parseInt(document.getElementById('filter_year').value);
       if (year) {
         filtered = salesAll.filter(s => sameYear(s.date_created, year));
-        summaryText = `مبيعات سنة ${year}`;
+        summaryText = `مبيعات سنة ${convertToLatinNumbers(year)}`;
       }
     }
 
@@ -340,9 +340,9 @@
   }
 
   // ---------- أدوات ----------
-  const fmtMoney = n => (Number(n)||0).toFixed(2);
+  const fmtMoney = n => convertToLatinNumbers((Number(n)||0).toFixed(2));
   function formatDateTime(iso) {
-    // يُظهر بصيغة YYYY-MM-DD HH:mm
+    // يُظهر بصيغة YYYY-MM-DD HH:mm بأرقام لاتينية
     if (!iso) return '-';
     
     const d = new Date(iso);
@@ -354,7 +354,30 @@
     }
     
     const pad = x => String(x).padStart(2,'0');
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    
+    // تحويل الأرقام العربية إلى لاتينية
+    const latinYear = convertToLatinNumbers(year.toString());
+    const latinMonth = convertToLatinNumbers(month);
+    const latinDay = convertToLatinNumbers(day);
+    const latinHours = convertToLatinNumbers(hours);
+    const latinMinutes = convertToLatinNumbers(minutes);
+    
+    return `${latinYear}-${latinMonth}-${latinDay} ${latinHours}:${latinMinutes}`;
+  }
+  
+  // تحويل الأرقام العربية إلى لاتينية
+  function convertToLatinNumbers(str) {
+    if (!str) return str;
+    const arabicToLatin = {
+      '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+      '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+    };
+    return str.replace(/[٠-٩]/g, digit => arabicToLatin[digit] || digit);
   }
   function sameDay(iso, y, m, d) {
     if (!iso) return false;
