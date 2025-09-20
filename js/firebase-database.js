@@ -307,98 +307,15 @@ class FirebaseDatabase {
   }
 
   // ===== تهيئة أشهر أنواع الهواتف (خصوصاً الآيفون) إن كانت القائمة فارغة =====
-  async seedCommonPhoneTypesIfEmpty() {
-    try {
-      const existing = await this.getPhoneTypes();
-      if (existing && existing.length > 0) {
-        console.log('ℹ️ phone_types already has data, skipping seed. count =', existing.length);
-        return false;
-      }
-
-      console.log('🌱 Seeding common phone types (Apple focus) ...');
-      const commonTypes = [
-        // Apple iPhone family (popular models)
-        ['Apple','iPhone 6'], ['Apple','iPhone 6s'], ['Apple','iPhone 7'], ['Apple','iPhone 7 Plus'],
-        ['Apple','iPhone 8'], ['Apple','iPhone 8 Plus'], ['Apple','iPhone X'], ['Apple','iPhone XR'],
-        ['Apple','iPhone XS'], ['Apple','iPhone XS Max'],
-        ['Apple','iPhone 11'], ['Apple','iPhone 11 Pro'], ['Apple','iPhone 11 Pro Max'],
-        ['Apple','iPhone SE (1st)'], ['Apple','iPhone SE (2nd)'], ['Apple','iPhone SE (3rd)'],
-        ['Apple','iPhone 12'], ['Apple','iPhone 12 Mini'], ['Apple','iPhone 12 Pro'], ['Apple','iPhone 12 Pro Max'],
-        ['Apple','iPhone 13'], ['Apple','iPhone 13 Mini'], ['Apple','iPhone 13 Pro'], ['Apple','iPhone 13 Pro Max'],
-        ['Apple','iPhone 14'], ['Apple','iPhone 14 Plus'], ['Apple','iPhone 14 Pro'], ['Apple','iPhone 14 Pro Max'],
-        ['Apple','iPhone 15'], ['Apple','iPhone 15 Plus'], ['Apple','iPhone 15 Pro'], ['Apple','iPhone 15 Pro Max'],
-
-        // (Optional) A few Samsung popular models
-        ['Samsung','S20'], ['Samsung','S21'], ['Samsung','S22'], ['Samsung','S23'], ['Samsung','S24'],
-        ['Samsung','A12'], ['Samsung','A13'], ['Samsung','A32'], ['Samsung','A52']
-      ];
-
-      for (const [brand, model] of commonTypes) {
-        await this.addPhoneType({ brand, model });
-      }
-
-      console.log('✅ Seeded common phone types successfully');
-      return true;
-    } catch (error) {
-      console.error('❌ Error seeding common phone types:', error);
-      return false;
-    }
-  }
+  // seedCommonPhoneTypesIfEmpty removed per request
 
   // نفس القائمة لكن مع دمج تجنّب التكرار وإمكانية الإضافة القسرية
-  buildCommonPhoneTypesList() {
-    return [
-      ['Apple','iPhone 6'], ['Apple','iPhone 6s'], ['Apple','iPhone 7'], ['Apple','iPhone 7 Plus'],
-      ['Apple','iPhone 8'], ['Apple','iPhone 8 Plus'], ['Apple','iPhone X'], ['Apple','iPhone XR'],
-      ['Apple','iPhone XS'], ['Apple','iPhone XS Max'],
-      ['Apple','iPhone 11'], ['Apple','iPhone 11 Pro'], ['Apple','iPhone 11 Pro Max'],
-      ['Apple','iPhone SE (1st)'], ['Apple','iPhone SE (2nd)'], ['Apple','iPhone SE (3rd)'],
-      ['Apple','iPhone 12'], ['Apple','iPhone 12 Mini'], ['Apple','iPhone 12 Pro'], ['Apple','iPhone 12 Pro Max'],
-      ['Apple','iPhone 13'], ['Apple','iPhone 13 Mini'], ['Apple','iPhone 13 Pro'], ['Apple','iPhone 13 Pro Max'],
-      ['Apple','iPhone 14'], ['Apple','iPhone 14 Plus'], ['Apple','iPhone 14 Pro'], ['Apple','iPhone 14 Pro Max'],
-      ['Apple','iPhone 15'], ['Apple','iPhone 15 Plus'], ['Apple','iPhone 15 Pro'], ['Apple','iPhone 15 Pro Max'],
-      ['Samsung','S20'], ['Samsung','S21'], ['Samsung','S22'], ['Samsung','S23'], ['Samsung','S24'],
-      ['Samsung','A12'], ['Samsung','A13'], ['Samsung','A32'], ['Samsung','A52']
-    ];
-  }
+  // buildCommonPhoneTypesList removed per request
 
   /**
    * يضيف أشهر الأنواع مع تجنّب التكرار. إذا كان force=true سيتم محاولة دمج القائمة حتى لو كانت موجودة.
    */
-  async seedCommonPhoneTypes(force = false) {
-    try {
-      // نقرأ مباشرة من مجموعة phone_types للتأكد من القراءة من Firestore وليس تحويل لاحق
-      const snap = await getDocs(collection(this.db, 'phone_types'));
-      const existingArr = [];
-      snap.forEach(d => existingArr.push({ id: d.id, ...(d.data()||{}) }));
-      const existingSet = new Set(
-        (existingArr || []).map(t => `${(t.brand || t.manufacturer || '').trim()}|${(t.model || '').trim()}`.toLowerCase())
-      );
-
-      const toInsert = [];
-      for (const [brand, model] of this.buildCommonPhoneTypesList()) {
-        const key = `${brand.trim()}|${model.trim()}`.toLowerCase();
-        if (force || !existingSet.has(key)) {
-          toInsert.push({ brand, model });
-        }
-      }
-
-      if (toInsert.length === 0) {
-        console.log('ℹ️ No new phone types to seed (already present).');
-        return false;
-      }
-
-      console.log(`🌱 Seeding ${toInsert.length} phone types (merge mode: ${force ? 'force' : 'if-empty'}) ...`);
-      for (const item of toInsert) {
-        await this.addPhoneType(item);
-      }
-      console.log('✅ Seed/merge completed.');
-      return true;
-    } catch (error) {
-      console.error('❌ Error in seedCommonPhoneTypes:', error);
-      return false;
-    }
-  }
+  // seedCommonPhoneTypes removed per request
 
   // ===== البحث =====
   async searchPhones(searchTerm) {
@@ -525,22 +442,6 @@ window.firebaseDatabase = new FirebaseDatabase();
 
 // تهيئة البيانات الافتراضية عند تحميل Firebase
 window.firebaseDatabase.initializeDefaultData()
-  .then(async () => {
-    // إجراء دمج لمرة واحدة حتى لو كانت المجموعة غير فارغة (مع تجنّب التكرار)
-    const FLAG = 'seed_common_phone_types_v1';
-    if (!localStorage.getItem(FLAG)) {
-      const seeded = await window.firebaseDatabase.seedCommonPhoneTypes(true);
-      if (seeded) {
-        localStorage.setItem(FLAG, '1');
-      } else {
-        // إذا لم يتم الإدراج (أو فشل)، جرب فقط في حال كانت المجموعة فارغة
-        await window.firebaseDatabase.seedCommonPhoneTypesIfEmpty();
-      }
-    } else {
-      // على الأقل ضمَّن السلوك القديم إذا كانت فارغة تماماً
-      await window.firebaseDatabase.seedCommonPhoneTypesIfEmpty();
-    }
-  })
   .then(() => {
     console.log('🔥 Firebase Database Manager initialized successfully!');
   })
