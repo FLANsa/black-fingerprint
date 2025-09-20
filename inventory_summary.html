@@ -240,6 +240,41 @@
         </div>
       </div>
 
+      <!-- ملخص الأكسسوارات -->
+      <div class="card mt-4" id="accessories_summary_block">
+        <div class="card-header">
+          <h3>ملخص الأكسسوارات</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-info" id="total_accessories">0</h4>
+                <p class="text-muted">إجمالي الأكسسوارات</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-success" id="total_accessory_quantity">0</h4>
+                <p class="text-muted">إجمالي الكمية</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-warning" id="total_accessory_purchase_value">0.00 ريال</h4>
+                <p class="text-muted">القيمة الشرائية</p>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <h4 class="text-primary" id="total_accessory_selling_value">0.00 ريال</h4>
+                <p class="text-muted">القيمة البيعية</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /col -->
   </div><!-- /row -->
 </div><!-- /container -->
@@ -338,11 +373,11 @@
         totalAccessorySellingValue
       });
 
-      // تحديث العناصر في الصفحة
+      // تحديث العناصر في الصفحة - قيم الهواتف فقط
       document.getElementById('total_phones').textContent = totalPhones;
-      document.getElementById('total_purchase_value').textContent = (totalPurchaseValue + totalAccessoryPurchaseValue).toFixed(2) + ' ريال';
-      document.getElementById('total_selling_value').textContent = (totalSellingValue + totalAccessorySellingValue).toFixed(2) + ' ريال';
-      document.getElementById('total_profit').textContent = (totalProfit + (totalAccessorySellingValue - totalAccessoryPurchaseValue)).toFixed(2) + ' ريال';
+      document.getElementById('total_purchase_value').textContent = totalPurchaseValue.toFixed(2) + ' ريال';
+      document.getElementById('total_selling_value').textContent = totalSellingValue.toFixed(2) + ' ريال';
+      document.getElementById('total_profit').textContent = totalProfit.toFixed(2) + ' ريال';
 
       document.getElementById('new_phones_count').textContent = newPhonesCount;
       document.getElementById('new_phones_purchase_value').textContent = newPhonesPurchaseValue.toFixed(2);
@@ -353,6 +388,12 @@
       document.getElementById('used_phones_purchase_value').textContent = usedPhonesPurchaseValue.toFixed(2);
       document.getElementById('used_phones_selling_value').textContent = usedPhonesSellingValue.toFixed(2);
       document.getElementById('used_phones_profit').textContent = usedPhonesProfit.toFixed(2);
+
+      // تحديث ملخص الأكسسوارات
+      document.getElementById('total_accessories').textContent = totalAccessories;
+      document.getElementById('total_accessory_quantity').textContent = totalAccessoryQuantity;
+      document.getElementById('total_accessory_purchase_value').textContent = totalAccessoryPurchaseValue.toFixed(2) + ' ريال';
+      document.getElementById('total_accessory_selling_value').textContent = totalAccessorySellingValue.toFixed(2) + ' ريال';
 
       // تحديث جداول التفاصيل
       updatePhoneTypeSummary(newPhones, usedPhones);
