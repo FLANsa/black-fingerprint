@@ -407,679 +407,447 @@
 
   <!-- Receipt Roll Printer Template -->
 <div id="receipt-roll-template" class="receipt-template">
-    <div class="receipt-container">
-  <div class="receipt-header">
-    <div class="company-info">
-          <h1>الصقري للإتصالات</h1>
-          <p>AL SAQRI TELECOM</p>
-          <p>الجوال: 0505663222</p>
-          <p>الرقم الضريبي: 310105614500003</p>
-          <p>السجل التجاري: 1131281064</p>
-          <p>العنوان: القصيم بريده الصفراء</p>
-          <p>اسواق النافوره</p>
-    </div>
-
-    <div class="sale-info">
-          <h2>فاتورة ضريبية مبسطة</h2>
-          <p>فاتورة: <span id="receipt_sale_number">-</span></p>
-          <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
-    </div>
-
-        <div class="customer-info" id="receipt_customer_info" style="display: none;">
-      <h3>معلومات العميل</h3>
-          <p id="receipt_customer_name">-</p>
-          <p id="receipt_customer_phone">-</p>
-          <p>الرقم الضريبي: </p>
-    </div>
-  </div>
-
-  <div class="receipt-items">
-        <h3>تفاصيل المنتجات</h3>
-        <table class="items-table">
-      <thead>
-            <tr>
-              <th>الكمية</th>
-              <th>المنتج</th>
-              <th>السعر غير شامل الضريبة</th>
-              <th>السعر شامل الضريبة</th>
-            </tr>
-      </thead>
-          <tbody id="receipt_items">
-            <!-- Items will be loaded here -->
-          </tbody>
-    </table>
-  </div>
-
-  <div class="receipt-summary">
-        <div class="summary-row">
-          <span>الاجمالي غير شامل الضريبة:</span>
-          <span id="receipt_subtotal">0.00 ريال</span>
-        </div>
-        <div class="summary-row">
-          <span>ضريبة القيمة المضافة 15%:</span>
-          <span id="receipt_vat">0.00 ريال</span>
-        </div>
-        <div class="summary-row total">
-          <span>الاجمالي شامل الضريبة:</span>
-          <span id="receipt_total">0.00 ريال</span>
-        </div>
+  <div class="receipt-container">
+    <div class="receipt-header">
+      <div class="company-info">
+        <h1>الصقري للإتصالات</h1>
+        <p>AL SAQRI TELECOM</p>
+        <p>الجوال: 0505663222</p>
+        <p>الرقم الضريبي: 310105614500003</p>
+        <p>السجل التجاري: 1131281064</p>
+        <p>العنوان: القصيم بريده الصفراء</p>
+        <p>اسواق النافوره</p>
       </div>
+
+      <div class="sale-info">
+        <h2>فاتورة ضريبية مبسطة</h2>
+        <p>فاتورة: <span id="receipt_sale_number">-</span></p>
+        <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
+      </div>
+
+      <div class="customer-info" id="receipt_customer_info" style="display: none;">
+        <h3>معلومات العميل</h3>
+        <p id="receipt_customer_name">-</p>
+        <p id="receipt_customer_phone">-</p>
+        <p>الرقم الضريبي: </p>
+      </div>
+    </div>
+
+    <div class="receipt-items">
+      <h3>تفاصيل المنتجات</h3>
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>الكمية</th>
+            <th>المنتج</th>
+            <th>السعر غير شامل الضريبة</th>
+            <th>السعر شامل الضريبة</th>
+          </tr>
+        </thead>
+        <tbody id="receipt_items">
+          <!-- Items will be loaded here -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="receipt-summary">
+      <div class="summary-row">
+        <span>الاجمالي غير شامل الضريبة:</span>
+        <span id="receipt_subtotal">0.00 ريال</span>
+      </div>
+      <div class="summary-row">
+        <span>ضريبة القيمة المضافة 15%:</span>
+        <span id="receipt_vat">0.00 ريال</span>
+      </div>
+      <div class="summary-row total">
+        <span>الاجمالي شامل الضريبة:</span>
+        <span id="receipt_total">0.00 ريال</span>
+      </div>
+    </div>
       
-      <div class="seller-info">
-        <p>اسم البائع: لؤي</p>
-  </div>
+    <div class="seller-info">
+      <p>اسم البائع: لؤي</p>
+    </div>
 
-  <div class="receipt-footer">
-        <h4>سياسة الاستبدال والاسترجاع</h4>
-        <p>1) الاجهزة الجديدة ضمانها عند الوكيل</p>
-        <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
-        <p>في حال وجود عطل داخلي يشمل ضمان</p>
-        <p>المستخدم في حال وجود كامل الملحقات</p>
-        <div class="qr-placeholder">
-          <p>[QR Code]</p>
-        </div>
-        <p>شكرا لزيارتكم الصقري للإتصالات</p>
-        <p>تاريخ الطباعة: <span id="print-date"></span></p>
+    <div class="receipt-footer">
+      <h4>سياسة الاستبدال والاسترجاع</h4>
+      <p>1) الاجهزة الجديدة ضمانها عند الوكيل</p>
+      <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
+      <p>في حال وجود عطل داخلي يشمل ضمان</p>
+      <p>المستخدم في حال وجود كامل الملحقات</p>
+      <div class="qr-placeholder">
+        <p>[QR Code]</p>
       </div>
+      <p>شكرا لزيارتكم الصقري للإتصالات</p>
+      <p>تاريخ الطباعة: <span id="print-date"></span></p>
+    </div>
   </div>
 </div>
 
 <!-- مكتبات JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- Firebase Configuration -->
-  <script type="module" src="js/firebase-config.js"></script>
-  <script type="module" src="js/firebase-database.js"></script>
-  <script type="module" src="js/firebase-storage-manager.js"></script>
+<!-- Firebase Configuration -->
+<script type="module" src="js/firebase-config.js"></script>
+<script type="module" src="js/firebase-database.js"></script>
+<script type="module" src="js/firebase-storage-manager.js"></script>
 
 <script>
-    let currentSale = null;
+  let currentSale = null;
 
-    // تحميل بيانات البيع من URL أو localStorage
-    document.addEventListener('DOMContentLoaded', async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // تعيين تاريخ الطباعة عند تحميل الصفحة
-      setPrintDate();
-      
-      const urlParams = new URLSearchParams(window.location.search);
-      const saleId = urlParams.get('id');
-      
-      if (saleId) {
-        await loadSaleData(saleId);
-      } else {
-        const lastSale = localStorage.getItem('lastSale');
-        if (lastSale) {
-          currentSale = JSON.parse(lastSale);
-          console.log('📦 استخدام آخر عملية بيع من localStorage:', currentSale);
-          displaySaleData();
-        } else {
-          console.warn('⚠️ لا توجد بيانات للعرض، إنشاء بيانات تجريبية');
-          // إنشاء بيانات تجريبية للاختبار
-          const now = new Date();
-          currentSale = {
-            id: 'test-sale-001',
-            sale_number: 'SALE-TEST001',
-            date_created: now.toISOString(),
-            date_added: now.toISOString(),
-            status: 'مكتمل',
-            customer_name: 'عميل تجريبي',
-            customer_phone: '0501234567',
-            payment_method: 'نقدي',
-            items: [
-              {
-                type: 'phone',
-                name: 'iPhone 15',
-                unitPrice: 4000,
-                quantity: 1,
-                totalPrice: 4000
-              }
-            ],
-            subtotal: 3478.26,
-            vat_amount: 521.74,
-            total_amount: 4000
-          };
-          console.log('🧪 بيانات تجريبية تم إنشاؤها:', currentSale);
-          console.log('🔍 Test sale date fields:', {
-            date_created: currentSale.date_created,
-            date_added: currentSale.date_added,
-            now: now.toISOString()
-          });
-          displaySaleData();
-        }
-      }
-    });
-
-    // تحميل بيانات البيع من Firebase
-    async function loadSaleData(saleId) {
-      try {
-        console.log('🔍 البحث عن عملية البيع:', saleId);
-        
-        if (window.storage && window.storage.isFirebaseAvailable) {
-          console.log('🔥 تحميل من Firebase...');
-          const sales = await window.storage.getSales();
-          console.log('📊 جميع عمليات البيع:', sales);
-          currentSale = sales.find(sale => sale.id === saleId);
-        } else {
-          console.log('💾 تحميل من localStorage...');
-          const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-          console.log('📊 جميع عمليات البيع:', sales);
-          currentSale = sales.find(sale => sale.id === saleId);
-        }
-        
-        console.log('✅ عملية البيع الموجودة:', currentSale);
-        
-        if (currentSale) {
-          console.log('🔍 تفاصيل عملية البيع:', {
-            id: currentSale.id,
-            sale_number: currentSale.sale_number,
-            date_created: currentSale.date_created,
-            date_added: currentSale.date_added,
-            status: currentSale.status,
-            customer_name: currentSale.customer_name
-          });
-          displaySaleData();
-        } else {
-          console.error('❌ لم يتم العثور على عملية البيع');
-          showAlert('danger', 'لم يتم العثور على عملية البيع المطلوبة');
-        }
-      } catch (error) {
-        console.error('خطأ في تحميل بيانات البيع:', error);
-        showAlert('danger', 'حدث خطأ في تحميل بيانات البيع');
-      }
-    }
-
-    // عرض بيانات البيع
-    function displaySaleData() {
-      if (!currentSale) return;
-
-      document.getElementById('sale_number').textContent = currentSale.sale_number || currentSale.id;
-      // تعيين تاريخ الإنشاء مع معالجة أفضل للأخطاء
-      const dateCreatedElement = document.getElementById('date_created');
-      if (dateCreatedElement) {
-        let saleDate = currentSale.date_created || currentSale.date_added;
-        
-        // إذا لم يوجد تاريخ، استخدم التاريخ الحالي
-        if (!saleDate) {
-          console.warn('⚠️ No date found in sale data, using current date');
-          saleDate = new Date().toISOString();
-        }
-        
-        console.log('🔍 Sale data for date:', {
-          date_created: currentSale.date_created,
-          date_added: currentSale.date_added,
-          selectedDate: saleDate,
-          fullSale: currentSale
-        });
-        const formattedDate = formatDate(saleDate);
-        dateCreatedElement.textContent = formattedDate;
-        console.log('✅ تم تعيين تاريخ الإنشاء:', formattedDate);
-      } else {
-        console.error('❌ عنصر تاريخ الإنشاء غير موجود');
-      }
-      document.getElementById('status').innerHTML = getStatusBadge(currentSale.status || 'مكتمل');
-      document.getElementById('payment_method').textContent = currentSale.payment_method || 'نقدي';
-
-      document.getElementById('customer_name').textContent = currentSale.customer_name || 'عميل نقدي';
-      document.getElementById('customer_phone').textContent = currentSale.customer_phone || 'غير محدد';
-      document.getElementById('customer_email').textContent = currentSale.customer_email || 'غير محدد';
-      document.getElementById('customer_address').textContent = currentSale.customer_address || 'غير محدد';
-
-      displaySaleItems();
-
-      const subtotal = currentSale.subtotal || 0;
-      const vatAmount = currentSale.vat_amount || 0;
-      const totalAmount = currentSale.total_amount || 0;
-
-      document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' ريال';
-      document.getElementById('vat_amount').textContent = vatAmount.toFixed(2) + ' ريال';
-      document.getElementById('total_amount').textContent = totalAmount.toFixed(2) + ' ريال';
-
-      if (currentSale.notes) {
-        document.getElementById('notes').textContent = currentSale.notes;
-        document.getElementById('notes_section').style.display = 'block';
-      }
-    }
-
-    // عرض منتجات البيع
-    function displaySaleItems() {
-      const itemsContainer = document.getElementById('sale_items');
-      itemsContainer.innerHTML = '';
-
-      console.log('🔍 عرض منتجات البيع:', currentSale);
-      console.log('📦 عناصر البيع:', currentSale?.items);
-
-      if (currentSale.items && currentSale.items.length > 0) {
-        currentSale.items.forEach(item => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${getProductTypeBadge(item.type || item.product_type)}</td>
-            <td>${item.name || item.product_name}</td>
-            <td>${item.description || item.product_description || 'لا يوجد وصف'}</td>
-            <td>${item.serial_number || item.barcode || 'لا يوجد'}</td>
-            <td>${(item.unitPrice || item.unit_price || 0).toFixed(2)} ريال</td>
-            <td>${item.quantity || 1}</td>
-            <td class="fw-bold text-success">${(item.totalPrice || item.total_price || 0).toFixed(2)} ريال</td>
-          `;
-          itemsContainer.appendChild(row);
-        });
-      } else {
-        itemsContainer.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا توجد منتجات</td></tr>';
-      }
-    }
-
-    // الحصول على شارة نوع المنتج
-    function getProductTypeBadge(type) {
-      const badges = {
-        'phone': '<span class="badge bg-primary">هاتف</span>',
-        'accessory': '<span class="badge bg-success">إكسسوار</span>',
-        'charger': '<span class="badge bg-warning">شاحن</span>',
-        'case': '<span class="badge bg-info">غلاف</span>',
-        'screen_protector': '<span class="badge bg-secondary">حماية شاشة</span>'
-      };
-      return badges[type] || `<span class="badge bg-dark">${type}</span>`;
-    }
-
-    // الحصول على شارة الحالة
-    function getStatusBadge(status) {
-      if (status === 'مكتمل') {
-        return '<span class="badge bg-success">مكتمل</span>';
-      } else if (status === 'ملغي') {
-        return '<span class="badge bg-danger">ملغي</span>';
-      } else {
-        return '<span class="badge bg-warning">' + status + '</span>';
-      }
-    }
-
-    // تنسيق التاريخ
-    function formatDate(dateString) {
-      console.log('🔍 formatDate called with:', dateString);
-      
-      if (!dateString) {
-        console.warn('⚠️ No date string provided');
-        return '-';
-      }
-      
-      try {
-        const date = new Date(dateString);
-        console.log('📅 Parsed date:', date);
-        
-        if (isNaN(date.getTime())) {
-          console.warn('⚠️ Invalid date:', dateString);
-          return '-';
-        }
-        
-        // محاولة التنسيق العربي أولاً
-        try {
-          const formatted = date.toLocaleString('ar-SA', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          });
-          console.log('✅ Arabic format result:', formatted);
-          return formatted;
-        } catch (error) {
-          // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
-          console.warn('Arabic locale not supported for formatDate, using English format');
-          const formatted = date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          });
-          console.log('✅ English format result:', formatted);
-          return formatted;
-        }
-      } catch (error) {
-        console.error('❌ Error formatting date:', error, 'Input:', dateString);
-        return '-';
-      }
-    }
-
-    // طباعة الفاتورة
-    function printReceipt() {
-      if (!currentSale) {
-        showAlert('warning', 'لا توجد بيانات للطباعة');
-        return;
-      }
-
-      setPrintDate();
-      populateReceiptTemplate();
-      
-      const printWindow = window.open('', '_blank');
-      const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
-      
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html dir="rtl" lang="ar">
-        <head>
-          <meta charset="UTF-8">
-          <title>فاتورة مبيعات</title>
-          <style>
-            body {
-              margin: 0;
-              padding: 0;
-              font-family: 'Arial', 'Tahoma', sans-serif;
-              font-size: 12px;
-              line-height: 1.4;
-              color: black;
-              background: white;
-              direction: rtl;
-              text-align: right;
-            }
-            
-            .receipt-container {
-              width: 80mm;
-              max-width: 80mm;
-              margin: 0 10mm 0 auto;
-              padding: 5mm;
-              box-sizing: border-box;
-            }
-            
-            .receipt-header {
-              text-align: center;
-              margin-bottom: 15px;
-              border-bottom: 1px solid #000;
-              padding-bottom: 10px;
-            }
-            
-            .company-info h1 {
-              font-size: 18px;
-              margin: 0 0 8px 0;
-              font-weight: bold;
-              text-align: center;
-            }
-            
-            .company-info p {
-              margin: 2px 0;
-              font-size: 11px;
-              text-align: center;
-            }
-            
-            .sale-info h2 {
-              font-size: 16px;
-              margin: 12px 0 8px 0;
-              font-weight: bold;
-              text-align: center;
-            }
-            
-            .sale-info p {
-              margin: 2px 0;
-              font-size: 11px;
-              text-align: center;
-            }
-            
-            .customer-info h3 {
-              font-size: 14px;
-              margin: 12px 0 6px 0;
-              font-weight: bold;
-              text-align: right;
-            }
-            
-            .customer-info p {
-              margin: 1px 0;
-              font-size: 11px;
-              text-align: right;
-            }
-            
-            .receipt-items {
-              margin: 15px 0;
-            }
-            
-            .receipt-items h3 {
-              font-size: 14px;
-              margin: 0 0 8px 0;
-              font-weight: bold;
-              text-align: center;
-            }
-            
-            .items-table {
-              width: 100%;
-              border-collapse: collapse;
-              font-size: 9px;
-              margin: 8px 0;
-            }
-            
-            .items-table th {
-              border-bottom: 1px solid #000;
-              padding: 3px 1px;
-              text-align: center;
-              font-weight: bold;
-              font-size: 9px;
-            }
-            
-            .items-table td {
-              padding: 2px 1px;
-              text-align: center;
-              border-bottom: 1px dotted #ccc;
-              font-size: 9px;
-            }
-            
-            .receipt-summary {
-              margin: 15px 0;
-              border-top: 1px solid #000;
-              padding-top: 10px;
-            }
-            
-            .summary-row {
-              display: flex;
-              justify-content: space-between;
-              margin: 6px 0;
-              font-size: 11px;
-            }
-            
-            .seller-info {
-              margin: 10px 0;
-              text-align: right;
-              font-size: 11px;
-            }
-            
-            .seller-info p {
-              margin: 2px 0;
-            }
-            
-            .summary-row.total {
-              font-weight: bold;
-              font-size: 14px;
-              border-top: 1px solid #000;
-              padding-top: 8px;
-              margin-top: 15px;
-            }
-            
-            .receipt-footer {
-              text-align: center;
-              margin-top: 20px;
-              border-top: 1px solid #000;
-              padding-top: 10px;
-            }
-            
-            .receipt-footer h4 {
-              font-size: 12px;
-              margin: 0 0 8px 0;
-              font-weight: bold;
-            }
-            
-            .receipt-footer p {
-              margin: 3px 0;
-              font-size: 10px;
-            }
-            
-            .qr-placeholder {
-              text-align: center;
-              margin: 10px 0;
-              padding: 10px;
-              border: 1px dashed #000;
-            }
-            
-            .qr-placeholder p {
-              margin: 0;
-              font-size: 9px;
-            }
-            
-            @media print {
-              @page {
-                size: 80mm auto;
-                margin: 5mm;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          ${receiptContent}
-        </body>
-        </html>
-      `);
-      
-      printWindow.document.close();
-      printWindow.focus();
-      
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 500);
-    }
-
-    // تعبئة قالب الفاتورة
-    function populateReceiptTemplate() {
-      if (!currentSale) return;
-
-      document.getElementById('receipt_sale_number').textContent = currentSale.sale_number || currentSale.id;
-      // تعيين تاريخ الفاتورة مع معالجة أفضل للأخطاء
-      const receiptDateElement = document.getElementById('receipt_date');
-      if (receiptDateElement) {
-        let saleDate = currentSale.date_created || currentSale.date_added;
-        
-        // إذا لم يوجد تاريخ، استخدم التاريخ الحالي
-        if (!saleDate) {
-          console.warn('⚠️ No date found for receipt, using current date');
-          saleDate = new Date().toISOString();
-        }
-        
-        const formattedDate = formatDate(saleDate);
-        receiptDateElement.textContent = formattedDate;
-        console.log('✅ تم تعيين تاريخ الفاتورة:', formattedDate);
-      } else {
-        console.error('❌ عنصر تاريخ الفاتورة غير موجود');
-      }
-
-      const customerInfo = document.getElementById('receipt_customer_info');
-      if (currentSale.customer_name && currentSale.customer_name !== 'عميل نقدي') {
-        document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + currentSale.customer_name;
-        customerInfo.style.display = 'block';
-      }
-      if (currentSale.customer_phone) {
-        document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + currentSale.customer_phone;
-        customerInfo.style.display = 'block';
-      }
-
-      const receiptItems = document.getElementById('receipt_items');
-      receiptItems.innerHTML = '';
-      
-      if (currentSale.items && currentSale.items.length > 0) {
-        currentSale.items.forEach(item => {
-          const row = document.createElement('tr');
-          const unitPrice = item.unitPrice || item.unit_price || 0;
-          const unitPriceWithoutVAT = unitPrice / 1.15;
-          row.innerHTML = `
-            <td>${item.quantity || 1}</td>
-            <td>${item.name || item.product_name}</td>
-            <td>${unitPriceWithoutVAT.toFixed(2)}</td>
-            <td>${unitPrice.toFixed(2)}</td>
-          `;
-          receiptItems.appendChild(row);
-        });
-      }
-
-      const subtotal = currentSale.subtotal || 0;
-      const vatAmount = currentSale.vat_amount || 0;
-      const totalAmount = currentSale.total_amount || 0;
-
-      document.getElementById('receipt_subtotal').textContent = subtotal.toFixed(2) + ' ريال';
-      document.getElementById('receipt_vat').textContent = vatAmount.toFixed(2) + ' ريال';
-      document.getElementById('receipt_total').textContent = totalAmount.toFixed(2) + ' ريال';
-    }
-
-    // تعيين تاريخ الطباعة
-  function setPrintDate() {
-    const now = new Date();
-      
-      // تنسيق التاريخ باللغة العربية مع دعم أفضل للمتصفحات
-      const options = {
+  // ✅ دالة تُرجع تاريخ اليوم بصيغة YYYY/MM/DD بالأرقام اللاتينية وبتوقيت الرياض
+  function todayRiyadh() {
+    try {
+      const dtf = new Intl.DateTimeFormat('en-GB', {
+        calendar: 'gregory',
+        numberingSystem: 'latn',
+        timeZone: 'Asia/Riyadh',
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      };
-      
-      let dateStr;
-      try {
-        // محاولة استخدام التنسيق العربي
-        dateStr = now.toLocaleString('ar-SA', options);
-        console.log('✅ تم استخدام التنسيق العربي للتاريخ');
-      } catch (error) {
-        // في حالة فشل التنسيق العربي، استخدم التنسيق الإنجليزي
-        console.warn('Arabic locale not supported, using English format');
-        try {
-          dateStr = now.toLocaleString('en-US', options);
-          console.log('✅ تم استخدام التنسيق الإنجليزي للتاريخ');
-        } catch (fallbackError) {
-          // في حالة فشل جميع التنسيقات، استخدم التنسيق اليدوي
-          console.warn('All locale formats failed, using manual format');
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, '0');
-          const day = String(now.getDate()).padStart(2, '0');
-          const hours = String(now.getHours()).padStart(2, '0');
-          const minutes = String(now.getMinutes()).padStart(2, '0');
-          const seconds = String(now.getSeconds()).padStart(2, '0');
-          dateStr = `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
-          console.log('✅ تم استخدام التنسيق اليدوي للتاريخ');
-        }
-      }
-      
-      // التأكد من وجود العنصر قبل التحديث
-      const printDateElement = document.getElementById('print-date');
-      if (printDateElement) {
-        printDateElement.textContent = dateStr;
-        console.log('✅ تم تعيين تاريخ الطباعة:', dateStr);
+        day: '2-digit'
+      });
+      // نستخدم formatToParts لضمان ترتيب YYYY/MM/DD
+      const parts = dtf.formatToParts(new Date());
+      const y = parts.find(p => p.type === 'year')?.value;
+      const m = parts.find(p => p.type === 'month')?.value;
+      const d = parts.find(p => p.type === 'day')?.value;
+      if (y && m && d) return `${y}/${m}/${d}`;
+      // لو دعم المتصفح ضعيف جدًا
+      const fallback = dtf.format(new Date()); // غالباً DD/MM/YYYY
+      const mm = fallback.match(/(\d{2}).(\d{2}).(\d{4})/);
+      if (mm) return `${mm[3]}/${mm[2]}/${mm[1]}`;
+      return fallback;
+    } catch (e) {
+      // Fallback يدوي (+3 ساعات من UTC)
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const rd = new Date(utc + 3 * 3600000);
+      const pad = n => String(n).padStart(2, '0');
+      return `${rd.getFullYear()}/${pad(rd.getMonth() + 1)}/${pad(rd.getDate())}`;
+    }
+  }
+
+  // تحميل بيانات البيع من URL أو localStorage
+  document.addEventListener('DOMContentLoaded', async () => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // تعيين تاريخ الطباعة عند تحميل الصفحة (اليوم فقط)
+    setPrintDate();
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const saleId = urlParams.get('id');
+    
+    if (saleId) {
+      await loadSaleData(saleId);
+    } else {
+      const lastSale = localStorage.getItem('lastSale');
+      if (lastSale) {
+        currentSale = JSON.parse(lastSale);
+        console.log('📦 استخدام آخر عملية بيع من localStorage:', currentSale);
+        displaySaleData();
       } else {
-        console.error('❌ عنصر تاريخ الطباعة غير موجود');
+        console.warn('⚠️ لا توجد بيانات للعرض، إنشاء بيانات تجريبية');
+        const now = new Date();
+        currentSale = {
+          id: 'test-sale-001',
+          sale_number: 'SALE-TEST001',
+          date_created: now.toISOString(),
+          date_added: now.toISOString(),
+          status: 'مكتمل',
+          customer_name: 'عميل تجريبي',
+          customer_phone: '0501234567',
+          payment_method: 'نقدي',
+          items: [
+            { type: 'phone', name: 'iPhone 15', unitPrice: 4000, quantity: 1, totalPrice: 4000 }
+          ],
+          subtotal: 3478.26,
+          vat_amount: 521.74,
+          total_amount: 4000
+        };
+        displaySaleData();
       }
     }
+  });
 
-    // عرض التنبيهات
-    function showAlert(type, message) {
-      const alertDiv = document.createElement('div');
-      alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-      alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px;';
-      alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      `;
-      document.body.appendChild(alertDiv);
+  // تحميل بيانات البيع من Firebase
+  async function loadSaleData(saleId) {
+    try {
+      console.log('🔍 البحث عن عملية البيع:', saleId);
       
-      setTimeout(() => {
-        if (alertDiv.parentNode) {
-          alertDiv.parentNode.removeChild(alertDiv);
-        }
-      }, 5000);
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        console.log('🔥 تحميل من Firebase...');
+        const sales = await window.storage.getSales();
+        currentSale = sales.find(sale => sale.id === saleId);
+      } else {
+        console.log('💾 تحميل من localStorage...');
+        const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        currentSale = sales.find(sale => sale.id === saleId);
+      }
+      
+      if (currentSale) {
+        displaySaleData();
+      } else {
+        console.error('❌ لم يتم العثور على عملية البيع');
+        showAlert('danger', 'لم يتم العثور على عملية البيع المطلوبة');
+      }
+    } catch (error) {
+      console.error('خطأ في تحميل بيانات البيع:', error);
+      showAlert('danger', 'حدث خطأ في تحميل بيانات البيع');
+    }
+  }
+
+  // عرض بيانات البيع
+  function displaySaleData() {
+    if (!currentSale) return;
+
+    document.getElementById('sale_number').textContent = currentSale.sale_number || currentSale.id;
+
+    // عرض تاريخ الإنشاء في الصفحة (لا يؤثر على تاريخ الإيصال)
+    const dateCreatedElement = document.getElementById('date_created');
+    if (dateCreatedElement) {
+      let saleDate = currentSale.date_created || currentSale.date_added || new Date().toISOString();
+      const formattedDate = formatDate(saleDate);
+      dateCreatedElement.textContent = formattedDate;
     }
 
-    // تسجيل الخروج
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        localStorage.removeItem('current_user');
-        window.location.href = 'login.html';
-      }
+    document.getElementById('status').innerHTML = getStatusBadge(currentSale.status || 'مكتمل');
+    document.getElementById('payment_method').textContent = currentSale.payment_method || 'نقدي';
+
+    document.getElementById('customer_name').textContent = currentSale.customer_name || 'عميل نقدي';
+    document.getElementById('customer_phone').textContent = currentSale.customer_phone || 'غير محدد';
+    document.getElementById('customer_email').textContent = currentSale.customer_email || 'غير محدد';
+    document.getElementById('customer_address').textContent = currentSale.customer_address || 'غير محدد';
+
+    displaySaleItems();
+
+    const subtotal = currentSale.subtotal || 0;
+    const vatAmount = currentSale.vat_amount || 0;
+    const totalAmount = currentSale.total_amount || 0;
+
+    document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' ريال';
+    document.getElementById('vat_amount').textContent = vatAmount.toFixed(2) + ' ريال';
+    document.getElementById('total_amount').textContent = totalAmount.toFixed(2) + ' ريال';
+
+    if (currentSale.notes) {
+      document.getElementById('notes').textContent = currentSale.notes;
+      document.getElementById('notes_section').style.display = 'block';
     }
+  }
+
+  // عرض منتجات البيع
+  function displaySaleItems() {
+    const itemsContainer = document.getElementById('sale_items');
+    itemsContainer.innerHTML = '';
+
+    if (currentSale.items && currentSale.items.length > 0) {
+      currentSale.items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${getProductTypeBadge(item.type || item.product_type)}</td>
+          <td>${item.name || item.product_name}</td>
+          <td>${item.description || item.product_description || 'لا يوجد وصف'}</td>
+          <td>${item.serial_number || item.barcode || 'لا يوجد'}</td>
+          <td>${(item.unitPrice || item.unit_price || 0).toFixed(2)} ريال</td>
+          <td>${item.quantity || 1}</td>
+          <td class="fw-bold text-success">${(item.totalPrice || item.total_price || 0).toFixed(2)} ريال</td>
+        `;
+        itemsContainer.appendChild(row);
+      });
+    } else {
+      itemsContainer.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا توجد منتجات</td></tr>';
+    }
+  }
+
+  // شارات
+  function getProductTypeBadge(type) {
+    const badges = {
+      'phone': '<span class="badge bg-primary">هاتف</span>',
+      'accessory': '<span class="badge bg-success">إكسسوار</span>',
+      'charger': '<span class="badge bg-warning">شاحن</span>',
+      'case': '<span class="badge bg-info">غلاف</span>',
+      'screen_protector': '<span class="badge bg-secondary">حماية شاشة</span>'
+    };
+    return badges[type] || `<span class="badge bg-dark">${type}</span>`;
+  }
+
+  function getStatusBadge(status) {
+    if (status === 'مكتمل') return '<span class="badge bg-success">مكتمل</span>';
+    if (status === 'ملغي') return '<span class="badge bg-danger">ملغي</span>';
+    return '<span class="badge bg-warning">' + status + '</span>';
+  }
+
+  // تنسيق تاريخ العرض داخل الصفحة فقط (لا يؤثر على الإيصال)
+  function formatDate(dateString) {
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      try {
+        return date.toLocaleString('ar-SA', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', hour12: false
+        });
+      } catch {
+        return date.toLocaleString('en-US', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', hour12: false
+        });
+      }
+    } catch {
+      return '-';
+    }
+  }
+
+  // طباعة الفاتورة
+  function printReceipt() {
+    if (!currentSale) {
+      showAlert('warning', 'لا توجد بيانات للطباعة');
+      return;
+    }
+
+    // تحديث تاريخ الطباعة (اليوم فقط)
+    setPrintDate();
+    populateReceiptTemplate();
+    
+    const printWindow = window.open('', '_blank');
+    const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <title>فاتورة مبيعات</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: 'Arial','Tahoma',sans-serif; font-size: 12px; line-height: 1.4; color: black; background: white; direction: rtl; text-align: right; }
+          .receipt-container { width: 80mm; max-width: 80mm; margin: 0 10mm 0 auto; padding: 5mm; box-sizing: border-box; }
+          .receipt-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+          .company-info h1 { font-size: 18px; margin: 0 0 8px 0; font-weight: bold; text-align: center; }
+          .company-info p { margin: 2px 0; font-size: 11px; text-align: center; }
+          .sale-info h2 { font-size: 16px; margin: 12px 0 8px 0; font-weight: bold; text-align: center; }
+          .sale-info p { margin: 2px 0; font-size: 11px; text-align: center; }
+          .customer-info h3 { font-size: 14px; margin: 12px 0 6px 0; font-weight: bold; text-align: right; }
+          .customer-info p { margin: 1px 0; font-size: 11px; text-align: right; }
+          .receipt-items { margin: 15px 0; }
+          .receipt-items h3 { font-size: 14px; margin: 0 0 8px 0; font-weight: bold; text-align: center; }
+          .items-table { width: 100%; border-collapse: collapse; font-size: 9px; margin: 8px 0; }
+          .items-table th { border-bottom: 1px solid #000; padding: 3px 1px; text-align: center; font-weight: bold; font-size: 9px; }
+          .items-table td { padding: 2px 1px; text-align: center; border-bottom: 1px dotted #ccc; font-size: 9px; }
+          .receipt-summary { margin: 15px 0; border-top: 1px solid #000; padding-top: 10px; }
+          .summary-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 11px; }
+          .seller-info { margin: 10px 0; text-align: right; font-size: 11px; }
+          .seller-info p { margin: 2px 0; }
+          .summary-row.total { font-weight: bold; font-size: 14px; border-top: 1px solid #000; padding-top: 8px; margin-top: 15px; }
+          .receipt-footer { text-align: center; margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; }
+          .receipt-footer h4 { font-size: 12px; margin: 0 0 8px 0; font-weight: bold; }
+          .receipt-footer p { margin: 3px 0; font-size: 10px; }
+          .qr-placeholder { text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed #000; }
+          .qr-placeholder p { margin: 0; font-size: 9px; }
+          @media print { @page { size: 80mm auto; margin: 5mm; } }
+        </style>
+      </head>
+      <body>
+        ${receiptContent}
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  }
+
+  // تعبئة قالب الفاتورة
+  function populateReceiptTemplate() {
+    if (!currentSale) return;
+
+    // رقم الفاتورة
+    document.getElementById('receipt_sale_number').textContent = currentSale.sale_number || currentSale.id;
+
+    // ✅ تاريخ الفاتورة = تاريخ اليوم فقط (لاتيني) بتوقيت الرياض
+    const receiptDateElement = document.getElementById('receipt_date');
+    if (receiptDateElement) {
+      receiptDateElement.textContent = todayRiyadh();
+    }
+
+    // معلومات العميل (اختياري)
+    const customerInfo = document.getElementById('receipt_customer_info');
+    if (currentSale.customer_name && currentSale.customer_name !== 'عميل نقدي') {
+      document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + currentSale.customer_name;
+      customerInfo.style.display = 'block';
+    }
+    if (currentSale.customer_phone) {
+      document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + currentSale.customer_phone;
+      customerInfo.style.display = 'block';
+    }
+
+    // المنتجات
+    const receiptItems = document.getElementById('receipt_items');
+    receiptItems.innerHTML = '';
+    
+    if (currentSale.items && currentSale.items.length > 0) {
+      currentSale.items.forEach(item => {
+        const row = document.createElement('tr');
+        const unitPrice = item.unitPrice || item.unit_price || 0;
+        const unitPriceWithoutVAT = unitPrice / 1.15;
+        row.innerHTML = `
+          <td>${item.quantity || 1}</td>
+          <td>${item.name || item.product_name}</td>
+          <td>${unitPriceWithoutVAT.toFixed(2)}</td>
+          <td>${unitPrice.toFixed(2)}</td>
+        `;
+        receiptItems.appendChild(row);
+      });
+    }
+
+    // المجاميع
+    const subtotal = currentSale.subtotal || 0;
+    const vatAmount = currentSale.vat_amount || 0;
+    const totalAmount = currentSale.total_amount || 0;
+
+    document.getElementById('receipt_subtotal').textContent = subtotal.toFixed(2) + ' ريال';
+    document.getElementById('receipt_vat').textContent = vatAmount.toFixed(2) + ' ريال';
+    document.getElementById('receipt_total').textContent = totalAmount.toFixed(2) + ' ريال';
+  }
+
+  // ✅ تعيين تاريخ الطباعة = اليوم فقط (لاتيني) بتوقيت الرياض
+  function setPrintDate() {
+    const printDateElement = document.getElementById('print-date');
+    if (printDateElement) {
+      printDateElement.textContent = todayRiyadh();
+    }
+  }
+
+  // عرض التنبيهات
+  function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 80px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.parentNode.removeChild(alertDiv);
+      }
+    }, 5000);
+  }
+
+  // تسجيل الخروج
+  function logout() {
+    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+      localStorage.removeItem('current_user');
+      window.location.href = 'login.html';
+    }
+  }
 </script>
 </body>
 </html>
