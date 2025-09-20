@@ -343,20 +343,36 @@
   const fmtMoney = n => (Number(n)||0).toFixed(2);
   function formatDateTime(iso) {
     // يُظهر بصيغة YYYY-MM-DD HH:mm
+    if (!iso) return '-';
+    
     const d = new Date(iso);
+    
+    // التحقق من صحة التاريخ
+    if (isNaN(d.getTime())) {
+      console.warn('⚠️ Invalid date:', iso);
+      return '-';
+    }
+    
     const pad = x => String(x).padStart(2,'0');
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
   function sameDay(iso, y, m, d) {
+    if (!iso) return false;
     const dt = new Date(iso);
+    if (isNaN(dt.getTime())) return false;
     return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
   }
   function sameMonth(iso, y, m) {
+    if (!iso) return false;
     const dt = new Date(iso);
+    if (isNaN(dt.getTime())) return false;
     return dt.getFullYear()===y && (dt.getMonth()+1)===m;
   }
   function sameYear(iso, y) {
-    return new Date(iso).getFullYear()===y;
+    if (!iso) return false;
+    const dt = new Date(iso);
+    if (isNaN(dt.getTime())) return false;
+    return dt.getFullYear()===y;
   }
 
   // ---------- تعبئة سنوات القوائم ----------
@@ -440,7 +456,21 @@
 
       // التاريخ
       const tdDate = document.createElement('td');
-      tdDate.textContent = formatDateTime(sale.date_created);
+      let saleDate = sale.date_created || sale.date_added;
+      
+      // إذا لم يوجد تاريخ، استخدم التاريخ الحالي
+      if (!saleDate) {
+        console.warn('⚠️ No date found for sale:', sale.id, 'using current date');
+        saleDate = new Date().toISOString();
+      }
+      
+      console.log('🔍 Sale date fields:', {
+        id: sale.id,
+        date_created: sale.date_created,
+        date_added: sale.date_added,
+        selectedDate: saleDate
+      });
+      tdDate.textContent = formatDateTime(saleDate);
       tr.appendChild(tdDate);
 
       // العميل
