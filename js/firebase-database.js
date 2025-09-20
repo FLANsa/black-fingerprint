@@ -284,11 +284,11 @@ class FirebaseDatabase {
     }
   }
 
-  async deletePhoneType(manufacturer, model) {
+  async deletePhoneType(brand, model) {
     try {
       const phoneTypesSnapshot = await getDocs(
         query(collection(this.db, 'phone_types'), 
-              where('manufacturer', '==', manufacturer), 
+              where('brand', '==', brand), 
               where('model', '==', model))
       );
       
@@ -298,7 +298,7 @@ class FirebaseDatabase {
       });
       
       await Promise.all(deletePromises);
-      console.log('✅ Phone type deleted:', manufacturer, model);
+      console.log('✅ Phone type deleted:', brand, model);
       return true;
     } catch (error) {
       console.error('❌ Error deleting phone type:', error);
@@ -398,32 +398,32 @@ class FirebaseDatabase {
     try {
       // تهيئة أنواع الهواتف الافتراضية
       const defaultPhoneTypes = [
-        { manufacturer: 'Apple', model: 'iPhone 13' },
-        { manufacturer: 'Apple', model: 'iPhone 14' },
-        { manufacturer: 'Apple', model: 'iPhone 15' },
-        { manufacturer: 'Apple', model: 'iPhone 15 Pro' },
-        { manufacturer: 'Apple', model: 'iPhone 15 Pro Max' },
-        { manufacturer: 'Samsung', model: 'Galaxy S22' },
-        { manufacturer: 'Samsung', model: 'Galaxy S23' },
-        { manufacturer: 'Samsung', model: 'Galaxy S24' },
-        { manufacturer: 'Samsung', model: 'Galaxy S24 Ultra' },
-        { manufacturer: 'Samsung', model: 'Galaxy A54' },
-        { manufacturer: 'Samsung', model: 'Galaxy A34' },
-        { manufacturer: 'Xiaomi', model: 'Redmi Note 12' },
-        { manufacturer: 'Xiaomi', model: 'Redmi Note 13' },
-        { manufacturer: 'Xiaomi', model: 'Mi 13' },
-        { manufacturer: 'Xiaomi', model: 'Mi 14' },
-        { manufacturer: 'Huawei', model: 'P60' },
-        { manufacturer: 'Huawei', model: 'P60 Pro' },
-        { manufacturer: 'Huawei', model: 'Mate 60' },
-        { manufacturer: 'OnePlus', model: '11' },
-        { manufacturer: 'OnePlus', model: '12' },
-        { manufacturer: 'Google', model: 'Pixel 7' },
-        { manufacturer: 'Google', model: 'Pixel 8' },
-        { manufacturer: 'Oppo', model: 'Find X6' },
-        { manufacturer: 'Oppo', model: 'Reno 10' },
-        { manufacturer: 'Vivo', model: 'X90' },
-        { manufacturer: 'Vivo', model: 'V29' }
+        { brand: 'Apple', model: 'iPhone 13' },
+        { brand: 'Apple', model: 'iPhone 14' },
+        { brand: 'Apple', model: 'iPhone 15' },
+        { brand: 'Apple', model: 'iPhone 15 Pro' },
+        { brand: 'Apple', model: 'iPhone 15 Pro Max' },
+        { brand: 'Samsung', model: 'Galaxy S22' },
+        { brand: 'Samsung', model: 'Galaxy S23' },
+        { brand: 'Samsung', model: 'Galaxy S24' },
+        { brand: 'Samsung', model: 'Galaxy S24 Ultra' },
+        { brand: 'Samsung', model: 'Galaxy A54' },
+        { brand: 'Samsung', model: 'Galaxy A34' },
+        { brand: 'Xiaomi', model: 'Redmi Note 12' },
+        { brand: 'Xiaomi', model: 'Redmi Note 13' },
+        { brand: 'Xiaomi', model: 'Mi 13' },
+        { brand: 'Xiaomi', model: 'Mi 14' },
+        { brand: 'Huawei', model: 'P60' },
+        { brand: 'Huawei', model: 'P60 Pro' },
+        { brand: 'Huawei', model: 'Mate 60' },
+        { brand: 'OnePlus', model: '11' },
+        { brand: 'OnePlus', model: '12' },
+        { brand: 'Google', model: 'Pixel 7' },
+        { brand: 'Google', model: 'Pixel 8' },
+        { brand: 'Oppo', model: 'Find X6' },
+        { brand: 'Oppo', model: 'Reno 10' },
+        { brand: 'Vivo', model: 'X90' },
+        { brand: 'Vivo', model: 'V29' }
       ];
 
       // التحقق من وجود أنواع الهواتف

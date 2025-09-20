@@ -485,7 +485,8 @@
           const phoneTypes = await window.storage.getPhoneTypes();
           console.log('📱 أنواع الهواتف المحملة:', phoneTypes);
           
-          const manufacturers = [...new Set(phoneTypes.map(pt => pt.manufacturer))];
+          // phoneTypes is now an object with brand as keys
+          const manufacturers = Object.keys(phoneTypes);
           console.log('🏭 الشركات المصنعة:', manufacturers);
           
           const select = document.getElementById('manufacturer');
@@ -500,8 +501,8 @@
           console.log('✅ تم تحميل الشركات المصنعة بنجاح');
         } else {
           console.log('⚠️ Firebase غير متاح، تحميل من localStorage...');
-          const phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '[]');
-          const manufacturers = [...new Set(phoneTypes.map(pt => pt.manufacturer))];
+          const phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '{}');
+          const manufacturers = Object.keys(phoneTypes);
           
           const select = document.getElementById('manufacturer');
           select.innerHTML = '<option value="">اختر الشركة المصنعة</option>';
@@ -524,22 +525,20 @@
         console.log('🔄 تحميل موديلات الشركة:', manufacturer);
         
         if (!manufacturer) {
-          document.getElementById('model').innerHTML = '';
+          document.getElementById('model').innerHTML = '<option value="">اختر الموديل</option>';
           return;
         }
         
-        let phoneTypes = [];
+        let phoneTypes = {};
         
         if (window.storage && window.storage.isFirebaseAvailable) {
           phoneTypes = await window.storage.getPhoneTypes();
         } else {
-          phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '[]');
+          phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '{}');
         }
         
-        const models = phoneTypes
-          .filter(pt => pt.manufacturer === manufacturer)
-          .map(pt => pt.model)
-          .filter((model, index, self) => self.indexOf(model) === index); // Remove duplicates
+        // phoneTypes is now an object with brand as keys and models as arrays
+        const models = phoneTypes[manufacturer] || [];
         
         console.log('📱 الموديلات المتاحة:', models);
         
@@ -549,7 +548,7 @@
         // حفظ الموديل الحالي إذا كان موجوداً
         const shouldPreserveModel = models.includes(currentModel);
         
-        modelSelect.innerHTML = '';
+        modelSelect.innerHTML = '<option value="">اختر الموديل</option>';
         models.forEach(model => {
           const option = document.createElement('option');
           option.value = model;
