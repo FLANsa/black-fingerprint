@@ -273,30 +273,118 @@
   let salesAll = [];
   let currentFilteredSales = [];
 
+  // ---------- أدوات مساعدة للوقت/التاريخ ----------
+  // يحوّل أي مدخل تاريخ (ISO string | number | Firestore Timestamp | object seconds/nanos) إلى كائن Date صالح
+  function normalizeToDate(v) {
+    if (v == null) return null;
+
+    // Firestore Timestamp: له toDate()
+    if (typeof v === 'object') {
+      if (typeof v.toDate === 'function') {
+        const d = v.toDate();
+        return isNaN(d?.getTime()) ? null : d;
+      }
+      // شكل seconds/nanoseconds
+      if ('seconds' in v || '_seconds' in v) {
+        const sec = Number(v.seconds ?? v._seconds ?? 0);
+        const nsec = Number(v.nanoseconds ?? v.nsecs ?? 0);
+        const ms = (sec * 1000) + Math.floor(nsec / 1e6);
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? null : d;
+      }
+    }
+
+    // رقم: قد يكون ms أو s
+    if (typeof v === 'number') {
+      const ms = v > 1e12 ? v : v * 1000; // > ~2001-09-09
+      const d = new Date(ms);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    // سترنق: قد تكون ISO أو رقمية
+    if (typeof v === 'string') {
+      const s = v.trim();
+      if (/^\d+$/.test(s)) {
+        const n = parseInt(s, 10);
+        const ms = n > 1e12 ? n : n * 1000;
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      const d = new Date(s);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    return null;
+  }
+
+  // ترجّع Date مفضّلة للصف: date_created ثم date_added ثم created_at… الخ
+  function getSaleDateValue(sale) {
+    return (
+      normalizeToDate(sale?.date_created) ||
+      normalizeToDate(sale?.date_added)   ||
+      normalizeToDate(sale?.created_at)   ||
+      normalizeToDate(sale?.createdAt)    ||
+      null
+    );
+  }
+
+  // تحويل الأرقام العربية إلى لاتينية — يدعم المدخلات الرقمية أيضاً
+  function convertToLatinNumbers(input) {
+    if (input == null) return '';
+    const str = String(input);
+    const arabicToLatin = {
+      '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+      '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+    };
+    return str.replace(/[٠-٩]/g, d => arabicToLatin[d] || d);
+  }
+
+  const fmtMoney = n => convertToLatinNumbers((Number(n)||0).toFixed(2));
+
+  function formatDateTime(anyDate) {
+    // يُظهر بصيغة YYYY-MM-DD HH:mm بأرقام لاتينية
+    const d = normalizeToDate(anyDate);
+    if (!d) return '-';
+    const pad = x => String(x).padStart(2,'0');
+    const year    = d.getFullYear();
+    const month   = pad(d.getMonth() + 1);
+    const day     = pad(d.getDate());
+    const hours   = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    return `${convertToLatinNumbers(year)}-${convertToLatinNumbers(month)}-${convertToLatinNumbers(day)} ${convertToLatinNumbers(hours)}:${convertToLatinNumbers(minutes)}`;
+  }
+
+  function sameDay(anyDate, y, m, d) {
+    const dt = normalizeToDate(anyDate);
+    if (!dt) return false;
+    return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
+  }
+  function sameMonth(anyDate, y, m) {
+    const dt = normalizeToDate(anyDate);
+    if (!dt) return false;
+    return dt.getFullYear()===y && (dt.getMonth()+1)===m;
+  }
+  function sameYear(anyDate, y) {
+    const dt = normalizeToDate(anyDate);
+    if (!dt) return false;
+    return dt.getFullYear()===y;
+  }
+
   // ---------- تحميل البيانات من Firebase ----------
   async function loadSalesFromFirebase() {
     try {
       console.log('🔄 تحميل قائمة المبيعات من Firebase...');
       
       if (window.storage && window.storage.isFirebaseAvailable) {
-        // تحميل من Firebase
         const sales = await window.storage.getSales();
-        if (sales && Array.isArray(sales)) {
-          salesAll = sales;
-          console.log('✅ تم تحميل المبيعات من Firebase:', salesAll.length);
-        } else {
-          salesAll = [];
-          console.log('⚠️ لا توجد مبيعات في Firebase');
-        }
+        salesAll = Array.isArray(sales) ? sales : [];
+        console.log('✅ تم تحميل المبيعات من Firebase:', salesAll.length);
       } else {
-        // تحميل من localStorage كبديل
         console.log('💾 تحميل المبيعات من localStorage...');
-        const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-        salesAll = sales;
+        salesAll = JSON.parse(localStorage.getItem('sales') || '[]');
         console.log('✅ تم تحميل المبيعات من localStorage:', salesAll.length);
       }
       
-      // تطبيق التصفية الحالية
       applyCurrentFilter();
       
     } catch (error) {
@@ -317,85 +405,35 @@
       const val = document.getElementById('filter_date').value;
       if (val) {
         const [y,m,d] = val.split('-').map(Number);
-        filtered = salesAll.filter(s => sameDay(s.date_created, y, m, d));
+        filtered = salesAll.filter(s => {
+          const dt = getSaleDateValue(s);
+          return dt && sameDay(dt, y, m, d);
+        });
         summaryText = `مبيعات يوم ${convertToLatinNumbers(val)}`;
       }
     } else if (type==='month') {
       const year = parseInt(document.getElementById('filter_month_year').value);
       const month = parseInt(document.getElementById('filter_month_month').value);
       if (year && month) {
-        filtered = salesAll.filter(s => sameMonth(s.date_created, year, month));
+        filtered = salesAll.filter(s => {
+          const dt = getSaleDateValue(s);
+          return dt && sameMonth(dt, year, month);
+        });
         summaryText = `مبيعات شهر ${convertToLatinNumbers(month)}/${convertToLatinNumbers(year)}`;
       }
     } else if (type==='year') {
       const year = parseInt(document.getElementById('filter_year').value);
       if (year) {
-        filtered = salesAll.filter(s => sameYear(s.date_created, year));
+        filtered = salesAll.filter(s => {
+          const dt = getSaleDateValue(s);
+          return dt && sameYear(dt, year);
+        });
         summaryText = `مبيعات سنة ${convertToLatinNumbers(year)}`;
       }
     }
 
     currentFilteredSales = filtered;
     renderSales(filtered, type, summaryText, emptyHint);
-  }
-
-  // ---------- أدوات ----------
-  const fmtMoney = n => convertToLatinNumbers((Number(n)||0).toFixed(2));
-  function formatDateTime(iso) {
-    // يُظهر بصيغة YYYY-MM-DD HH:mm بأرقام لاتينية
-    if (!iso) return '-';
-    
-    const d = new Date(iso);
-    
-    // التحقق من صحة التاريخ
-    if (isNaN(d.getTime())) {
-      console.warn('⚠️ Invalid date:', iso);
-      return '-';
-    }
-    
-    const pad = x => String(x).padStart(2,'0');
-    const year = d.getFullYear();
-    const month = pad(d.getMonth() + 1);
-    const day = pad(d.getDate());
-    const hours = pad(d.getHours());
-    const minutes = pad(d.getMinutes());
-    
-    // تحويل الأرقام العربية إلى لاتينية
-    const latinYear = convertToLatinNumbers(year.toString());
-    const latinMonth = convertToLatinNumbers(month);
-    const latinDay = convertToLatinNumbers(day);
-    const latinHours = convertToLatinNumbers(hours);
-    const latinMinutes = convertToLatinNumbers(minutes);
-    
-    return `${latinYear}-${latinMonth}-${latinDay} ${latinHours}:${latinMinutes}`;
-  }
-  
-  // تحويل الأرقام العربية إلى لاتينية
-  function convertToLatinNumbers(str) {
-    if (!str) return str;
-    const arabicToLatin = {
-      '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
-      '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
-    };
-    return str.replace(/[٠-٩]/g, digit => arabicToLatin[digit] || digit);
-  }
-  function sameDay(iso, y, m, d) {
-    if (!iso) return false;
-    const dt = new Date(iso);
-    if (isNaN(dt.getTime())) return false;
-    return dt.getFullYear()===y && (dt.getMonth()+1)===m && dt.getDate()===d;
-  }
-  function sameMonth(iso, y, m) {
-    if (!iso) return false;
-    const dt = new Date(iso);
-    if (isNaN(dt.getTime())) return false;
-    return dt.getFullYear()===y && (dt.getMonth()+1)===m;
-  }
-  function sameYear(iso, y) {
-    if (!iso) return false;
-    const dt = new Date(iso);
-    if (isNaN(dt.getTime())) return false;
-    return dt.getFullYear()===y;
   }
 
   // ---------- تعبئة سنوات القوائم ----------
@@ -479,21 +517,8 @@
 
       // التاريخ
       const tdDate = document.createElement('td');
-      let saleDate = sale.date_created || sale.date_added;
-      
-      // إذا لم يوجد تاريخ، استخدم التاريخ الحالي
-      if (!saleDate) {
-        console.warn('⚠️ No date found for sale:', sale.id, 'using current date');
-        saleDate = new Date().toISOString();
-      }
-      
-      console.log('🔍 Sale date fields:', {
-        id: sale.id,
-        date_created: sale.date_created,
-        date_added: sale.date_added,
-        selectedDate: saleDate
-      });
-      tdDate.textContent = formatDateTime(saleDate);
+      const dt = getSaleDateValue(sale) || new Date();
+      tdDate.textContent = formatDateTime(dt);
       tr.appendChild(tdDate);
 
       // العميل
@@ -540,9 +565,11 @@
              class="btn btn-sm btn-info" title="عرض التفاصيل">
             <i class="fas fa-eye"></i>
           </a>
-          <button class="btn btn-sm btn-success" onclick="window.print()" title="طباعة الفاتورة">
+          <a class="btn btn-sm btn-success"
+             href="view_sale.html?id=${encodeURIComponent(sale.id)}&print=1"
+             title="طباعة الفاتورة">
             <i class="fas fa-print"></i>
-          </button>
+          </a>
         </div>
       `;
       tr.appendChild(tdAct);
@@ -567,11 +594,9 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     
-    // إدراج التنبيه في أعلى الصفحة
     const container = document.querySelector('.container');
     container.insertBefore(alertDiv, container.firstChild);
     
-    // إزالة التنبيه تلقائياً بعد 5 ثوان
     setTimeout(() => {
       if (alertDiv.parentNode) {
         alertDiv.remove();
@@ -580,7 +605,6 @@
   }
 
   // ---------- تهيئة ----------
-  // تسجيل الخروج
   function logout() {
     if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
       localStorage.removeItem('current_user');
@@ -592,10 +616,9 @@
   document.addEventListener('DOMContentLoaded', async () => {
     populateYears();
     toggleDateInput();
-    
-    // تحميل البيانات من Firebase
     await loadSalesFromFirebase();
   });
 </script>
+
 </body>
 </html>
