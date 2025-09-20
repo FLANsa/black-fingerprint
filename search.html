@@ -271,6 +271,7 @@
                   <th>الشركة المصنعة</th>
                   <th>الموديل</th>
                   <th>الحالة</th>
+                  <th>سعر الشراء</th>
                   <th>سعر البيع</th>
                   <th>الإجراءات</th>
                 </tr>
@@ -284,7 +285,8 @@
                     <td>${(p.condition === 'new' || p.phone_type === 'new')
                         ? '<span class="badge bg-success">جديد</span>'
                         : '<span class="badge bg-warning">مستعمل</span>'}</td>
-                    <td>${fmtMoney(p.selling_price || p.price || 0)} ريال</td>
+                    <td><span class="text-success">${fmtMoney(p.purchase_price || 0)} ريال</span></td>
+                    <td><span class="text-primary">${fmtMoney(p.selling_price || p.price || 0)} ريال</span></td>
                     <td>
                       <div class="btn-group" role="group">
                         <button type="button" class="btn btn-sm btn-outline-info" onclick="viewPhoneDetails('${p.phone_number || p.id}')" title="عرض التفاصيل">
@@ -317,6 +319,7 @@
                   <th>الاسم</th>
                   <th>الفئة</th>
                   <th>الكمية</th>
+                  <th>سعر الشراء</th>
                   <th>سعر البيع</th>
                   <th>الإجراءات</th>
                 </tr>
@@ -327,7 +330,8 @@
                     <td><strong>${a.arabic_name || a.name || 'غير محدد'}</strong></td>
                     <td><span class="badge bg-primary">${a.category || 'غير محدد'}</span></td>
                     <td><span class="badge bg-success">${a.quantity_in_stock || a.quantity || 0}</span></td>
-                    <td>${fmtMoney(a.selling_price || 0)} ريال</td>
+                    <td><span class="text-success">${fmtMoney(a.purchase_price || 0)} ريال</span></td>
+                    <td><span class="text-primary">${fmtMoney(a.selling_price || 0)} ريال</span></td>
                     <td>
                       <div class="btn-group" role="group">
                         <button type="button" class="btn btn-sm btn-outline-info" onclick="viewAccessoryDetails('${a.id}')" title="عرض التفاصيل">
@@ -364,9 +368,14 @@
 الشركة المصنعة: ${phone.manufacturer || phone.brand || 'غير محدد'}
 الموديل: ${phone.model || 'غير محدد'}
 الحالة: ${phone.condition === 'new' || phone.phone_type === 'new' ? 'جديد' : 'مستعمل'}
+سعر الشراء: ${fmtMoney(phone.purchase_price || 0)} ريال
 سعر البيع: ${fmtMoney(phone.selling_price || phone.price || 0)} ريال
+الربح: ${fmtMoney((phone.selling_price || phone.price || 0) - (phone.purchase_price || 0))} ريال
 الذاكرة: ${phone.phone_memory || phone.memory || 'غير محدد'}
 نسبة البطارية: ${phone.battery_level || phone.age || 'غير محدد'}
+اللون: ${phone.phone_color || 'غير محدد'}
+الرقم التسلسلي: ${phone.serial_number || 'غير محدد'}
+الضمان: ${phone.warranty || 'غير محدد'} شهر
       `;
       alert(details);
     }

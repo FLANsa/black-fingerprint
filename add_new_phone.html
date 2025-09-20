@@ -364,17 +364,52 @@
         localStorage.setItem('lastAddedPhone', JSON.stringify(phoneData));
 
         let savedOK=false;
-        if(window.storage && window.storage.isFirebaseAvailable){
-          const id = await window.storage.addPhone(phoneData);
-          savedOK = !!id;
-        }else{
-          const arr = JSON.parse(localStorage.getItem('phones')||'[]'); phoneData.id=Date.now().toString(); arr.push(phoneData);
-          localStorage.setItem('phones', JSON.stringify(arr)); savedOK=true;
-        }
-        if(savedOK){
-          const shouldPrint = confirm('✅ تم إضافة الهاتف!\n\nهل تريد طباعة الباركود؟');
-          if(shouldPrint){ window.location.href = `print_barcode.html?phone_number=${encodeURIComponent(phoneData.phone_number)}`; }
-          return true;
+        
+        // التحقق من وجود معرف التعديل
+        if (window.editingPhoneId) {
+          console.log('🔄 تحديث الهاتف:', window.editingPhoneId);
+          phoneData.id = window.editingPhoneId;
+          
+          if(window.storage && window.storage.isFirebaseAvailable){
+            // تحديث في Firebase
+            savedOK = await window.storage.updatePhone(window.editingPhoneId, phoneData);
+          } else {
+            // تحديث في localStorage
+            const arr = JSON.parse(localStorage.getItem('phones')||'[]');
+            const index = arr.findIndex(p => p.id === window.editingPhoneId || p.phone_number === window.editingPhoneId);
+            if (index !== -1) {
+              arr[index] = { ...arr[index], ...phoneData };
+              localStorage.setItem('phones', JSON.stringify(arr));
+              savedOK = true;
+            }
+          }
+          
+          if(savedOK){
+            showAlert('success', 'تم تحديث الهاتف بنجاح!');
+            // إعادة توجيه إلى صفحة البحث
+            setTimeout(() => {
+              window.location.href = 'search.html';
+            }, 2000);
+            return true;
+          }
+        } else {
+          // إضافة هاتف جديد
+          if(window.storage && window.storage.isFirebaseAvailable){
+            const id = await window.storage.addPhone(phoneData);
+            savedOK = !!id;
+          }else{
+            const arr = JSON.parse(localStorage.getItem('phones')||'[]'); 
+            phoneData.id=Date.now().toString(); 
+            arr.push(phoneData);
+            localStorage.setItem('phones', JSON.stringify(arr)); 
+            savedOK=true;
+          }
+          
+          if(savedOK){
+            const shouldPrint = confirm('✅ تم إضافة الهاتف!\n\nهل تريد طباعة الباركود؟');
+            if(shouldPrint){ window.location.href = `print_barcode.html?phone_number=${encodeURIComponent(phoneData.phone_number)}`; }
+            return true;
+          }
         }
         alert('❌ تعذّر الحفظ'); return false;
 
@@ -408,10 +443,95 @@
       });
     }
 
+    // ===== تحميل بيانات الهاتف للتعديل =====
+    async function loadPhoneForEdit(phoneNumber) {
+      try {
+        console.log('🔄 تحميل بيانات الهاتف للتعديل:', phoneNumber);
+        
+        let phone = null;
+        
+        // البحث في Firebase أولاً
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const phones = await window.storage.getPhones();
+          phone = phones.find(p => p.phone_number === phoneNumber || p.id === phoneNumber);
+        }
+        
+        // البحث في localStorage كبديل
+        if (!phone) {
+          const phones = JSON.parse(localStorage.getItem('phones') || '[]');
+          phone = phones.find(p => p.phone_number === phoneNumber || p.id === phoneNumber);
+        }
+        
+        if (phone) {
+          console.log('✅ تم العثور على الهاتف:', phone);
+          
+          // ملء النموذج بالبيانات
+          document.getElementById('barcode_input').value = phone.phone_number || '';
+          document.getElementById('brand').value = phone.manufacturer || phone.brand || '';
+          document.getElementById('model').value = phone.model || '';
+          document.getElementById('color').value = phone.phone_color || '';
+          document.getElementById('memory').value = phone.phone_memory || phone.memory || '';
+          document.getElementById('serial').value = phone.serial_number || '';
+          document.getElementById('purchase_price').value = phone.purchase_price || '';
+          document.getElementById('selling_price').value = phone.selling_price || phone.price || '';
+          document.getElementById('warranty').value = phone.warranty || '';
+          document.getElementById('description').value = phone.description || '';
+          document.getElementById('customer_id').value = phone.customer_id || '';
+          document.getElementById('customer_name').value = phone.customer_name || '';
+          document.getElementById('customer_phone').value = phone.customer_phone || '';
+          
+          // تحديث عنوان الصفحة
+          document.title = 'تعديل هاتف جديد — الصقري للاتصالات';
+          document.querySelector('h2').textContent = 'تعديل هاتف جديد';
+          
+          // حفظ معرف الهاتف للتعديل
+          window.editingPhoneId = phone.id || phone.phone_number;
+          
+          showAlert('info', 'تم تحميل بيانات الهاتف للتعديل');
+        } else {
+          console.log('❌ لم يتم العثور على الهاتف');
+          showAlert('warning', 'لم يتم العثور على الهاتف المطلوب');
+        }
+        
+      } catch (error) {
+        console.error('❌ خطأ في تحميل بيانات الهاتف:', error);
+        showAlert('danger', 'حدث خطأ في تحميل بيانات الهاتف');
+      }
+    }
+
+    // ===== عرض التنبيهات =====
+    function showAlert(type, message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, 5000);
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
+      // التحقق من وجود معامل التعديل في URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const editPhoneNumber = urlParams.get('edit');
+      
       if(!document.getElementById('barcode_input').value){ document.getElementById('barcode_input').focus(); }
       setupArabicNumberSupport(); calculateVAT(); await populateBrandsFromFirebase();
       setupInputValidation();
+      
+      // تحميل بيانات الهاتف للتعديل إذا كان هناك معامل edit
+      if (editPhoneNumber) {
+        await loadPhoneForEdit(editPhoneNumber);
+      }
+      
       const form = document.querySelector('form');
       form.addEventListener('submit', async (e)=>{ e.preventDefault(); if(await savePhoneToFirebase()){ form.reset(); await populateBrandsFromFirebase(); } });
     });
