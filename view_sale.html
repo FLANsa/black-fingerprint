@@ -8,9 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  
-  <!-- QR Code Library -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -411,8 +408,8 @@
   <!-- Receipt Roll Printer Template -->
 <div id="receipt-roll-template" class="receipt-template">
   <div class="receipt-container">
-  <div class="receipt-header">
-    <div class="company-info">
+    <div class="receipt-header">
+      <div class="company-info">
         <h1>الصقري للإتصالات</h1>
         <p>AL SAQRI TELECOM</p>
         <p>الجوال: 0505663222</p>
@@ -420,40 +417,40 @@
         <p>السجل التجاري: 1131281064</p>
         <p>العنوان: القصيم بريده الصفراء</p>
         <p>اسواق النافوره</p>
-    </div>
+      </div>
 
-    <div class="sale-info">
+      <div class="sale-info">
         <h2>فاتورة ضريبية مبسطة</h2>
         <p>فاتورة: <span id="receipt_sale_number">-</span></p>
         <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
-    </div>
+      </div>
 
       <div class="customer-info" id="receipt_customer_info" style="display: none;">
-      <h3>معلومات العميل</h3>
+        <h3>معلومات العميل</h3>
         <p id="receipt_customer_name">-</p>
         <p id="receipt_customer_phone">-</p>
         <p>الرقم الضريبي: </p>
       </div>
-  </div>
+    </div>
 
-  <div class="receipt-items">
+    <div class="receipt-items">
       <h3>تفاصيل المنتجات</h3>
       <table class="items-table">
-      <thead>
+        <thead>
           <tr>
             <th>الكمية</th>
             <th>المنتج</th>
             <th>السعر غير شامل الضريبة</th>
             <th>السعر شامل الضريبة</th>
           </tr>
-      </thead>
+        </thead>
         <tbody id="receipt_items">
           <!-- Items will be loaded here -->
         </tbody>
-    </table>
-  </div>
+      </table>
+    </div>
 
-  <div class="receipt-summary">
+    <div class="receipt-summary">
       <div class="summary-row">
         <span>الاجمالي غير شامل الضريبة:</span>
         <span id="receipt_subtotal">0.00 ريال</span>
@@ -470,17 +467,16 @@
       
     <div class="seller-info">
       <p>اسم البائع: لؤي</p>
-  </div>
+    </div>
 
-  <div class="receipt-footer">
+    <div class="receipt-footer">
       <h4>سياسة الاستبدال والاسترجاع</h4>
       <p>1) الاجهزة الجديدة ضمانها عند الوكيل</p>
       <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
       <p>في حال وجود عطل داخلي يشمل ضمان</p>
       <p>المستخدم في حال وجود كامل الملحقات</p>
       <div class="qr-placeholder">
-        <canvas id="qr-code-container"></canvas>
-        <p style="margin-top: 5px; font-size: 8px;">الرقم الضريبي: 310105614500003</p>
+        <p>[QR Code]</p>
       </div>
       <p>شكرا لزيارتكم الصقري للإتصالات</p>
       <p>تاريخ الطباعة: <span id="print-date"></span></p>
@@ -539,9 +535,6 @@
     // تعيين تاريخ الطباعة عند تحميل الصفحة (اليوم فقط)
     setPrintDate();
     
-    // إنشاء QR Code للرقم الضريبي
-    generateTaxNumberQR();
-    
     const urlParams = new URLSearchParams(window.location.search);
     const saleId = urlParams.get('id');
     
@@ -565,7 +558,7 @@
           customer_name: 'عميل تجريبي',
           customer_phone: '0501234567',
           payment_method: 'نقدي',
-    items: [
+          items: [
             { type: 'phone', name: 'iPhone 15', unitPrice: 4000, quantity: 1, totalPrice: 4000 }
           ],
           subtotal: 3478.26,
@@ -789,45 +782,56 @@
     setPrintDate();
     populateReceiptTemplate();
     
-    // إنشاء QR Code للرقم الضريبي في نافذة الطباعة
+    const printWindow = window.open('', '_blank');
+    const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <title>فاتورة مبيعات</title>
+        <style>
+          body { margin: 0; padding: 0; font-family: 'Arial','Tahoma',sans-serif; font-size: 12px; line-height: 1.4; color: black; background: white; direction: rtl; text-align: right; }
+          .receipt-container { width: 80mm; max-width: 80mm; margin: 0 10mm 0 auto; padding: 5mm; box-sizing: border-box; }
+          .receipt-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 10px; }
+          .company-info h1 { font-size: 18px; margin: 0 0 8px 0; font-weight: bold; text-align: center; }
+          .company-info p { margin: 2px 0; font-size: 11px; text-align: center; }
+          .sale-info h2 { font-size: 16px; margin: 12px 0 8px 0; font-weight: bold; text-align: center; }
+          .sale-info p { margin: 2px 0; font-size: 11px; text-align: center; }
+          .customer-info h3 { font-size: 14px; margin: 12px 0 6px 0; font-weight: bold; text-align: right; }
+          .customer-info p { margin: 1px 0; font-size: 11px; text-align: right; }
+          .receipt-items { margin: 15px 0; }
+          .receipt-items h3 { font-size: 14px; margin: 0 0 8px 0; font-weight: bold; text-align: center; }
+          .items-table { width: 100%; border-collapse: collapse; font-size: 9px; margin: 8px 0; }
+          .items-table th { border-bottom: 1px solid #000; padding: 3px 1px; text-align: center; font-weight: bold; font-size: 9px; }
+          .items-table td { padding: 2px 1px; text-align: center; border-bottom: 1px dotted #ccc; font-size: 9px; }
+          .receipt-summary { margin: 15px 0; border-top: 1px solid #000; padding-top: 10px; }
+          .summary-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 11px; }
+          .seller-info { margin: 10px 0; text-align: right; font-size: 11px; }
+          .seller-info p { margin: 2px 0; }
+          .summary-row.total { font-weight: bold; font-size: 14px; border-top: 1px solid #000; padding-top: 8px; margin-top: 15px; }
+          .receipt-footer { text-align: center; margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; }
+          .receipt-footer h4 { font-size: 12px; margin: 0 0 8px 0; font-weight: bold; }
+          .receipt-footer p { margin: 3px 0; font-size: 10px; }
+          .qr-placeholder { text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed #000; }
+          .qr-placeholder p { margin: 0; font-size: 9px; }
+          @media print { @page { size: 80mm auto; margin: 5mm; } }
+        </style>
+      </head>
+      <body>
+        ${receiptContent}
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    printWindow.focus();
+    
     setTimeout(() => {
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>فاتورة ضريبية</title>
-            <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-            <style>
-              body { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.2; color: black; background: white; }
-              .qr-placeholder { text-align: center; margin: 10px 0; padding: 10px; border: 1px dashed #000; }
-              #qr-code-container { max-width: 100%; height: auto; }
-            </style>
-          </head>
-          <body>
-            ${receiptContent}
-            <script>
-              // إنشاء QR Code في نافذة الطباعة
-              setTimeout(() => {
-                const qrContainer = document.getElementById('qr-code-container');
-                if (qrContainer && typeof QRCode !== 'undefined') {
-                  QRCode.toCanvas(qrContainer, '310105614500003', {
-                    width: 120,
-                    height: 120,
-                    margin: 2,
-                    color: { dark: '#000000', light: '#FFFFFF' }
-                  });
-                }
-              }, 100);
-            </script>
-          </body>
-          </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-      }
-    }, 100);
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   }
 
   // تعبئة قالب الفاتورة
@@ -888,37 +892,6 @@
     const printDateElement = document.getElementById('print-date');
     if (printDateElement) {
       printDateElement.textContent = todayRiyadh();
-    }
-  }
-
-  // إنشاء QR Code للرقم الضريبي
-  function generateTaxNumberQR() {
-    const taxNumber = '310105614500003';
-    const qrContainer = document.getElementById('qr-code-container');
-    
-    if (qrContainer && typeof QRCode !== 'undefined') {
-      // مسح المحتوى السابق
-      qrContainer.innerHTML = '';
-      
-      // إنشاء QR Code
-      QRCode.toCanvas(qrContainer, taxNumber, {
-        width: 120,
-        height: 120,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        }
-      }, function (error) {
-        if (error) {
-          console.error('خطأ في إنشاء QR Code:', error);
-          qrContainer.innerHTML = '<p style="font-size: 10px; color: #666;">QR Code غير متاح</p>';
-        } else {
-          console.log('✅ تم إنشاء QR Code للرقم الضريبي بنجاح');
-        }
-      });
-    } else {
-      console.warn('⚠️ QRCode library not loaded or container not found');
     }
   }
 
