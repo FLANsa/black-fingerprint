@@ -128,7 +128,9 @@
                 </div>
                 <div class="col-md-4">
                   <label for="model" class="form-label">الموديل</label>
-                  <input type="text" class="form-control" id="model" required>
+                  <select class="form-select" id="model" required>
+                    <option value="">اختر الموديل</option>
+                  </select>
                 </div>
               </div>
 
@@ -309,8 +311,18 @@
           
           // ملء النموذج بالبيانات
           document.getElementById('phone_number').value = phone.phone_number || '';
-          document.getElementById('manufacturer').value = phone.manufacturer || phone.brand || '';
-          document.getElementById('model').value = phone.model || '';
+          
+          // تعيين الشركة المصنعة أولاً
+          const manufacturer = phone.manufacturer || phone.brand || '';
+          document.getElementById('manufacturer').value = manufacturer;
+          
+          // تحميل الموديلات بعد تعيين الشركة المصنعة
+          if (manufacturer) {
+            await loadModels(manufacturer);
+            // تعيين الموديل بعد تحميل القائمة
+            document.getElementById('model').value = phone.model || '';
+          }
+          
           document.getElementById('phone_color').value = phone.phone_color || '';
           document.getElementById('phone_memory').value = phone.phone_memory || phone.memory || '';
           document.getElementById('serial_number').value = phone.serial_number || '';
@@ -467,8 +479,28 @@
     // ===== تحميل قائمة الشركات المصنعة =====
     async function loadManufacturers() {
       try {
+        console.log('🔄 تحميل قائمة الشركات المصنعة من Firebase...');
+        
         if (window.storage && window.storage.isFirebaseAvailable) {
           const phoneTypes = await window.storage.getPhoneTypes();
+          console.log('📱 أنواع الهواتف المحملة:', phoneTypes);
+          
+          const manufacturers = [...new Set(phoneTypes.map(pt => pt.manufacturer))];
+          console.log('🏭 الشركات المصنعة:', manufacturers);
+          
+          const select = document.getElementById('manufacturer');
+          select.innerHTML = '<option value="">اختر الشركة المصنعة</option>';
+          manufacturers.forEach(manufacturer => {
+            const option = document.createElement('option');
+            option.value = manufacturer;
+            option.textContent = manufacturer;
+            select.appendChild(option);
+          });
+          
+          console.log('✅ تم تحميل الشركات المصنعة بنجاح');
+        } else {
+          console.log('⚠️ Firebase غير متاح، تحميل من localStorage...');
+          const phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '[]');
           const manufacturers = [...new Set(phoneTypes.map(pt => pt.manufacturer))];
           
           const select = document.getElementById('manufacturer');
@@ -482,6 +514,66 @@
         }
       } catch (error) {
         console.error('❌ خطأ في تحميل الشركات المصنعة:', error);
+        showAlert('warning', 'فشل في تحميل قائمة الشركات المصنعة');
+      }
+    }
+
+    // ===== تحميل قائمة الموديلات حسب الشركة المصنعة =====
+    async function loadModels(manufacturer) {
+      try {
+        console.log('🔄 تحميل موديلات الشركة:', manufacturer);
+        
+        if (!manufacturer) {
+          document.getElementById('model').innerHTML = '';
+          return;
+        }
+        
+        let phoneTypes = [];
+        
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          phoneTypes = await window.storage.getPhoneTypes();
+        } else {
+          phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '[]');
+        }
+        
+        const models = phoneTypes
+          .filter(pt => pt.manufacturer === manufacturer)
+          .map(pt => pt.model)
+          .filter((model, index, self) => self.indexOf(model) === index); // Remove duplicates
+        
+        console.log('📱 الموديلات المتاحة:', models);
+        
+        const modelSelect = document.getElementById('model');
+        const currentModel = modelSelect.value;
+        
+        // حفظ الموديل الحالي إذا كان موجوداً
+        const shouldPreserveModel = models.includes(currentModel);
+        
+        modelSelect.innerHTML = '';
+        models.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model;
+          option.textContent = model;
+          if (shouldPreserveModel && model === currentModel) {
+            option.selected = true;
+          }
+          modelSelect.appendChild(option);
+        });
+        
+        // إذا لم يكن الموديل الحالي في القائمة، أضفه
+        if (currentModel && !shouldPreserveModel) {
+          const option = document.createElement('option');
+          option.value = currentModel;
+          option.textContent = currentModel;
+          option.selected = true;
+          modelSelect.insertBefore(option, modelSelect.firstChild);
+        }
+        
+        console.log('✅ تم تحميل الموديلات بنجاح');
+        
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الموديلات:', error);
+        showAlert('warning', 'فشل في تحميل قائمة الموديلات');
       }
     }
 
@@ -554,6 +646,13 @@
 
       // إضافة مستمع لتغيير حالة الهاتف
       document.getElementById('condition').addEventListener('change', toggleBatteryAgeField);
+
+      // إضافة مستمع لتغيير الشركة المصنعة
+      document.getElementById('manufacturer').addEventListener('change', async function(e) {
+        const selectedManufacturer = e.target.value;
+        console.log('🔄 تغيير الشركة المصنعة إلى:', selectedManufacturer);
+        await loadModels(selectedManufacturer);
+      });
 
       // إضافة مستمع للنموذج
       document.getElementById('editPhoneForm').addEventListener('submit', async function(e) {
