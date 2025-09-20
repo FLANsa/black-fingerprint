@@ -543,7 +543,7 @@
       }
   
       let html = '<div class="table-responsive"><table class="table table-sm">';
-      html += '<thead><tr><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الربح</th><th>الكمية</th><th>المجموع</th><th>إجمالي الربح</th><th>الإجراء</th></tr></thead><tbody>';
+      html += '<thead><tr><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>المجموع</th><th>الإجراء</th></tr></thead><tbody>';
   
       cart.forEach((item, i) => {
         html += `
@@ -558,7 +558,6 @@
                 <span class="input-group-text">ريال</span>
               </div>
             </td>
-            <td><span class="text-success fw-bold">${(item.profit || 0).toFixed(2)} ريال</span></td>
             <td>
               <div class="input-group input-group-sm">
                 <input type="number" class="form-control" id="quantity_${i}"
@@ -567,7 +566,6 @@
               </div>
             </td>
             <td>${item.totalPrice.toFixed(2)} ريال</td>
-            <td><span class="text-success fw-bold">${(item.totalProfit || 0).toFixed(2)} ريال</span></td>
             <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${i})"><i class="fas fa-trash"></i></button></td>
           </tr>
         `;
@@ -592,29 +590,17 @@
       document.getElementById('cart_vat').textContent = vat.toFixed(2);
       document.getElementById('cart_total').textContent = total.toFixed(2);
   
-      // أضف/حدّث صفوف تكلفة الشراء والربح
+      // إخفاء صفوف تكلفة الشراء والربح (المنطق يبقى موجود لكن غير مرئي)
       const cartSummary = document.getElementById('cart_summary');
       let purchaseCostElement = document.getElementById('cart_purchase_cost');
       let profitElement = document.getElementById('cart_profit');
-  
-      if (!purchaseCostElement || !profitElement) {
-        const row1 = document.createElement('div');
-        row1.className = 'row mb-2';
-        row1.innerHTML = `
-          <div class="col-6"><strong>إجمالي سعر الشراء:</strong></div>
-          <div class="col-6 text-end"><span id="cart_purchase_cost" class="text-muted">${totalPurchaseCost.toFixed(2)} ريال</span></div>
-        `;
-        const row2 = document.createElement('div');
-        row2.className = 'row mb-2';
-        row2.innerHTML = `
-          <div class="col-6"><strong>إجمالي الربح المتوقع:</strong></div>
-          <div class="col-6 text-end"><span id="cart_profit" class="text-success fw-bold">${totalProfit.toFixed(2)} ريال</span></div>
-        `;
-        cartSummary.insertBefore(row2, cartSummary.querySelector('.row:last-child'));
-        cartSummary.insertBefore(row1, cartSummary.querySelector('.row:last-child'));
-      } else {
-        document.getElementById('cart_purchase_cost').textContent = totalPurchaseCost.toFixed(2) + ' ريال';
-        document.getElementById('cart_profit').textContent = totalProfit.toFixed(2) + ' ريال';
+
+      // إزالة العناصر إذا كانت موجودة
+      if (purchaseCostElement) {
+        purchaseCostElement.parentElement.remove();
+      }
+      if (profitElement) {
+        profitElement.parentElement.remove();
       }
   
       document.getElementById('complete_sale_btn').disabled = cart.length === 0;
@@ -685,7 +671,7 @@
           <div class="alert alert-success">
             <h6><i class="fas fa-mobile-alt"></i> تم العثور على الهاتف:</h6>
             <p><strong>${manufacturer} ${model}</strong></p>
-            <p>الباركود: ${barcode} | السعر: ${price} ريال | سعر الشراء: ${purchase} ريال | الربح: ${profit.toFixed(2)} ريال</p>
+            <p>الباركود: ${barcode} | السعر: ${price} ريال | سعر الشراء: ${purchase} ريال</p>
             <button class="btn btn-sm btn-primary" onclick="selectPhoneByBarcode('${foundPhone.id || foundPhone.phone_number}')">
               <i class="fas fa-plus"></i> إضافة للسلة
             </button>
@@ -729,7 +715,7 @@
   
       document.getElementById('barcode_search_result').style.display = 'none';
       document.getElementById('barcode_search').value = '';
-      alert(`تم إضافة ${manufacturer} ${model} (باركود: ${barcode}) للسلة.\nسعر البيع: ${sellingPrice} ريال\nسعر الشراء: ${purchasePrice} ريال\nالربح: ${profit.toFixed(2)} ريال`);
+      alert(`تم إضافة ${manufacturer} ${model} (باركود: ${barcode}) للسلة.\nسعر البيع: ${sellingPrice} ريال\nسعر الشراء: ${purchasePrice} ريال`);
     }
   
     // ====== إتمام عملية البيع (يحفظ في Firebase إن توفرت) ======
@@ -773,7 +759,7 @@
         }
   
         localStorage.setItem('lastSale', JSON.stringify(saleData));
-        alert(`تم إنشاء عملية البيع!\nرقم العملية: ${saleNumber}\nقبل الضريبة: ${subtotal.toFixed(2)}\nالضريبة: ${vat.toFixed(2)}\nالإجمالي: ${totalWithVAT.toFixed(2)}\nسعر الشراء: ${totalPurchaseCost.toFixed(2)}\nالربح المتوقع: ${totalProfit.toFixed(2)}`);
+        alert(`تم إنشاء عملية البيع!\nرقم العملية: ${saleNumber}\nقبل الضريبة: ${subtotal.toFixed(2)}\nالضريبة: ${vat.toFixed(2)}\nالإجمالي: ${totalWithVAT.toFixed(2)}\nسعر الشراء: ${totalPurchaseCost.toFixed(2)}`);
   
         cart = [];
         updateCartDisplay();
