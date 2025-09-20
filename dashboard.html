@@ -303,7 +303,6 @@
       
       // التحقق من أن المستخدم مدير
       if (userData.role !== 'admin') {
-        alert('هذه الصفحة مخصصة للمديرين فقط');
         window.location.href = 'limited_dashboard.html';
         return false;
       }
