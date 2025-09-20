@@ -185,44 +185,6 @@
     </div>
   </div>
 
-  <!-- Sold Phones Summary -->
-  <div class="row mb-4" id="sold_phones_section" style="display: none;">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header bg-danger text-white">
-          <h5 class="mb-0"><i class="fas fa-mobile-alt"></i> ملخص الهواتف المباعة</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-3">
-              <div class="text-center">
-                <h4 class="text-danger" id="total_sold_phones">0</h4>
-                <p class="text-muted">إجمالي الهواتف المباعة</p>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="text-center">
-                <h4 class="text-warning" id="sold_purchase_value">0.00 ريال</h4>
-                <p class="text-muted">القيمة الشرائية المباعة</p>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="text-center">
-                <h4 class="text-primary" id="sold_selling_value">0.00 ريال</h4>
-                <p class="text-muted">القيمة البيعية المباعة</p>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="text-center">
-                <h4 class="text-success" id="sold_profit">0.00 ريال</h4>
-                <p class="text-muted">الربح المحقق</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Sales Performance Cards -->
   <div class="row mb-4">
@@ -381,24 +343,6 @@
       document.getElementById('total_selling_value').textContent = totalSellingValue.toFixed(2) + ' ريال';
       document.getElementById('total_expected_profit').textContent = totalExpectedProfit.toFixed(2) + ' ريال';
 
-      // تحديث إحصائيات الهواتف المباعة
-      const soldPhonesCount = soldPhones.length;
-      const soldPurchaseValue = soldPhones.reduce((sum, phone) => sum + (phone.purchase_price || 0), 0);
-      const soldSellingValue = soldPhones.reduce((sum, phone) => sum + (phone.selling_price || 0), 0);
-      const soldProfit = soldSellingValue - soldPurchaseValue;
-
-      document.getElementById('total_sold_phones').textContent = soldPhonesCount;
-      document.getElementById('sold_purchase_value').textContent = soldPurchaseValue.toFixed(2) + ' ريال';
-      document.getElementById('sold_selling_value').textContent = soldSellingValue.toFixed(2) + ' ريال';
-      document.getElementById('sold_profit').textContent = soldProfit.toFixed(2) + ' ريال';
-
-      // إظهار/إخفاء قسم الهواتف المباعة
-      const soldPhonesSection = document.getElementById('sold_phones_section');
-      if (soldPhonesCount > 0) {
-        soldPhonesSection.style.display = 'block';
-      } else {
-        soldPhonesSection.style.display = 'none';
-      }
 
       // تحديث إحصائيات المبيعات
       const totalSales = sales.length;
