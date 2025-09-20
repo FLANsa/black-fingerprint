@@ -382,21 +382,18 @@ class FirebaseStorageManager {
   async getPhoneTypes() {
     if (this.isFirebaseAvailable) {
       try {
+        console.log('🔄 Storage Manager: تحميل أنواع الهواتف من Firebase...');
         const phoneTypes = await this.firebaseDB.getPhoneTypes();
-        // Convert array to object format for compatibility
-        const phoneTypesObj = {};
-        phoneTypes.forEach(type => {
-          if (!phoneTypesObj[type.brand]) {
-            phoneTypesObj[type.brand] = [];
-          }
-          phoneTypesObj[type.brand].push(type.model);
-        });
-        return phoneTypesObj;
+        console.log('📱 Storage Manager: أنواع الهواتف المحملة:', phoneTypes);
+        
+        // Return the array directly for the new format
+        return phoneTypes;
       } catch (error) {
-        console.error('Error getting phone types from Firebase:', error);
+        console.error('❌ Storage Manager: خطأ في تحميل أنواع الهواتف من Firebase:', error);
         return this.getItem(CONFIG.STORAGE_KEYS.PHONE_TYPES);
       }
     }
+    console.log('💾 Storage Manager: Firebase غير متاح، تحميل من localStorage...');
     return this.getItem(CONFIG.STORAGE_KEYS.PHONE_TYPES);
   }
 
