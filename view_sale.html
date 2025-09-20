@@ -54,19 +54,11 @@
         setTimeout(generateTaxQR, 100);
       };
       script.onerror = function() {
-        showQRCodeError();
+        // QR library failed to load
       };
       document.head.appendChild(script);
     }
     
-    function showQRCodeError() {
-      const container = document.getElementById('tax-qr');
-      const fallback = document.getElementById('tax-qr-fallback');
-      if (container && fallback) {
-        container.innerHTML = '';
-        fallback.classList.remove('d-none');
-      }
-    }
     
     // Start loading when DOM is ready
     if (document.readyState === 'loading') {
@@ -657,20 +649,6 @@
       <p>المستخدم في حال وجود كامل الملحقات</p>
       <div class="qr-block">
         <div id="tax-qr" aria-label="QR code for tax number"></div>
-        <div class="qr-fallback d-none text-danger" id="tax-qr-fallback">
-          <div class="text-center">
-            <i class="fas fa-qrcode fa-3x text-muted mb-2"></i>
-            <div class="small">تعذر إنشاء رمز QR</div>
-            <div class="mt-2">
-              <button class="btn btn-sm btn-outline-primary me-2" onclick="retryQRGeneration()">
-                <i class="fas fa-redo"></i> إعادة المحاولة
-              </button>
-              <button class="btn btn-sm btn-outline-secondary" onclick="showTextQR()">
-                <i class="fas fa-text-width"></i> عرض نصي
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
       <p>شكرا لزيارتكم الصقري للإتصالات</p>
       <p>تاريخ الطباعة: <span id="print-date"></span></p>
@@ -1094,7 +1072,6 @@
   // Generate the QR into #tax-qr using available QR library
   function generateTaxQR() {
     const container = document.getElementById('tax-qr');
-    const fallback  = document.getElementById('tax-qr-fallback');
 
     if (!container) {
       return;
@@ -1102,23 +1079,18 @@
 
     // reset
     container.innerHTML = '';
-    if (fallback) fallback.classList.add('d-none');
 
     // Try different QR libraries
     if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
       // Use qrcode library (preferred)
-      generateQRWithQRCodeLibrary(container, fallback);
+      generateQRWithQRCodeLibrary(container);
     } else if (typeof QRCode !== 'undefined' && QRCode.prototype) {
       // Use QRCode.js library (fallback)
-      generateQRWithQRCodeJS(container, fallback);
-    } else {
-      if (fallback) {
-        fallback.classList.remove('d-none');
-      }
+      generateQRWithQRCodeJS(container);
     }
   }
 
-  function generateQRWithQRCodeLibrary(container, fallback) {
+  function generateQRWithQRCodeLibrary(container) {
     try {
       // Create canvas element
       const canvas = document.createElement('canvas');
@@ -1134,12 +1106,7 @@
           light: '#ffffff'
         }
       }, function (error) {
-        if (error) {
-          if (fallback) {
-            fallback.classList.remove('d-none');
-            fallback.textContent = 'تعذر إنشاء رمز QR: ' + error.message;
-          }
-        } else {
+        if (!error) {
           // Convert canvas to image for better print compatibility
           const png = canvas.toDataURL('image/png');
           const imgEl = document.createElement('img');
@@ -1152,14 +1119,11 @@
         }
       });
     } catch (err) {
-      if (fallback) {
-        fallback.classList.remove('d-none');
-        fallback.textContent = 'تعذر إنشاء رمز QR: ' + err.message;
-      }
+      // QR generation failed silently
     }
   }
 
-  function generateQRWithQRCodeJS(container, fallback) {
+  function generateQRWithQRCodeJS(container) {
     try {
       // Use QRCode.js library
       const qr = new QRCode(container, {
@@ -1189,62 +1153,16 @@
             imgEl.height = 120;
             container.innerHTML = '';
             container.appendChild(imgEl);
-          } else {
-            if (fallback) {
-              fallback.classList.remove('d-none');
-              fallback.textContent = 'تعذر إنشاء رمز QR - لم يتم العثور على العنصر';
-            }
           }
         } catch (innerErr) {
-          if (fallback) {
-            fallback.classList.remove('d-none');
-            fallback.textContent = 'تعذر تحويل QR إلى صورة';
-          }
+          // QR conversion failed silently
         }
       }, 200);
     } catch (err) {
-      if (fallback) {
-        fallback.classList.remove('d-none');
-        fallback.textContent = 'تعذر إنشاء رمز QR: ' + err.message;
-      }
+      // QR generation failed silently
     }
   }
 
-  // Retry QR generation function
-  function retryQRGeneration() {
-    const fallback = document.getElementById('tax-qr-fallback');
-    if (fallback) {
-      fallback.classList.add('d-none');
-    }
-    generateTaxQR();
-  }
-
-  // Show text-based QR representation
-  function showTextQR() {
-    const container = document.getElementById('tax-qr');
-    const fallback = document.getElementById('tax-qr-fallback');
-    
-    if (container && fallback) {
-      fallback.classList.add('d-none');
-      
-      // Create a simple text-based representation
-      const textQR = document.createElement('div');
-      textQR.className = 'text-center';
-      textQR.innerHTML = `
-        <div class="border p-3 bg-light" style="font-family: monospace; font-size: 12px; line-height: 1.2;">
-          <div class="mb-2"><strong>QR Code (Text)</strong></div>
-          <div class="mb-2">████████████████████</div>
-          <div class="mb-2">█  ██  ██  ██  ██  █</div>
-          <div class="mb-2">████  ██  ██  ██  ██</div>
-          <div class="mb-2">█  ██  ██  ██  ██  █</div>
-          <div class="mb-2">████████████████████</div>
-        </div>
-      `;
-      
-      container.innerHTML = '';
-      container.appendChild(textQR);
-    }
-  }
 
   // Ensure we have an <img> in the QR container before we clone HTML into the print window
   function ensureQrReadyForPrint() {
