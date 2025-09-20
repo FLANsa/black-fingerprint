@@ -122,9 +122,6 @@
       max-width: 100%;
       max-height: 100%;
     }
-    .qr-caption {
-      font-size: 11px;
-    }
 
     /* Ensure visible in print */
     @media print {
@@ -143,11 +140,6 @@
         display: block !important;
         margin: 0 !important;
         text-align: left !important;
-      }
-      .qr-caption { 
-        font-size: 11px !important;
-        text-align: left !important;
-        margin: 0 !important;
       }
     }
     
@@ -355,7 +347,6 @@
       margin:0 auto;           /* center QR bitmap */
       max-width:100%; max-height:100%;
     }
-    .qr-caption{ font-size:11px; text-align:center; }
 
     /* kill previous print-left overrides and center in print too */
     @media print{
@@ -373,7 +364,6 @@
         display:block !important;
         margin:0 auto !important;   /* center in print */
       }
-      .qr-caption{ font-size:11px !important; text-align:center !important; margin:0 !important; }
     }
   </style>
 </head>
@@ -667,12 +657,10 @@
       <p>المستخدم في حال وجود كامل الملحقات</p>
       <div class="qr-block">
         <div id="tax-qr" aria-label="QR code for tax number"></div>
-        <div class="qr-caption">الرقم الضريبي: <span id="tax-number-text">310105614500003</span></div>
         <div class="qr-fallback d-none text-danger" id="tax-qr-fallback">
           <div class="text-center">
             <i class="fas fa-qrcode fa-3x text-muted mb-2"></i>
             <div class="small">تعذر إنشاء رمز QR</div>
-            <div class="small text-muted">الرقم الضريبي: 310105614500003</div>
             <div class="mt-2">
               <button class="btn btn-sm btn-outline-primary me-2" onclick="retryQRGeneration()">
                 <i class="fas fa-redo"></i> إعادة المحاولة
@@ -1020,7 +1008,6 @@
             display:block;
             margin:0 auto 6px;
           }
-          .qr-caption{ font-size:10px; text-align:center; }
           
           @media print { @page { size: 80mm auto; margin: 5mm; } }
         </style>
@@ -1108,7 +1095,6 @@
   function generateTaxQR() {
     const container = document.getElementById('tax-qr');
     const fallback  = document.getElementById('tax-qr-fallback');
-    const caption   = document.getElementById('tax-number-text');
 
     if (!container) {
       return;
@@ -1117,7 +1103,6 @@
     // reset
     container.innerHTML = '';
     if (fallback) fallback.classList.add('d-none');
-    if (caption)  caption.textContent = TAX_NUMBER;
 
     // Try different QR libraries
     if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
@@ -1253,7 +1238,6 @@
           <div class="mb-2">████  ██  ██  ██  ██</div>
           <div class="mb-2">█  ██  ██  ██  ██  █</div>
           <div class="mb-2">████████████████████</div>
-          <div class="small text-muted mt-2">الرقم الضريبي: 310105614500003</div>
         </div>
       `;
       
