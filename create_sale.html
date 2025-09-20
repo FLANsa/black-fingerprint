@@ -500,8 +500,25 @@
         cartHTML += `
           <tr>
             <td>${item.name}</td>
-            <td>${item.unitPrice.toFixed(2)} ريال</td>
-            <td>${item.quantity}</td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="number" class="form-control" id="price_${index}" 
+                       value="${item.unitPrice.toFixed(2)}" 
+                       step="0.01" min="0" 
+                       onchange="updateItemPrice(${index})"
+                       style="width: 80px;">
+                <span class="input-group-text">ريال</span>
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="number" class="form-control" id="quantity_${index}" 
+                       value="${item.quantity}" 
+                       min="1" 
+                       onchange="updateItemQuantity(${index})"
+                       style="width: 60px;">
+              </div>
+            </td>
             <td>${item.totalPrice.toFixed(2)} ريال</td>
             <td>
               <button class="btn btn-sm btn-danger" onclick="removeFromCart(${index})">
@@ -541,6 +558,45 @@
 
     function removeFromCart(index) {
       cart.splice(index, 1);
+      updateCartDisplay();
+    }
+
+    function updateItemPrice(index) {
+      const newPrice = parseFloat(document.getElementById(`price_${index}`).value) || 0;
+      if (newPrice < 0) {
+        alert('السعر لا يمكن أن يكون سالباً');
+        document.getElementById(`price_${index}`).value = cart[index].unitPrice.toFixed(2);
+        return;
+      }
+      
+      cart[index].unitPrice = newPrice;
+      cart[index].totalPrice = newPrice * cart[index].quantity;
+      updateCartDisplay();
+    }
+
+    function updateItemQuantity(index) {
+      const newQuantity = parseInt(document.getElementById(`quantity_${index}`).value) || 1;
+      if (newQuantity < 1) {
+        alert('الكمية يجب أن تكون 1 أو أكثر');
+        document.getElementById(`quantity_${index}`).value = cart[index].quantity;
+        return;
+      }
+      
+      // التحقق من المخزون للأكسسوارات
+      if (cart[index].type !== 'phone') {
+        const selectedOption = document.querySelector(`option[data-id="${cart[index].id}"]`);
+        if (selectedOption) {
+          const availableStock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
+          if (availableStock < newQuantity) {
+            alert(`الكمية المطلوبة (${newQuantity}) أكبر من المخزون المتاح (${availableStock})`);
+            document.getElementById(`quantity_${index}`).value = cart[index].quantity;
+            return;
+          }
+        }
+      }
+      
+      cart[index].quantity = newQuantity;
+      cart[index].totalPrice = cart[index].unitPrice * newQuantity;
       updateCartDisplay();
     }
 
