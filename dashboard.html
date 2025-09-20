@@ -508,8 +508,112 @@
       // حساب نسبة الربح
       document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
 
+      // تحديث آخر المبيعات
+      updateRecentSales(sales);
+
     } catch (error) {
       console.error('خطأ في تحديث لوحة التحكم:', error);
+    }
+  }
+
+  // تحديث قسم آخر المبيعات
+  function updateRecentSales(sales) {
+    const recentSalesContainer = document.getElementById('recent_sales_wrap');
+    
+    if (!sales || sales.length === 0) {
+      recentSalesContainer.innerHTML = `
+        <div class="text-center py-4">
+          <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">لا توجد مبيعات حديثة</h5>
+        </div>
+      `;
+      return;
+    }
+
+    // ترتيب المبيعات حسب التاريخ (الأحدث أولاً) واختيار آخر 5
+    const sortedSales = sales
+      .sort((a, b) => {
+        const dateA = getSaleDateValue(a) || new Date(0);
+        const dateB = getSaleDateValue(b) || new Date(0);
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+
+    let salesHTML = '';
+    
+    sortedSales.forEach(sale => {
+      const saleDate = getSaleDateValue(sale) || new Date();
+      const formattedDate = formatDate(saleDate);
+      const customerName = sale.customer_name || 'عميل نقدي';
+      const totalAmount = sale.total_amount || 0;
+      const itemCount = sale.items ? sale.items.length : 0;
+      const status = sale.status || 'مكتمل';
+      
+      // تحديد لون الحالة
+      let statusBadge = 'bg-warning';
+      if (status === 'مكتمل') statusBadge = 'bg-success';
+      else if (status === 'ملغي') statusBadge = 'bg-danger';
+
+      salesHTML += `
+        <div class="row align-items-center py-2 border-bottom">
+          <div class="col-md-2">
+            <span class="badge bg-primary">${sale.sale_number || sale.id || 'غير محدد'}</span>
+          </div>
+          <div class="col-md-2">
+            <small class="text-muted">${formattedDate}</small>
+          </div>
+          <div class="col-md-3">
+            <strong>${customerName}</strong>
+          </div>
+          <div class="col-md-2">
+            <span class="badge bg-info">${convertToLatinNumbers(itemCount)} منتج</span>
+          </div>
+          <div class="col-md-2">
+            <strong class="text-success">${convertToLatinNumbers(totalAmount.toFixed(2))} ريال</strong>
+          </div>
+          <div class="col-md-1">
+            <span class="badge ${statusBadge}">${status}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    recentSalesContainer.innerHTML = `
+      <div class="table-responsive">
+        <div class="row fw-bold text-muted border-bottom pb-2 mb-2">
+          <div class="col-md-2">رقم العملية</div>
+          <div class="col-md-2">التاريخ</div>
+          <div class="col-md-3">العميل</div>
+          <div class="col-md-2">المنتجات</div>
+          <div class="col-md-2">المبلغ</div>
+          <div class="col-md-1">الحالة</div>
+        </div>
+        ${salesHTML}
+      </div>
+      <div class="text-center mt-3">
+        <a href="list_sales.html" class="btn btn-outline-success">
+          <i class="fas fa-list"></i> عرض جميع المبيعات
+        </a>
+      </div>
+    `;
+  }
+
+  // تنسيق التاريخ للعرض
+  function formatDate(anyDate) {
+    const d = normalizeToDate(anyDate);
+    if (!d) return '-';
+    
+    try {
+      const pad = x => String(x).padStart(2,'0');
+      const year    = d.getFullYear();
+      const month   = pad(d.getMonth() + 1);
+      const day     = pad(d.getDate());
+      const hours   = pad(d.getHours());
+      const minutes = pad(d.getMinutes());
+      
+      return `${convertToLatinNumbers(year)}-${convertToLatinNumbers(month)}-${convertToLatinNumbers(day)} ${convertToLatinNumbers(hours)}:${convertToLatinNumbers(minutes)}`;
+    } catch {
+      return '-';
     }
   }
 
