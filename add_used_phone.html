@@ -360,6 +360,7 @@
           brand: document.getElementById('brand').value,
           model: document.getElementById('model').value,
           condition: 'used',
+          status: 'available',  // <— إضافة حالة الهاتف (متاح/مباع)
           purchase_price: parseFloat(document.getElementById('purchase_price').value)||0,
           selling_price: parseFloat(document.getElementById('selling_price').value)||0,
           purchase_price_without_vat: parseFloat((parseFloat(document.getElementById('purchase_price').value)||0)/1.15) || 0,

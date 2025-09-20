@@ -275,6 +275,35 @@
         </div>
       </div>
 
+      <!-- ملخص الهواتف المباعة -->
+      <div class="card mt-4" id="sold_phones_summary_block">
+        <div class="card-header">
+          <h3>ملخص الهواتف المباعة</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="text-center">
+                <h4 class="text-danger" id="total_sold_phones">0</h4>
+                <p class="text-muted">إجمالي الهواتف المباعة</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center">
+                <h4 class="text-warning" id="total_sold_purchase_value">0.00 ريال</h4>
+                <p class="text-muted">القيمة الشرائية</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="text-center">
+                <h4 class="text-primary" id="total_sold_selling_value">0.00 ريال</h4>
+                <p class="text-muted">القيمة البيعية</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /col -->
   </div><!-- /row -->
 </div><!-- /container -->
@@ -330,14 +359,17 @@
         accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
       }
 
-      // فصل الهواتف الجديدة والمستعملة
-      const newPhones = phones.filter(p => p.condition === 'new' || p.phone_type === 'new');
-      const usedPhones = phones.filter(p => p.condition === 'used' || p.phone_type === 'used');
+      // فلترة الهواتف المتاحة فقط (استبعاد المباعة)
+      const availablePhones = phones.filter(p => (p.status || 'available') === 'available');
+      
+      // فصل الهواتف الجديدة والمستعملة (المتاحة فقط)
+      const newPhones = availablePhones.filter(p => p.condition === 'new' || p.phone_type === 'new');
+      const usedPhones = availablePhones.filter(p => p.condition === 'used' || p.phone_type === 'used');
 
-      // حساب الإحصائيات الأساسية للهواتف
-      const totalPhones = phones.length;
-      const totalPurchaseValue = phones.reduce((sum, p) => sum + (p.purchase_price || p.price || 0), 0);
-      const totalSellingValue = phones.reduce((sum, p) => sum + (p.selling_price || p.price || 0), 0);
+      // حساب الإحصائيات الأساسية للهواتف (المتاحة فقط)
+      const totalPhones = availablePhones.length;
+      const totalPurchaseValue = availablePhones.reduce((sum, p) => sum + (p.purchase_price || p.price || 0), 0);
+      const totalSellingValue = availablePhones.reduce((sum, p) => sum + (p.selling_price || p.price || 0), 0);
       const totalProfit = totalSellingValue - totalPurchaseValue;
 
       // إحصائيات الهواتف الجديدة
@@ -351,6 +383,12 @@
       const usedPhonesPurchaseValue = usedPhones.reduce((sum, p) => sum + (p.purchase_price || p.price || 0), 0);
       const usedPhonesSellingValue = usedPhones.reduce((sum, p) => sum + (p.selling_price || p.price || 0), 0);
       const usedPhonesProfit = usedPhonesSellingValue - usedPhonesPurchaseValue;
+
+      // إحصائيات الهواتف المباعة
+      const soldPhones = phones.filter(p => p.status === 'sold');
+      const soldPhonesCount = soldPhones.length;
+      const soldPhonesPurchaseValue = soldPhones.reduce((sum, p) => sum + (p.purchase_price || p.price || 0), 0);
+      const soldPhonesSellingValue = soldPhones.reduce((sum, p) => sum + (p.selling_price || p.price || 0), 0);
 
       // حساب إحصائيات الأكسسوارات
       const totalAccessories = accessories.length;
@@ -394,6 +432,11 @@
       document.getElementById('total_accessory_quantity').textContent = totalAccessoryQuantity;
       document.getElementById('total_accessory_purchase_value').textContent = totalAccessoryPurchaseValue.toFixed(2) + ' ريال';
       document.getElementById('total_accessory_selling_value').textContent = totalAccessorySellingValue.toFixed(2) + ' ريال';
+
+      // تحديث ملخص الهواتف المباعة
+      document.getElementById('total_sold_phones').textContent = soldPhonesCount;
+      document.getElementById('total_sold_purchase_value').textContent = soldPhonesPurchaseValue.toFixed(2) + ' ريال';
+      document.getElementById('total_sold_selling_value').textContent = soldPhonesSellingValue.toFixed(2) + ' ريال';
 
       // تحديث جداول التفاصيل
       updatePhoneTypeSummary(newPhones, usedPhones);

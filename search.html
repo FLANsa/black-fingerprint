@@ -100,20 +100,30 @@
           <!-- واجهة فقط: لا إرسال لخادم -->
           <form id="searchForm" action="#" onsubmit="handleSearch(event)">
             <div class="row">
-              <div class="col-md-8">
+              <div class="col-md-6">
                 <div class="mb-3">
                   <label for="search_term" class="form-label">كلمة البحث</label>
                   <input type="text" class="form-control form-control-lg" id="search_term" name="search_term"
                          placeholder="أدخل الباركود، الرقم التسلسلي، اسم المنتج...">
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 <div class="mb-3">
                   <label for="search_type" class="form-label">نوع البحث</label>
-                  <select class="form-select form-select-lg" id="search_type" name="search_type">
+                  <select class="form-select form-select-lg" id="search_type" name="search_type" onchange="toggleStatusFilter()">
                     <option value="all">الكل</option>
                     <option value="phones">الهواتف</option>
                     <option value="accessories">الأكسسوارات</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="mb-3">
+                  <label for="status_filter" class="form-label">حالة الهاتف</label>
+                  <select class="form-select form-select-lg" id="status_filter" name="status_filter" style="display: none;">
+                    <option value="all">الكل</option>
+                    <option value="available">متاح</option>
+                    <option value="sold">مباع</option>
                   </select>
                 </div>
               </div>
@@ -172,13 +182,26 @@
     return arr.some(x => s.includes((x||'').toString().toLowerCase()));
   }
 
+  // ===== إظهار/إخفاء فلتر الحالة =====
+  function toggleStatusFilter() {
+    const searchType = document.getElementById('search_type').value;
+    const statusFilter = document.getElementById('status_filter');
+    
+    if (searchType === 'phones') {
+      statusFilter.style.display = 'block';
+    } else {
+      statusFilter.style.display = 'none';
+    }
+  }
+
   // ===== منطق البحث من قاعدة البيانات =====
   async function handleSearch(e){
     e.preventDefault();
     const term = (document.getElementById('search_term').value || '').trim();
     const type = document.getElementById('search_type').value || 'all';
+    const statusFilter = document.getElementById('status_filter').value || 'all';
 
-    console.log('🔍 البحث عن:', term, 'نوع:', type);
+    console.log('🔍 البحث عن:', term, 'نوع:', type, 'حالة:', statusFilter);
 
     if (!term) {
       showAlert('warning', 'يرجى إدخال كلمة البحث');
@@ -209,8 +232,17 @@
 
       if (type === 'all' || type === 'phones') {
         phones = allPhones.filter(p => {
+          // فلترة حسب الحالة أولاً
+          if (type === 'phones' && statusFilter !== 'all') {
+            const phoneStatus = p.status || 'available'; // افتراضي متاح للهواتف القديمة
+            if (phoneStatus !== statusFilter) {
+              return false;
+            }
+          }
+          
+          // البحث في النص
           const searchText = `${p.phone_number || ''} ${p.manufacturer || p.brand || ''} ${p.model || ''} ${p.condition || p.phone_type || ''}`.toLowerCase();
-          console.log('🔍 البحث في الهاتف:', p.phone_number, 'النص:', searchText);
+          console.log('🔍 البحث في الهاتف:', p.phone_number, 'النص:', searchText, 'الحالة:', p.status || 'available');
           return tokens.some(token => searchText.includes(token));
         });
       }
@@ -282,9 +314,15 @@
                     <td><strong>${p.phone_number || p.device_number || 'غير محدد'}</strong></td>
                     <td>${p.manufacturer || p.brand || 'غير محدد'}</td>
                     <td>${p.model || 'غير محدد'}</td>
-                    <td>${(p.condition === 'new' || p.phone_type === 'new')
+                    <td>
+                      ${(p.condition === 'new' || p.phone_type === 'new')
                         ? '<span class="badge bg-success">جديد</span>'
-                        : '<span class="badge bg-warning">مستعمل</span>'}</td>
+                        : '<span class="badge bg-warning">مستعمل</span>'}
+                      <br>
+                      ${(p.status === 'sold')
+                        ? '<span class="badge bg-danger mt-1">مباع</span>'
+                        : '<span class="badge bg-primary mt-1">متاح</span>'}
+                    </td>
                     <td><span class="text-success">${fmtMoney(p.purchase_price || 0)} ريال</span></td>
                     <td><span class="text-primary">${fmtMoney(p.selling_price || p.price || 0)} ريال</span></td>
                     <td>

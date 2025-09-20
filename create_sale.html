@@ -603,6 +603,45 @@
       });
     }
 
+    // تحديث حالة الهواتف المباعة إلى "مباع"
+    async function updateSoldPhonesStatus(saleItems) {
+      try {
+        console.log('🔄 تحديث حالة الهواتف المباعة...');
+        
+        for (const item of saleItems) {
+          if (item.type === 'phone') {
+            const phoneId = item.id;
+            console.log(`📱 تحديث حالة الهاتف: ${phoneId}`);
+            
+            if (window.storage && window.storage.isFirebaseAvailable) {
+              // تحديث في Firebase
+              const success = await window.storage.updatePhone(phoneId, { status: 'sold' });
+              if (success) {
+                console.log(`✅ تم تحديث حالة الهاتف ${phoneId} إلى مباع في Firebase`);
+              } else {
+                console.log(`❌ فشل في تحديث حالة الهاتف ${phoneId} في Firebase`);
+              }
+            } else {
+              // تحديث في localStorage
+              const phones = JSON.parse(localStorage.getItem('phones') || '[]');
+              const phoneIndex = phones.findIndex(p => p.id === phoneId || p.phone_number === phoneId);
+              if (phoneIndex !== -1) {
+                phones[phoneIndex].status = 'sold';
+                localStorage.setItem('phones', JSON.stringify(phones));
+                console.log(`✅ تم تحديث حالة الهاتف ${phoneId} إلى مباع في localStorage`);
+              } else {
+                console.log(`❌ لم يتم العثور على الهاتف ${phoneId} في localStorage`);
+              }
+            }
+          }
+        }
+        
+        console.log('✅ تم تحديث جميع الهواتف المباعة بنجاح');
+      } catch (error) {
+        console.error('❌ خطأ في تحديث حالة الهواتف المباعة:', error);
+      }
+    }
+
     // بدل الاتصال بالخادم — نعرض رسالة فقط ونطبع البيانات في الـ Console
     async function completeSale() {
       if (cart.length === 0) {
@@ -658,6 +697,9 @@
           localStorage.setItem('sales', JSON.stringify(sales));
           console.log('✅ تم حفظ البيع في localStorage');
         }
+
+        // تحديث حالة الهواتف المباعة إلى "مباع"
+        await updateSoldPhonesStatus(saleData.items);
 
         // حفظ آخر عملية بيع للعرض السريع
         localStorage.setItem('lastSale', JSON.stringify(saleData));
