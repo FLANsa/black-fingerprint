@@ -254,6 +254,7 @@
     // بيانات المنتجات من Firebase
     let phones = [];
     let accessories = [];
+    let accessoryCategories = [];
     let cart = [];
 
     // تهيئة Firebase عند تحميل الصفحة
@@ -275,7 +276,11 @@
       try {
         phones = await window.storage.getPhones();
         accessories = await window.storage.getAccessories();
-        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length });
+        accessoryCategories = await window.storage.getAccessoryCategories();
+        console.log('✅ تم تحميل البيانات من Firebase:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length });
+        
+        // تحديث قائمة أنواع المنتجات
+        updateProductTypeDropdown();
       } catch (error) {
         console.error('❌ خطأ في تحميل البيانات من Firebase:', error);
         await loadDataFromLocalStorage();
@@ -287,10 +292,46 @@
       try {
         phones = JSON.parse(localStorage.getItem('phones') || '[]');
         accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
-        console.log('💾 تم تحميل البيانات من localStorage:', { phones: phones.length, accessories: accessories.length });
+        accessoryCategories = JSON.parse(localStorage.getItem('accessory_categories') || '[]');
+        console.log('💾 تم تحميل البيانات من localStorage:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length });
+        
+        // تحديث قائمة أنواع المنتجات
+        updateProductTypeDropdown();
       } catch (error) {
         console.error('❌ خطأ في تحميل البيانات من localStorage:', error);
       }
+    }
+
+    // تحديث قائمة أنواع المنتجات من قاعدة البيانات
+    function updateProductTypeDropdown() {
+      const productTypeSelect = document.getElementById('product_type');
+      
+      // الحفاظ على الخيارات الأساسية
+      productTypeSelect.innerHTML = `
+        <option value="">اختر نوع المنتج</option>
+        <option value="phone">هاتف</option>
+      `;
+      
+      // إضافة فئات الأكسسوارات من قاعدة البيانات
+      if (accessoryCategories && accessoryCategories.length > 0) {
+        accessoryCategories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category.name; // استخدام اسم الفئة كقيمة
+          option.textContent = category.name; // عرض اسم الفئة
+          productTypeSelect.appendChild(option);
+        });
+      } else {
+        // إضافة الفئات الافتراضية إذا لم تكن متوفرة في قاعدة البيانات
+        const defaultCategories = ['إكسسوار', 'شاحن', 'غلاف', 'حماية الشاشة', 'أخرى'];
+        defaultCategories.forEach(category => {
+          const option = document.createElement('option');
+          option.value = category;
+          option.textContent = category;
+          productTypeSelect.appendChild(option);
+        });
+      }
+      
+      console.log('✅ تم تحديث قائمة أنواع المنتجات:', accessoryCategories.length, 'فئة');
     }
 
     function loadProducts() {
@@ -315,22 +356,20 @@
           productSelect.appendChild(option);
         });
       } else {
-        const map = { accessory: 'accessory', charger: 'charger', case: 'case', screen_protector: 'screen_protector' };
-        const target = map[productType];
-        if (target) {
-          accessories.forEach(acc => {
-            if (acc.category === target && acc.quantity_in_stock > 0) {
-              const option = document.createElement('option');
-              option.value = acc.id;
-              option.textContent = `${acc.name} (المخزون: ${acc.quantity_in_stock})`;
-              option.setAttribute('data-price', acc.selling_price);
-              option.setAttribute('data-name', acc.name);
-              option.setAttribute('data-description', acc.description || '');
-              option.setAttribute('data-stock', acc.quantity_in_stock);
-              productSelect.appendChild(option);
-            }
-          });
-        }
+        // البحث عن الأكسسوارات التي تطابق الفئة المختارة
+        accessories.forEach(acc => {
+          if (acc.category === productType && (acc.quantity_in_stock || acc.quantity) > 0) {
+            const option = document.createElement('option');
+            option.value = acc.id;
+            const stock = acc.quantity_in_stock || acc.quantity || 0;
+            option.textContent = `${acc.name} (المخزون: ${stock})`;
+            option.setAttribute('data-price', acc.selling_price || acc.price);
+            option.setAttribute('data-name', acc.name);
+            option.setAttribute('data-description', acc.description || '');
+            option.setAttribute('data-stock', stock);
+            productSelect.appendChild(option);
+          }
+        });
       }
     }
 
