@@ -157,6 +157,12 @@
           </select>
         </div>
 
+        <!-- Sale number search -->
+        <div class="col-md-3">
+          <label for="filter_sale_number" class="form-label">رقم الفاتورة</label>
+          <input type="text" class="form-control" id="filter_sale_number" placeholder="اكتب رقم الفاتورة (SALE-...)" oninput="applyCurrentFilter()">
+        </div>
+
         <div class="col-md-3">
           <label class="form-label">&nbsp;</label>
           <div>
@@ -434,6 +440,14 @@
       }
     }
 
+    // Filter by sale number if provided
+    const saleNo = (document.getElementById('filter_sale_number')?.value || '').trim();
+    if (saleNo) {
+      const q = saleNo.toLowerCase();
+      filtered = filtered.filter(s => (s.sale_number || '').toLowerCase().includes(q));
+      summaryText = summaryText ? `${summaryText} — رقم الفاتورة يحتوي: ${saleNo}` : `رقم الفاتورة يحتوي: ${saleNo}`;
+    }
+
     currentFilteredSales = filtered;
     renderSales(filtered, type, summaryText, emptyHint);
   }
@@ -472,6 +486,7 @@
   function resetFilter() {
     document.getElementById('filterForm').reset();
     toggleDateInput();
+    document.getElementById('filter_sale_number').value = '';
     applyCurrentFilter();
   }
 
