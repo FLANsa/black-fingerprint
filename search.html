@@ -103,7 +103,7 @@
               <div class="col-md-8">
                 <div class="mb-3">
                   <label for="search_term" class="form-label">كلمة البحث</label>
-                  <input type="text" class="form-control form-control-lg" id="search_term" name="search_term"
+                  <input type="text" class="form-control form-control-lg arabic-number-field" id="search_term" name="search_term"
                          placeholder="أدخل الباركود، الرقم التسلسلي، اسم المنتج...">
                 </div>
               </div>
@@ -166,6 +166,33 @@
   let allAccessories = [];
   let allSales = [];
   let soldPhonesSet = new Set();
+
+  // ===== دعم الأرقام العربية =====
+  function convertArabicToEnglishNumbers(str) {
+    if (!str) return '';
+    const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+    return str.toString().replace(/[٠-٩]/g, m => map[m] ?? m);
+  }
+  
+  function parseArabicNumber(value) {
+    if (!value || value.trim() === '') return 0;
+    const converted = convertArabicToEnglishNumbers(value.toString());
+    const num = parseFloat(converted);
+    return isNaN(num) ? 0 : num;
+  }
+  
+  function setupArabicNumberSupport() {
+    document.querySelectorAll('.arabic-number-field').forEach(field => {
+      field.addEventListener('input', function() {
+        const pos = this.selectionStart;
+        const cv = convertArabicToEnglishNumbers(this.value);
+        if (cv !== this.value) {
+          this.value = cv;
+          this.setSelectionRange(pos, pos);
+        }
+      });
+    });
+  }
 
   // ===== الأدوات =====
   const fmtMoney = n => (Number(n)||0).toFixed(2);
@@ -560,6 +587,9 @@
   document.addEventListener('DOMContentLoaded', async function() {
     // Update navigation based on user role
     updateNavigationForUser();
+    
+    // إعداد دعم الأرقام العربية
+    setupArabicNumberSupport();
     
     // التحقق من تسجيل الدخول أولاً
     if (!checkLogin()) return;

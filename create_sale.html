@@ -107,7 +107,7 @@
               </div>
               <div class="mb-3">
                 <label for="customer_phone" class="form-label">رقم الهاتف</label>
-                <input type="tel" class="form-control" id="customer_phone" name="customer_phone">
+                <input type="tel" class="form-control arabic-number-field" id="customer_phone" name="customer_phone">
               </div>
               <div class="mb-3">
                 <label for="customer_email" class="form-label">البريد الإلكتروني</label>
@@ -267,7 +267,7 @@
     let accessoryCategories = [];
     let sales = [];
     let cart = [];
-  
+
     // ملاحظة: نتوقع أن window.storage يوفّر الدوال التالية عندما تكون Firebase متاحة:
     // getPhones(), getAccessories(), getAccessoryCategories(), getSales()
     // إذا ما كانت متوفرة، بيصير التحميل من LocalStorage.
@@ -396,12 +396,12 @@
     function loadProducts() {
       const productType = document.getElementById('product_type').value;
       const productSelect = document.getElementById('product_select');
-  
+
       productSelect.innerHTML = '<option value="">اختر المنتج</option>';
       document.getElementById('product_details').style.display = 'none';
   
       if (!productType) return;
-  
+
       if (productType === 'phone') {
         // هواتف غير مباعة
         const availablePhones = (phones || []).filter(ph => {
@@ -476,7 +476,7 @@
     function updateProductInfo() {
       const productSelect = document.getElementById('product_select');
       const selectedOption = productSelect.options[productSelect.selectedIndex];
-  
+
       if (selectedOption && selectedOption.value) {
         document.getElementById('selected_product_name').textContent = selectedOption.getAttribute('data-name') || '-';
         document.getElementById('selected_product_description').textContent = selectedOption.getAttribute('data-description') || '-';
@@ -487,13 +487,13 @@
         document.getElementById('product_details').style.display = 'none';
       }
     }
-  
+
     function updateTotalPrice() {
       const price = parseFloat(document.getElementById('selected_product_price').textContent) || 0;
       const quantity = parseArabicNumber(document.getElementById('quantity').value) || 1;
       document.getElementById('total_price').textContent = (price * quantity).toFixed(2);
     }
-  
+
     // ====== دعم الأرقام العربية ======
     function convertArabicToEnglishNumbers(str) {
       if (!str) return '';
@@ -524,12 +524,12 @@
       const productType = document.getElementById('product_type').value;
       const productSelect = document.getElementById('product_select');
       const quantity = parseArabicNumber(document.getElementById('quantity').value) || 1;
-  
+
       if (!productType || !productSelect.value) {
         alert('يرجى اختيار نوع المنتج والمنتج');
         return;
       }
-  
+
       const opt = productSelect.options[productSelect.selectedIndex];
   
       // تحقق مخزون الأكسسوارات
@@ -557,31 +557,31 @@
         totalPrice: unitPrice * quantity,
         totalProfit: profit * quantity
       };
-  
+
       cart.push(product);
       updateCartDisplay();
-  
+
       // reset
       document.getElementById('product_type').value = '';
       document.getElementById('product_select').innerHTML = '<option value="">اختر المنتج</option>';
       document.getElementById('quantity').value = '1';
       document.getElementById('product_details').style.display = 'none';
     }
-  
+
     // ====== عرض وتلخيص السلة ======
     function updateCartDisplay() {
       const cartItems = document.getElementById('cart_items');
       const cartSummary = document.getElementById('cart_summary');
-  
+
       if (cart.length === 0) {
         cartItems.innerHTML = '<p class="text-muted text-center">لا توجد منتجات في السلة</p>';
         cartSummary.style.display = 'none';
         return;
       }
-  
+
       let html = '<div class="table-responsive"><table class="table table-sm">';
       html += '<thead><tr><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>المجموع</th><th>الإجراء</th></tr></thead><tbody>';
-  
+
       cart.forEach((item, i) => {
         html += `
           <tr>
@@ -589,16 +589,16 @@
             <td><span class="text-muted">${(item.purchasePrice || 0).toFixed(2)} ريال</span></td>
             <td>
               <div class="input-group input-group-sm">
-                <input type="number" class="form-control" id="price_${i}"
-                       value="${item.unitPrice.toFixed(2)}" step="0.01" min="0"
+                <input type="text" class="form-control arabic-number-field" id="price_${i}"
+                       value="${item.unitPrice.toFixed(2)}"
                        onchange="updateItemPrice(${i})" style="width: 80px;">
                 <span class="input-group-text">ريال</span>
               </div>
             </td>
             <td>
               <div class="input-group input-group-sm">
-                <input type="number" class="form-control" id="quantity_${i}"
-                       value="${item.quantity}" min="1"
+                <input type="text" class="form-control arabic-number-field" id="quantity_${i}"
+                       value="${item.quantity}"
                        onchange="updateItemQuantity(${i})" style="width: 60px;">
               </div>
             </td>
@@ -607,14 +607,17 @@
           </tr>
         `;
       });
-  
+
       html += '</tbody></table></div>';
       cartItems.innerHTML = html;
-  
+
+      // إضافة دعم الأرقام العربية للحقول الديناميكية
+      setupArabicNumberSupport();
+
       updateCartSummary();
       cartSummary.style.display = 'block';
     }
-  
+
     function updateCartSummary() {
       const totalWithVAT = cart.reduce((s, it) => s + it.totalPrice, 0);
       const subtotal = totalWithVAT / 1.15;
@@ -622,7 +625,7 @@
       const total = totalWithVAT;
       const totalProfit = cart.reduce((s, it) => s + (it.totalProfit || 0), 0);
       const totalPurchaseCost = cart.reduce((s, it) => s + ((it.purchasePrice || 0) * it.quantity), 0);
-  
+
       document.getElementById('cart_subtotal').textContent = subtotal.toFixed(2);
       document.getElementById('cart_vat').textContent = vat.toFixed(2);
       document.getElementById('cart_total').textContent = total.toFixed(2);
@@ -639,17 +642,17 @@
       if (profitElement) {
         profitElement.parentElement.remove();
       }
-  
+
       document.getElementById('complete_sale_btn').disabled = cart.length === 0;
     }
-  
+
     function removeFromCart(index) {
       cart.splice(index, 1);
       updateCartDisplay();
     }
-  
+
     function updateItemPrice(index) {
-      const newPrice = parseFloat(document.getElementById(`price_${index}`).value) || 0;
+      const newPrice = parseArabicNumber(document.getElementById(`price_${index}`).value);
       if (newPrice < 0) {
         alert('السعر لا يمكن أن يكون سالباً');
         document.getElementById(`price_${index}`).value = cart[index].unitPrice.toFixed(2);
@@ -663,7 +666,7 @@
     }
   
     function updateItemQuantity(index) {
-      const newQty = parseInt(document.getElementById(`quantity_${index}`).value) || 1;
+      const newQty = Math.floor(parseArabicNumber(document.getElementById(`quantity_${index}`).value)) || 1;
       if (newQty < 1) {
         alert('الكمية يجب أن تكون 1 أو أكثر');
         document.getElementById(`quantity_${index}`).value = cart[index].quantity;
@@ -672,7 +675,7 @@
       // تحقق مخزون الأكسسوارات
       if (cart[index].type !== 'phone') {
         const opt = document.querySelector(`option[data-id="${cart[index].id}"]`);
-        const availableStock = parseInt(opt?.getAttribute('data-stock') || '0');
+        const availableStock = Math.floor(parseArabicNumber(opt?.getAttribute('data-stock') || '0'));
         if (availableStock && newQty > availableStock) {
           alert(`الكمية المطلوبة (${newQty}) أكبر من المخزون (${availableStock})`);
           document.getElementById(`quantity_${index}`).value = cart[index].quantity;
@@ -814,7 +817,7 @@
       const saleNumber = 'SALE-' + Date.now().toString().slice(-6);
       const totalProfit = cart.reduce((s, it) => s + (it.totalProfit || 0), 0);
       const totalPurchaseCost = cart.reduce((s, it) => s + ((it.purchasePrice || 0) * it.quantity), 0);
-  
+
       const saleData = {
         sale_number: saleNumber,
         customer_name: document.getElementById('customer_name').value.trim() || 'عميل نقدي',
@@ -851,8 +854,8 @@
         localStorage.setItem('lastSale', JSON.stringify(saleData));
         alert(`تم إنشاء عملية البيع!\nرقم العملية: ${saleNumber}\nقبل الضريبة: ${subtotal.toFixed(2)}\nالضريبة: ${vat.toFixed(2)}\nالإجمالي: ${totalWithVAT.toFixed(2)}\nسعر الشراء: ${totalPurchaseCost.toFixed(2)}`);
   
-        cart = [];
-        updateCartDisplay();
+      cart = [];
+      updateCartDisplay();
         document.getElementById('customerForm')?.reset?.();
         document.getElementById('warranty_input').value = '';
   

@@ -112,7 +112,7 @@
                   <div class="mb-3">
                     <label for="purchase_price" class="form-label">سعر الشراء (بعد الضريبة)</label>
                     <div class="input-group">
-                      <input type="number" class="form-control" id="purchase_price" name="purchase_price" step="0.01" required>
+                      <input type="text" class="form-control arabic-number-field" id="purchase_price" name="purchase_price" required>
                       <span class="input-group-text">ريال</span>
                     </div>
                     <small class="form-text text-muted">سيتم حساب السعر قبل الضريبة تلقائياً</small>
@@ -122,7 +122,7 @@
                   <div class="mb-3">
                     <label for="selling_price" class="form-label">سعر البيع (بعد الضريبة)</label>
                     <div class="input-group">
-                      <input type="number" class="form-control" id="selling_price" name="selling_price" step="0.01" required>
+                      <input type="text" class="form-control arabic-number-field" id="selling_price" name="selling_price" required>
                       <span class="input-group-text">ريال</span>
                     </div>
                     <small class="form-text text-muted">سيتم حساب السعر قبل الضريبة تلقائياً</small>
@@ -176,13 +176,13 @@
                 <div class="col-md-4">
                   <div class="mb-3">
                     <label for="customer_id" class="form-label">رقم الهوية / الإقامة <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="customer_id" name="customer_id" required maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="1234567890">
+                    <input type="text" class="form-control arabic-number-field" id="customer_id" name="customer_id" required maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="1234567890">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="mb-3">
                     <label for="customer_phone" class="form-label">رقم هاتف العميل <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="customer_phone" name="customer_phone" required maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="05xxxxxxxx">
+                    <input type="text" class="form-control arabic-number-field" id="customer_phone" name="customer_phone" required maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="05xxxxxxxx">
                   </div>
                 </div>
               </div>
@@ -249,10 +249,38 @@
   <script>
     function clearBarcode(){ document.getElementById('barcode_input').value = ''; }
 
+    // تحويل الأرقام العربية إلى إنجليزية
+    function convertArabicToEnglishNumbers(str) {
+      if (!str) return '';
+      const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+      return str.toString().replace(/[٠-٩]/g, m => map[m] ?? m);
+    }
+    
+    function parseArabicNumber(value) {
+      if (!value || value.trim() === '') return 0;
+      const converted = convertArabicToEnglishNumbers(value.toString());
+      const num = parseFloat(converted);
+      return isNaN(num) ? 0 : num;
+    }
+    
+    function setupArabicNumberSupport() {
+      document.querySelectorAll('.arabic-number-field').forEach(field => {
+        field.addEventListener('input', function() {
+          const pos = this.selectionStart;
+          const cv = convertArabicToEnglishNumbers(this.value);
+          if (cv !== this.value) {
+            this.value = cv;
+            this.setSelectionRange(pos, pos);
+          }
+          updateVATCalculations();
+        });
+      });
+    }
+
     function calculatePriceWithoutVAT(priceWithVAT){ return (priceWithVAT||0)/1.15; }
     function updateVATCalculations(){
-      const pFinal = parseFloat(document.getElementById('purchase_price').value)||0;
-      const sFinal = parseFloat(document.getElementById('selling_price').value)||0;
+      const pFinal = parseArabicNumber(document.getElementById('purchase_price').value);
+      const sFinal = parseArabicNumber(document.getElementById('selling_price').value);
       document.getElementById('purchase_price_before_vat').value = (pFinal?calculatePriceWithoutVAT(pFinal):0).toFixed(2)+' ريال';
       document.getElementById('selling_price_before_vat').value  = (sFinal?calculatePriceWithoutVAT(sFinal):0).toFixed(2)+' ريال';
     }
@@ -432,10 +460,10 @@
           brand: document.getElementById('brand').value,
           model: document.getElementById('model').value,
           condition: 'used',
-          purchase_price: parseFloat(document.getElementById('purchase_price').value)||0,
-          selling_price: parseFloat(document.getElementById('selling_price').value)||0,
-          purchase_price_without_vat: parseFloat((parseFloat(document.getElementById('purchase_price').value)||0)/1.15) || 0,
-          selling_price_without_vat: parseFloat((parseFloat(document.getElementById('selling_price').value)||0)/1.15) || 0,
+          purchase_price: parseArabicNumber(document.getElementById('purchase_price').value),
+          selling_price: parseArabicNumber(document.getElementById('selling_price').value),
+          purchase_price_without_vat: parseArabicNumber(document.getElementById('purchase_price').value) / 1.15,
+          selling_price_without_vat: parseArabicNumber(document.getElementById('selling_price').value) / 1.15,
           serial_number: document.getElementById('serial_number').value,
           phone_number,
           phone_condition: document.getElementById('phone_condition').value,
@@ -661,6 +689,7 @@
       form.addEventListener('submit', async (e)=>{ e.preventDefault(); if(await saveUsedPhoneToFirebase()){ form.reset(); await populateBrandsFromFirebase(); } });
       await populateBrandsFromFirebase();
       setupInputValidation();
+      setupArabicNumberSupport();
       
       // تحميل بيانات الهاتف للتعديل إذا كان هناك معامل edit
       if (editPhoneNumber) {

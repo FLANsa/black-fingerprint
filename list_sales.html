@@ -160,7 +160,7 @@
         <!-- Sale number search -->
         <div class="col-md-3">
           <label for="filter_sale_number" class="form-label">رقم الفاتورة</label>
-          <input type="text" class="form-control" id="filter_sale_number" placeholder="اكتب رقم الفاتورة (SALE-...)" oninput="applyCurrentFilter()">
+          <input type="text" class="form-control arabic-number-field" id="filter_sale_number" placeholder="اكتب رقم الفاتورة (SALE-...)" oninput="applyCurrentFilter()">
         </div>
 
         <div class="col-md-3">
@@ -281,6 +281,33 @@
   let currentFilteredSales = [];
   let currentPage = 1;
   const pageSize = 20;
+
+  // ---------- دعم الأرقام العربية ----------
+  function convertArabicToEnglishNumbers(str) {
+    if (!str) return '';
+    const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+    return str.toString().replace(/[٠-٩]/g, m => map[m] ?? m);
+  }
+  
+  function parseArabicNumber(value) {
+    if (!value || value.trim() === '') return 0;
+    const converted = convertArabicToEnglishNumbers(value.toString());
+    const num = parseFloat(converted);
+    return isNaN(num) ? 0 : num;
+  }
+  
+  function setupArabicNumberSupport() {
+    document.querySelectorAll('.arabic-number-field').forEach(field => {
+      field.addEventListener('input', function() {
+        const pos = this.selectionStart;
+        const cv = convertArabicToEnglishNumbers(this.value);
+        if (cv !== this.value) {
+          this.value = cv;
+          this.setSelectionRange(pos, pos);
+        }
+      });
+    });
+  }
 
   // ---------- أدوات مساعدة للوقت/التاريخ ----------
   // يحوّل أي مدخل تاريخ (Date | ISO string | number | Firestore Timestamp | {seconds/_seconds, nanoseconds/_nanoseconds}) إلى Date صالح
@@ -713,6 +740,9 @@
   document.addEventListener('DOMContentLoaded', async () => {
     // تحديث التنقل بناءً على دور المستخدم
     updateNavigationForUser();
+    
+    // إعداد دعم الأرقام العربية
+    setupArabicNumberSupport();
     
     populateYears();
     toggleDateInput();
