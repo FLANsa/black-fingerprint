@@ -465,17 +465,18 @@
       document.getElementById('total_expected_profit').textContent = convertToLatinNumbers(totalExpectedProfit.toFixed(2)) + ' ريال';
 
 
-      // تحديث إحصائيات المبيعات
-      const totalSales = sales.length;
-      const totalSalesAmount = sales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
-      const totalSalesSubtotal = sales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
-      const totalVatAmount = sales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
+      // تحديث إحصائيات المبيعات (استثناء المبيعات المسترجعة)
+      const effectiveSales = (sales || []).filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
+      const totalSales = effectiveSales.length;
+      const totalSalesAmount = effectiveSales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+      const totalSalesSubtotal = effectiveSales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
+      const totalVatAmount = effectiveSales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
 
       // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة
       let totalActualProfit = 0;
       let totalPurchaseCostAfterTax = 0;
       
-      sales.forEach(sale => {
+      effectiveSales.forEach(sale => {
         if (sale.items && Array.isArray(sale.items)) {
           sale.items.forEach(item => {
             // سعر البيع بعد الضريبة (من المبيعات)
@@ -526,7 +527,7 @@
       document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
 
       // تحديث آخر المبيعات
-      updateRecentSales(sales);
+      updateRecentSales(effectiveSales);
 
     } catch (error) {
       console.error('خطأ في تحديث لوحة التحكم:', error);
