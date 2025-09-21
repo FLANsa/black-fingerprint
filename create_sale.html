@@ -544,6 +544,16 @@
       const unitPrice = parseFloat(opt.getAttribute('data-price')) || 0;
       const purchasePrice = parseFloat(opt.getAttribute('data-purchase-price') || '0') || 0;
       const profit = unitPrice - purchasePrice;
+      
+      // Get battery level for phones
+      let batteryLevel = null;
+      if (productType === 'phone') {
+        const phoneId = productSelect.value;
+        const phone = phones.find(p => (p.id || p.phone_number) === phoneId);
+        if (phone) {
+          batteryLevel = phone.battery_level || null;
+        }
+      }
   
       const product = {
         id: productSelect.value,
@@ -555,7 +565,8 @@
         profit,
         quantity,
         totalPrice: unitPrice * quantity,
-        totalProfit: profit * quantity
+        totalProfit: profit * quantity,
+        battery_level: batteryLevel
       };
 
       cart.push(product);
@@ -749,7 +760,8 @@
         profit,
         quantity: 1,
         totalPrice: sellingPrice,
-        totalProfit: profit
+        totalProfit: profit,
+        battery_level: ph.battery_level || null
       });
       updateCartDisplay();
   

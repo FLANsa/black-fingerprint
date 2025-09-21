@@ -815,9 +815,16 @@
     if (currentSale.items && currentSale.items.length > 0) {
       currentSale.items.forEach(item => {
         const row = document.createElement('tr');
+        
+        // Add battery percentage for phones
+        let productName = item.name || item.product_name;
+        if (item.type === 'phone' && item.battery_level) {
+          productName += ` (البطارية: ${item.battery_level}%)`;
+        }
+        
         row.innerHTML = `
           <td>${getProductTypeBadge(item.type || item.product_type)}</td>
-          <td>${item.name || item.product_name}</td>
+          <td>${productName}</td>
           <td>${item.description || item.product_description || 'لا يوجد وصف'}</td>
           <td>${item.serial_number || item.barcode || 'لا يوجد'}</td>
           <td>${(item.unitPrice || item.unit_price || 0).toFixed(2)} ريال</td>
@@ -1087,9 +1094,16 @@
         const row = document.createElement('tr');
         const unitPrice = item.unitPrice || item.unit_price || 0;
         const unitPriceWithoutVAT = unitPrice / 1.15;
+        
+        // Add battery percentage for phones
+        let productName = item.name || item.product_name;
+        if (item.type === 'phone' && item.battery_level) {
+          productName += ` (البطارية: ${item.battery_level}%)`;
+        }
+        
         row.innerHTML = `
           <td>${item.quantity || 1}</td>
-          <td>${item.name || item.product_name}</td>
+          <td>${productName}</td>
           <td>${unitPriceWithoutVAT.toFixed(2)}</td>
           <td>${unitPrice.toFixed(2)}</td>
         `;
