@@ -518,6 +518,8 @@
     // تعبئة الجدول
     const tbody = document.getElementById('sales_tbody');
     tbody.innerHTML = '';
+    // استبعاد المسترجعة من المجاميع فقط (لكن تظل معروضة ومحتسبة في عدد العمليات)
+    const effectiveForTotals = (sales || []).filter(s => !(s && (s.returned === true || s.status === 'مسترجعة')));
     let totalSubtotal = 0, totalVat = 0, totalAmount = 0;
 
     sales.forEach(sale => {
@@ -595,8 +597,17 @@
     });
 
     // الرأس + البطاقات
-    document.getElementById('total_sales_count').textContent = sales.length;
-    document.getElementById('sum_total_sales_count').textContent = sales.length;
+    document.getElementById('total_sales_count').textContent = sales.length; // يشمل المسترجعة
+    document.getElementById('sum_total_sales_count').textContent = sales.length; // يشمل المسترجعة
+
+    // احسب المجاميع من غير المسترجعة فقط
+    totalSubtotal = 0; totalVat = 0; totalAmount = 0;
+    effectiveForTotals.forEach(sale => {
+      totalSubtotal += sale.subtotal || 0;
+      totalVat      += sale.vat_amount || 0;
+      totalAmount   += sale.total_amount || 0;
+    });
+
     document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
     document.getElementById('sum_total_sales_subtotal').textContent = fmtMoney(totalSubtotal);
     document.getElementById('sum_total_vat_amount').textContent = fmtMoney(totalVat);
