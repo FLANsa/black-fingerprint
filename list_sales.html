@@ -212,6 +212,7 @@
           </tbody>
         </table>
       </div>
+      <div id="sales_pagination" class="d-flex justify-content-center mt-3"></div>
     </div>
   </div>
 
@@ -278,6 +279,8 @@
   // ---------- متغيرات عامة ----------
   let salesAll = [];
   let currentFilteredSales = [];
+  let currentPage = 1;
+  const pageSize = 20;
 
   // ---------- أدوات مساعدة للوقت/التاريخ ----------
   // يحوّل أي مدخل تاريخ (Date | ISO string | number | Firestore Timestamp | {seconds/_seconds, nanoseconds/_nanoseconds}) إلى Date صالح
@@ -515,6 +518,14 @@
 
     if (!hasData) return;
 
+    // تطبيق التقسيم إلى صفحات
+    const totalItems = sales.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const startIdx = (currentPage - 1) * pageSize;
+    const endIdx = Math.min(startIdx + pageSize, totalItems);
+    const pageSlice = sales.slice(startIdx, endIdx);
+
     // تعبئة الجدول
     const tbody = document.getElementById('sales_tbody');
     tbody.innerHTML = '';
@@ -522,7 +533,7 @@
     const effectiveForTotals = (sales || []).filter(s => !(s && (s.returned === true || s.status === 'مسترجعة')));
     let totalSubtotal = 0, totalVat = 0, totalAmount = 0;
 
-    sales.forEach(sale => {
+    pageSlice.forEach(sale => {
       totalSubtotal += sale.subtotal || 0;
       totalVat      += sale.vat_amount || 0;
       totalAmount   += sale.total_amount || 0;
@@ -611,6 +622,42 @@
     document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
     document.getElementById('sum_total_sales_subtotal').textContent = fmtMoney(totalSubtotal);
     document.getElementById('sum_total_vat_amount').textContent = fmtMoney(totalVat);
+
+    // رسم عناصر التصفح بين الصفحات
+    renderPagination(totalPages);
+  }
+
+  function renderPagination(totalPages) {
+    const container = document.getElementById('sales_pagination');
+    if (!container) return;
+    if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+    let html = '<nav><ul class="pagination">';
+    const disabledPrev = (currentPage === 1) ? ' disabled' : '';
+    html += `<li class="page-item${disabledPrev}"><a class="page-link" href="#" onclick="gotoPage(${currentPage-1}); return false;">السابق</a></li>`;
+
+    const maxButtons = 5;
+    let start = Math.max(1, currentPage - Math.floor(maxButtons/2));
+    let end = Math.min(totalPages, start + maxButtons - 1);
+    if (end - start + 1 < maxButtons) start = Math.max(1, end - maxButtons + 1);
+
+    for (let p = start; p <= end; p++) {
+      const active = (p === currentPage) ? ' active' : '';
+      html += `<li class="page-item${active}"><a class="page-link" href="#" onclick="gotoPage(${p}); return false;">${p}</a></li>`;
+    }
+
+    const disabledNext = (currentPage === totalPages) ? ' disabled' : '';
+    html += `<li class="page-item${disabledNext}"><a class="page-link" href="#" onclick="gotoPage(${currentPage+1}); return false;">التالي</a></li>`;
+    html += '</ul></nav>';
+    container.innerHTML = html;
+  }
+
+  function gotoPage(p) {
+    if (p < 1) return;
+    currentPage = p;
+    // أعد الرسم بالاعتماد على الفلتر الحالي المخزن
+    renderSales(currentFilteredSales, 'all', '', 'لم يتم إنشاء أي مبيعات بعد');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ---------- عرض التنبيهات ----------
