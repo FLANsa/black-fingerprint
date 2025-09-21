@@ -87,6 +87,9 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="fas fa-shopping-cart"></i> قائمة المبيعات</h2>
     <div>
+      <button type="button" class="btn btn-outline-secondary me-2" onclick="seedDemoSales()">
+        <i class="fas fa-database"></i> إضافة بيانات تجريبية
+      </button>
       <a href="create_sale.html" class="btn btn-success me-2">
         <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
       </a>
@@ -658,6 +661,78 @@
     // أعد الرسم بالاعتماد على الفلتر الحالي المخزن
     renderSales(currentFilteredSales, 'all', '', 'لم يتم إنشاء أي مبيعات بعد');
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ===== بيانات تجريبية =====
+  async function seedDemoSales() {
+    try {
+      if (!confirm('هل تريد إضافة 25 عملية بيع تجريبية؟')) return;
+
+      const hasFirebase = (window.storage && window.storage.isFirebaseAvailable);
+      // إذا لا توجد مبيعات، أو المستخدم وافق، نضيف
+      const base = new Date();
+      const customers = ['عميل نقدي', 'أحمد', 'محمد', 'فاطمة', 'سارة'];
+      const payments = ['نقدي', 'بطاقة ائتمان', 'تحويل بنكي'];
+
+      for (let i = 0; i < 25; i++) {
+        const total = [3000, 4200, 5550, 799.00, 1249.00, 23456][i % 6];
+        const subtotal = total / 1.15;
+        const vat = total - subtotal;
+        const qty = 1;
+        const unitPrice = total; // السعر شامل الضريبة
+        const isReturned = (i % 5 === 0); // كل خامس فاتورة مسترجعة
+        const d = new Date(base.getTime() - i * 3600 * 1000); // فرق ساعة بين كل سجل
+
+        const sale = {
+          sale_number: `SALE-${String(Math.floor(100000 + Math.random()*900000))}`,
+          customer_name: customers[i % customers.length],
+          customer_phone: '',
+          customer_email: '',
+          customer_address: '',
+          payment_method: payments[i % payments.length],
+          notes: '',
+          items: [
+            {
+              id: `P-${1000 + i}`,
+              type: 'phone',
+              name: `هاتف تجريبي ${i+1}`,
+              description: '',
+              unitPrice: unitPrice,
+              purchasePrice: subtotal * 0.9, // سعر شراء تقريبي
+              profit: unitPrice - (subtotal * 0.9),
+              quantity: qty,
+              totalPrice: unitPrice * qty,
+              totalProfit: (unitPrice - (subtotal * 0.9)) * qty
+            }
+          ],
+          subtotal: subtotal,
+          vat_amount: vat,
+          total_amount: total,
+          total_purchase_cost: subtotal * 0.9,
+          total_profit: (unitPrice - (subtotal * 0.9)) * qty,
+          status: isReturned ? 'مسترجعة' : 'مكتمل',
+          returned: isReturned ? true : false,
+          returned_at: isReturned ? new Date().toISOString() : undefined,
+          date_created: d.toISOString(),
+          date_added: d.toISOString()
+        };
+
+        if (hasFirebase) {
+          await window.storage.addSale?.(sale);
+        } else {
+          const local = JSON.parse(localStorage.getItem('sales') || '[]');
+          sale.id = Date.now().toString() + '_' + i;
+          local.push(sale);
+          localStorage.setItem('sales', JSON.stringify(local));
+        }
+      }
+
+      await loadSalesFromFirebase();
+      showAlert('success', 'تمت إضافة البيانات التجريبية بنجاح');
+    } catch (e) {
+      console.error(e);
+      showAlert('danger', 'حدث خطأ أثناء إضافة البيانات التجريبية');
+    }
   }
 
   // ---------- عرض التنبيهات ----------
