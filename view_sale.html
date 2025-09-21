@@ -1298,7 +1298,7 @@
       }
       if (!confirm('هل تريد استرجاع كامل الفاتورة وإرجاع المنتجات إلى المخزون؟')) return;
 
-      // استرجاع مخزون الأكسسوارات فقط (الهواتف تُعتبر متاحة عبر تجاهل المبيعات المسترجعة)
+      // استرجاع مخزون الأكسسوارات + لا نلمس الهاتف (يصبح متاحاً تلقائياً لأننا نستبعد المبيعات المسترجعة)
       let accessories = [];
       if (window.storage && window.storage.isFirebaseAvailable) {
         accessories = await window.storage.getAccessories();

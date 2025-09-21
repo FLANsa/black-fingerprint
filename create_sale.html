@@ -348,7 +348,8 @@
     // ====== بيع الهاتف مرة واحدة ======
     function isPhoneSold(phoneId) {
       if (!sales || sales.length === 0) return false;
-      return sales.some(sale =>
+      const effectiveSales = sales.filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
+      return effectiveSales.some(sale =>
         Array.isArray(sale.items) &&
         sale.items.some(item => item.type === 'phone' && (item.id === phoneId || item.phone_id === phoneId))
       );
