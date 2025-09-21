@@ -143,18 +143,31 @@
   function valuesFromPhone(phone){
     const phone_number = phone?.phone_number || phone?.barcode || phone?.id || '';
     const memory = phone?.phone_memory || phone?.memory || phone?.storage || '-';
-    // priority: explicit battery_level → if new then 100 → if age exists show it as months → fallback '-'
+    // Hide battery for new phones, show for used phones
     let battery = '-';
-    if (phone?.battery_level != null && phone.battery_level !== '') battery = String(phone.battery_level);
-    else if (phone?.condition === 'new') battery = '100';
-    else if (phone?.age != null) battery = String(phone.age); // تم الحفظ من صفحة المستعمل كـ battery_level أيضاً
+    if (phone?.condition === 'new') {
+      battery = ''; // Empty for new phones - will be hidden
+    } else if (phone?.battery_level != null && phone.battery_level !== '') {
+      battery = String(phone.battery_level);
+    } else if (phone?.age != null) {
+      battery = String(phone.age); // تم الحفظ من صفحة المستعمل كـ battery_level أيضاً
+    }
     return { phone_number, memory, battery };
   }
 
   function fillSticker({phone_number, memory, battery}){
     document.getElementById('phone-number').textContent = phone_number || '-';
     document.getElementById('phone-memory').textContent = memory || '-';
-    document.getElementById('battery-level').textContent = battery || '-';
+    
+    // Hide battery level row for new phones (when battery is empty)
+    const batteryRow = document.querySelector('.row2:nth-child(2)'); // Second row (battery)
+    if (battery === '') {
+      batteryRow.style.display = 'none';
+    } else {
+      batteryRow.style.display = 'flex';
+      document.getElementById('battery-level').textContent = battery || '-';
+    }
+    
     generateBarcode(phone_number || '-');
   }
 
