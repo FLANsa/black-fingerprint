@@ -228,10 +228,51 @@
     return (Number(amount) || 0).toFixed(2);
   }
 
-    // تنسيق التاريخ
-    function formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('ar-SA');
+    // تحويل أي قيمة إلى كائن تاريخ صالح (يدعم Firestore Timestamp و ISO وغيرها)
+    function normalizeToDate(v) {
+      if (v == null) return null;
+      if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+      if (typeof v === 'object') {
+        if (typeof v.toDate === 'function') {
+          const d = v.toDate();
+          return isNaN(d?.getTime()) ? null : d;
+        }
+        if ('seconds' in v || '_seconds' in v) {
+          const sec  = Number(v.seconds ?? v._seconds ?? 0);
+          const nsec = Number(v.nanoseconds ?? v._nanoseconds ?? 0);
+          const ms = (sec * 1000) + Math.floor(nsec / 1e6);
+          const d = new Date(ms);
+          return isNaN(d.getTime()) ? null : d;
+        }
+      }
+      if (typeof v === 'number') {
+        const ms = v > 1e12 ? v : v * 1000;
+        const d = new Date(ms);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      if (typeof v === 'string') {
+        const s = v.trim();
+        if (/^\d+$/.test(s)) {
+          const n = parseInt(s, 10);
+          const ms = n > 1e12 ? n : n * 1000;
+          const d = new Date(ms);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        const d = new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      return null;
+    }
+
+    // تنسيق التاريخ (أرقام لاتينية دائمًا)
+    function formatDate(value) {
+      const d = normalizeToDate(value);
+      if (!d) return '-';
+      const pad = n => String(n).padStart(2, '0');
+      const y = d.getFullYear();
+      const m = pad(d.getMonth() + 1);
+      const day = pad(d.getDate());
+      return `${y}-${m}-${day}`; // YYYY-MM-DD
     }
 
     // عرض التنبيهات
