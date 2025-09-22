@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار إصلاح مشكلة الفهارس — تجربة النظام للاتصالات</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f8f9fa; 
+            padding-top: 70px; 
+        }
+        .navbar { 
+            background-color: #2c3e50; 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            z-index: 1030; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand, .nav-link { color: white !important; }
+        .card { 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
+        }
+        .card-header { 
+            font-weight: 600; 
+        }
+        .btn-primary { 
+            background-color: #2c3e50; 
+            border-color: #2c3e50; 
+        }
+        .btn-primary:hover { 
+            background-color: #1a252f; 
+            border-color: #1a252f; 
+        }
+        .alert-warning {
+            border-left: 4px solid #ffc107;
+        }
+        .alert-success {
+            border-left: 4px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">تجربة النظام للاتصالات</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">اختبار إصلاح مشكلة الفهارس</h2>
+        
+        <!-- Warning Alert -->
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>مشكلة الفهارس:</strong> إذا ظهر خطأ "The query requires an index"، 
+            يرجى اتباع التعليمات في ملف <code>firebase-indexes-setup.md</code> لإنشاء الفهارس المطلوبة.
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">اختبار تحميل البيانات</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="testDataLoading()">
+                            <i class="fas fa-database"></i> اختبار تحميل البيانات
+                        </button>
+                        <p class="text-muted">سيتم اختبار تحميل أعمال الصيانة مع الفلاتر</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">اختبار صفحة الحسابات</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-success mb-2" onclick="testAccountsPage()">
+                            <i class="fas fa-calculator"></i> اختبار الحسابات
+                        </button>
+                        <p class="text-muted">سيتم اختبار صفحة الحسابات مباشرة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">النتائج</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="results"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">تعليمات إصلاح المشكلة</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>الطريقة السريعة (Firebase CLI):</h6>
+                        <pre><code>firebase deploy --only firestore:indexes</code></pre>
+                        
+                        <h6 class="mt-3">الطريقة اليدوية:</h6>
+                        <ol>
+                            <li>اذهب إلى <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a></li>
+                            <li>اختر مشروع <code>phone-store-demo</code></li>
+                            <li>انتقل إلى "Firestore Database" → "Indexes"</li>
+                            <li>انقر على "Create Index"</li>
+                            <li>اختر Collection: <code>maintenanceJobs</code></li>
+                            <li>أضف الحقول: <code>status</code> (Ascending), <code>visitDate</code> (Descending)</li>
+                            <li>انقر "Create"</li>
+                        </ol>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>ملاحظة:</strong> قد يستغرق إنشاء الفهارس عدة دقائق. 
+                            بعد الإنشاء، اختبر الصفحة مرة أخرى.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script type="module" src="js/firebase-config-cdn.js"></script>
+    <script type="module" src="js/firebase-database-cdn.js"></script>
+    
+    <script>
+        let resultsDiv = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const alertClass = type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : type === 'warning' ? 'alert-warning' : 'alert-info';
+            resultsDiv.innerHTML += `
+                <div class="alert ${alertClass}">
+                    <strong>[${timestamp}]</strong> ${message}
+                </div>
+            `;
+        }
+        
+        async function testDataLoading() {
+            try {
+                log('بدء اختبار تحميل البيانات...', 'info');
+                
+                const today = new Date();
+                const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+                
+                // اختبار تحميل أعمال الصيانة
+                log('اختبار تحميل أعمال الصيانة...', 'info');
+                const jobs = await window.firebaseDatabase.getMaintenanceJobs({
+                    status: 'done',
+                    dateFrom: thirtyDaysAgo,
+                    dateTo: today
+                });
+                log(`تم تحميل ${jobs.length} عمل صيانة`, 'success');
+                
+                // اختبار حسابات المندوبين
+                log('اختبار حسابات المندوبين...', 'info');
+                const repSettlements = await window.firebaseDatabase.getRepSettlements(thirtyDaysAgo, today);
+                log(`تم تحميل حسابات ${repSettlements.length} مندوب`, 'success');
+                
+                // اختبار حسابات الفنيين
+                log('اختبار حسابات الفنيين...', 'info');
+                const techSettlements = await window.firebaseDatabase.getTechSettlements(thirtyDaysAgo, today);
+                log(`تم تحميل حسابات ${techSettlements.length} فني`, 'success');
+                
+                // اختبار المدفوعات
+                log('اختبار المدفوعات...', 'info');
+                const payments = await window.firebaseDatabase.getPayments({
+                    dateFrom: thirtyDaysAgo,
+                    dateTo: today
+                });
+                log(`تم تحميل ${payments.length} دفعة`, 'success');
+                
+                log('تم اختبار تحميل البيانات بنجاح!', 'success');
+                log('إذا لم تظهر أخطاء، فالمشكلة تم حلها', 'success');
+                
+            } catch (error) {
+                log(`خطأ في تحميل البيانات: ${error.message}`, 'error');
+                
+                if (error.message.includes('index')) {
+                    log('هذا خطأ فهارس. يرجى اتباع التعليمات أعلاه لإنشاء الفهارس المطلوبة', 'warning');
+                }
+                
+                console.error('Error testing data loading:', error);
+            }
+        }
+        
+        async function testAccountsPage() {
+            try {
+                log('بدء اختبار صفحة الحسابات...', 'info');
+                
+                // محاولة فتح صفحة الحسابات
+                const accountsUrl = 'maintenance-accounts.html';
+                log(`محاولة فتح صفحة الحسابات: ${accountsUrl}`, 'info');
+                
+                // إنشاء رابط للاختبار
+                const testLink = document.createElement('a');
+                testLink.href = accountsUrl;
+                testLink.target = '_blank';
+                testLink.textContent = 'افتح صفحة الحسابات';
+                testLink.className = 'btn btn-success';
+                
+                const linkContainer = document.createElement('div');
+                linkContainer.appendChild(testLink);
+                resultsDiv.appendChild(linkContainer);
+                
+                log('انقر على الرابط أعلاه لفتح صفحة الحسابات', 'info');
+                
+            } catch (error) {
+                log(`خطأ في اختبار صفحة الحسابات: ${error.message}`, 'error');
+                console.error('Error testing accounts page:', error);
+            }
+        }
+        
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            log('تم تحميل صفحة اختبار إصلاح الفهارس', 'info');
+            log('انقر على "اختبار تحميل البيانات" لبدء الاختبار', 'info');
+        });
+    </script>
+</body>
+</html>
