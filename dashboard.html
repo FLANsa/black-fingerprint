@@ -547,30 +547,60 @@
       // جلب أرباح الصيانة من قاعدة البيانات
       let maintenanceJobs = [];
       try {
-        maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
-        maintenanceProfit = maintenanceJobs.reduce((sum, job) => sum + (job.shopProfit || 0), 0);
-        console.log('🔧 أرباح الصيانة (shopProfit):', maintenanceProfit);
-        console.log('🔧 عدد أعمال الصيانة المكتملة:', maintenanceJobs.length);
-        console.log('🔧 تفاصيل أعمال الصيانة:', maintenanceJobs.map(job => ({
-          customer: job.customerName,
-          amountCharged: job.amountCharged,
-          partCost: job.partCost,
-          profit: job.profit,
-          techCommission: job.techCommission,
-          shopProfit: job.shopProfit,
-          calculation: `${job.amountCharged} - ${job.partCost} = ${job.profit}, ${job.profit} - ${job.techCommission} = ${job.shopProfit}`
-        })));
+        console.log('🔍 بدء جلب أعمال الصيانة...');
+        console.log('🔍 Firebase Database متاح:', !!window.firebaseDatabase);
         
-        // تشخيص إضافي للتأكد من الحساب
-        const totalShopProfit = maintenanceJobs.reduce((sum, job) => {
+        maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
+        console.log('🔍 تم جلب أعمال الصيانة:', maintenanceJobs.length, 'عمل');
+        
+        // فحص تفصيلي لكل عمل
+        maintenanceJobs.forEach((job, index) => {
+          console.log(`🔍 عمل صيانة ${index + 1}:`, {
+            id: job.id,
+            customer: job.customerName,
+            status: job.status,
+            amountCharged: job.amountCharged,
+            partCost: job.partCost,
+            profit: job.profit,
+            techCommission: job.techCommission,
+            shopProfit: job.shopProfit,
+            hasShopProfit: 'shopProfit' in job,
+            shopProfitType: typeof job.shopProfit
+          });
+        });
+        
+        maintenanceProfit = maintenanceJobs.reduce((sum, job) => {
           const shopProfit = job.shopProfit || 0;
-          console.log(`🔧 عمل صيانة: ${job.customerName}, shopProfit: ${shopProfit}`);
+          console.log(`🔧 حساب shopProfit: ${job.customerName} = ${shopProfit}`);
           return sum + shopProfit;
         }, 0);
-        console.log('🔧 إجمالي shopProfit محسوب يدوياً:', totalShopProfit);
+        
+        console.log('🔧 أرباح الصيانة النهائية (shopProfit):', maintenanceProfit);
+        console.log('🔧 عدد أعمال الصيانة المكتملة:', maintenanceJobs.length);
+        
+        // اختبار حساب بديل
+        const alternativeCalculation = maintenanceJobs.reduce((sum, job) => {
+          const amountCharged = Number(job.amountCharged) || 0;
+          const partCost = Number(job.partCost) || 0;
+          const profit = Math.max(0, amountCharged - partCost);
+          const techCommission = Number(job.techCommission) || 0;
+          const shopProfit = Math.max(0, profit - techCommission);
+          console.log(`🔧 حساب بديل: ${job.customerName} = ${amountCharged} - ${partCost} = ${profit}, ${profit} - ${techCommission} = ${shopProfit}`);
+          return sum + shopProfit;
+        }, 0);
+        
+        console.log('🔧 حساب بديل لأرباح الصيانة:', alternativeCalculation);
+        
+        // استخدام الحساب البديل إذا كان أفضل
+        if (alternativeCalculation > maintenanceProfit) {
+          console.log('🔧 استخدام الحساب البديل لأنه أعلى');
+          maintenanceProfit = alternativeCalculation;
+        }
         
       } catch (error) {
-        console.error('خطأ في جلب أرباح الصيانة:', error);
+        console.error('❌ خطأ في جلب أرباح الصيانة:', error);
+        console.error('❌ تفاصيل الخطأ:', error.message);
+        console.error('❌ stack trace:', error.stack);
         maintenanceProfit = 0;
         maintenanceJobs = [];
       }
