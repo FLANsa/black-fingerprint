@@ -1,7 +1,7 @@
 {
-  "name": "alsaqri-phones",
+  "name": "phone-store-demo",
   "version": "1.0.0",
-  "description": "الصقري للاتصالات - نظام إدارة متجر الهواتف الذكية",
+  "description": "Phone Store Demo - A web application for managing phone inventory and sales",
   "main": "index.html",
   "scripts": {
     "start": "python3 -m http.server 8000",
@@ -15,19 +15,22 @@
     "arabic",
     "saudi-arabia",
     "pos-system",
-    "phone-shop"
+    "phone-shop",
+    "firebase",
+    "demo"
   ],
-  "author": "الصقري للاتصالات",
+  "author": "Phone Store Demo",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FLANsa/alsaqri-phones.git"
+    "url": "https://github.com/FLANsa/phone-store-demo.git"
   },
-  "homepage": "https://alsaqri-phones.onrender.com",
+  "homepage": "https://github.com/FLANsa/phone-store-demo",
   "engines": {
     "node": ">=14.0.0",
     "python": ">=3.7.0"
   },
-  "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "firebase": "^10.14.1"
+  }
 }

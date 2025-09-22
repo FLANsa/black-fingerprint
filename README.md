@@ -1,132 +1,141 @@
-# الصقري للاتصالات - نظام إدارة متجر الهواتف
+# Phone Store Demo
 
-نظام متكامل لإدارة متجر الهواتف المحمولة الجديدة والمستعملة، مبني بالكامل باستخدام HTML, CSS, JavaScript.
+A comprehensive web application for managing phone store inventory and sales, designed for the Saudi market.
 
-## المميزات
+## Key Features
 
-### 📱 إدارة الهواتف
-- إضافة هواتف جديدة ومستعملة
-- إدارة المخزون والباركود
-- دعم الأرقام العربية في جميع الحقول
-- حساب الضريبة تلقائياً (15% ضريبة القيمة المضافة)
+### 📱 Inventory Management
+- Add and manage new and used phones
+- Manage accessories and add-ons
+- Advanced barcode system for products
+- Inventory tracking and alerts
 
-### 🛍️ إدارة الأكسسوارات
-- إضافة وتعديل الأكسسوارات
-- تصنيف الأكسسوارات
-- تتبع المخزون
-- حساب الأرباح
+### 💰 Sales System
+- Create sales invoices
+- Customer and sales management
+- Detailed sales reports
+- Multiple payment options
 
-### 💰 نظام المبيعات
-- نقطة بيع متكاملة (POS)
-- إنشاء فواتير
-- حساب الضريبة تلقائياً
-- تتبع المبيعات
+### 🔍 Search and Filter
+- Advanced product search
+- Filter by category and price
+- Detailed product display
 
-### 🔍 البحث والتصفية
-- بحث متقدم في المخزون
-- تصفية حسب النوع والحالة
-- تقارير مفصلة
+### 📊 Reports and Statistics
+- Comprehensive dashboard
+- Daily and monthly sales reports
+- Inventory statistics
+- Performance reports
 
-### 👤 نظام المستخدمين
-- تسجيل دخول آمن
-- إدارة الصلاحيات
-- تتبع العمليات
-
-## التقنيات المستخدمة
+## Technologies Used
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **UI Framework**: Bootstrap 5
-- **Icons**: Font Awesome
-- **Storage**: LocalStorage
-- **Fonts**: Cairo (عربي)
+- **Backend**: Python Flask
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Auth
+- **Storage**: Firebase Storage
+- **Analytics**: Firebase Analytics
+- **Deployment**: Render.com
 
-## التثبيت والتشغيل
+## Installation and Setup
 
-1. **استنساخ المشروع**:
-   ```bash
-   git clone https://github.com/[username]/alsaqri-phones.git
-   cd alsaqri-phones
-   ```
+### Requirements
+- Python 3.7+
+- Node.js 14+
+- Firebase account
 
-2. **تشغيل المشروع**:
-   - افتح `index.html` في المتصفح مباشرة
-   - أو استخدم خادم محلي:
-   ```bash
-   python3 -m http.server 8000
-   ```
+### Installation Steps
 
-3. **تسجيل الدخول**:
-   - **المدير**: `admin` / `admin123`
-   - **الموظف**: `user` / `user123`
-
-## هيكل المشروع
-
-```
-alsaqri-phones/
-├── index.html              # الصفحة الرئيسية
-├── login.html              # تسجيل الدخول
-├── dashboard.html          # لوحة التحكم
-├── add_new_phone.html      # إضافة هاتف جديد
-├── add_used_phone.html     # إضافة هاتف مستعمل
-├── add_accessory.html      # إضافة أكسسوار
-├── create_sale.html        # إنشاء عملية بيع
-├── list_sales.html         # قائمة المبيعات
-├── inventory_summary.html  # ملخص المخزون
-├── search.html             # البحث في المخزون
-├── list_accessories_simple.html # قائمة الأكسسوارات
-├── js/                     # ملفات JavaScript
-│   ├── config.js
-│   ├── utils.js
-│   ├── storage.js
-│   ├── auth.js
-│   ├── barcode.js
-│   ├── phone-manager.js
-│   ├── accessory-manager.js
-│   ├── sales-manager.js
-│   └── main.js
-└── README.md
+1. **Clone the repository**
+```bash
+git clone https://github.com/FLANsa/phone-store-demo.git
+cd phone-store-demo
 ```
 
-## المميزات التقنية
+2. **Install dependencies**
+```bash
+pip install -r requirements.txt
+npm install
+```
 
-### 🌐 دعم الأرقام العربية
-- تحويل تلقائي للأرقام العربية (٠-٩) إلى إنجليزية
-- دعم في جميع حقول الإدخال الرقمية
-- حسابات دقيقة مع الأرقام العربية
+3. **Setup Firebase**
+- Create a new project in Firebase Console
+- Enable Firestore Database
+- Enable Authentication
+- Enable Storage
+- Enable Analytics
+- Copy Firebase configuration to `js/firebase-config.js`
 
-### 💼 نظام الضريبة السعودي
-- ضريبة القيمة المضافة 15%
-- حساب تلقائي للضريبة
-- عرض الأسعار مع وبدون الضريبة
+4. **Run the project**
+```bash
+python start.py
+```
 
-### 💾 تخزين البيانات
-- استخدام LocalStorage لحفظ البيانات
-- لا حاجة لقاعدة بيانات خارجية
-- نسخ احتياطي تلقائي
+## Project Structure
 
-### 📱 تصميم متجاوب
-- متوافق مع جميع الأجهزة
-- واجهة مستخدم عربية
-- تصميم عصري وسهل الاستخدام
+```
+phone-store-demo/
+├── templates/          # HTML templates
+├── static/            # Static files
+│   ├── css/          # CSS files
+│   ├── js/           # JavaScript files
+│   └── images/       # Images
+├── app.py            # Main application
+├── requirements.txt  # Python dependencies
+├── package.json      # Node.js dependencies
+└── README.md        # This file
+```
 
-## المساهمة
+## Usage
 
-نرحب بالمساهمات! يرجى:
+### Adding a New Product
+1. Navigate to "Add New Phone" page
+2. Fill in product details
+3. Upload product image
+4. Save the product
 
-1. عمل Fork للمشروع
-2. إنشاء branch جديد للميزة
-3. عمل Commit للتغييرات
-4. عمل Push للـ branch
-5. إنشاء Pull Request
+### Creating a Sale
+1. Navigate to "Create Sale" page
+2. Select products
+3. Enter customer details
+4. Save the sale
 
-## الترخيص
+## Firebase Configuration
 
-هذا المشروع مرخص تحت رخصة MIT - انظر ملف [LICENSE](LICENSE) للتفاصيل.
+The project uses Firebase v10+ with the following services:
+- **Firestore**: Database for storing products, sales, and customers
+- **Authentication**: User authentication and authorization
+- **Storage**: File storage for product images
+- **Analytics**: Usage analytics and reporting
 
-## الدعم
+## Contributing
 
-للدعم والاستفسارات، يرجى فتح issue في GitHub أو التواصل معنا.
+We welcome contributions! Please follow these steps:
+
+1. Fork the project
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For support, please contact us via:
+- Email: support@phonestoredemo.com
+- GitHub Issues: [Create an issue](https://github.com/FLANsa/phone-store-demo/issues)
+
+## Future Updates
+
+- [ ] Mobile application
+- [ ] Customer loyalty points system
+- [ ] Payment gateway integration
+- [ ] Advanced reporting
+- [ ] Notification system
 
 ---
 
-**الصقري للاتصالات** - نظام إدارة متجر الهواتف الذكية 🇸🇦
+**Phone Store Demo** - Our vision is to provide the best phone store management solutions in Saudi Arabia.
