@@ -541,32 +541,25 @@ class FirebaseDatabase {
     try {
       let q = collection(this.db, 'maintenanceJobs');
       
-      // تطبيق الفلاتر بشكل تدريجي لتجنب مشاكل الفهارس
+      // نستخدم استعلام بسيط بدون orderBy لتجنب مشاكل الفهارس
       if (filters.status) {
         q = query(q, where('status', '==', filters.status));
       }
       
-      // إذا كان لدينا فلاتر متعددة، نستخدم استعلام أبسط
-      if (filters.repId || filters.techId || filters.dateFrom || filters.dateTo) {
-        // نستخدم استعلام بدون orderBy لتجنب مشاكل الفهارس
-        if (filters.repId) {
-          q = query(q, where('repId', '==', filters.repId));
-        }
-        
-        if (filters.techId) {
-          q = query(q, where('techId', '==', filters.techId));
-        }
-        
-        if (filters.dateFrom) {
-          q = query(q, where('visitDate', '>=', filters.dateFrom));
-        }
-        
-        if (filters.dateTo) {
-          q = query(q, where('visitDate', '<=', filters.dateTo));
-        }
-      } else {
-        // إذا لم تكن هناك فلاتر، نستخدم orderBy
-        q = query(q, orderBy('visitDate', 'desc'));
+      if (filters.repId) {
+        q = query(q, where('repId', '==', filters.repId));
+      }
+      
+      if (filters.techId) {
+        q = query(q, where('techId', '==', filters.techId));
+      }
+      
+      if (filters.dateFrom) {
+        q = query(q, where('visitDate', '>=', filters.dateFrom));
+      }
+      
+      if (filters.dateTo) {
+        q = query(q, where('visitDate', '<=', filters.dateTo));
       }
 
       const querySnapshot = await getDocs(q);
@@ -575,14 +568,12 @@ class FirebaseDatabase {
         jobs.push({ id: doc.id, ...doc.data() });
       });
       
-      // ترتيب النتائج يدوياً إذا لم نستخدم orderBy
-      if (filters.repId || filters.techId || filters.dateFrom || filters.dateTo) {
-        jobs.sort((a, b) => {
-          const dateA = a.visitDate?.seconds ? new Date(a.visitDate.seconds * 1000) : new Date(a.visitDate);
-          const dateB = b.visitDate?.seconds ? new Date(b.visitDate.seconds * 1000) : new Date(b.visitDate);
-          return dateB - dateA; // ترتيب تنازلي
-        });
-      }
+      // ترتيب النتائج يدوياً دائماً
+      jobs.sort((a, b) => {
+        const dateA = a.visitDate?.seconds ? new Date(a.visitDate.seconds * 1000) : new Date(a.visitDate);
+        const dateB = b.visitDate?.seconds ? new Date(b.visitDate.seconds * 1000) : new Date(b.visitDate);
+        return dateB - dateA; // ترتيب تنازلي
+      });
       
       console.log('✅ Maintenance jobs loaded:', jobs.length);
       return jobs;
