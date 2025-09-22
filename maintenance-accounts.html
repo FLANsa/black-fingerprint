@@ -106,17 +106,22 @@
         
         /* Custom Tab Colors */
         .nav-tabs .nav-link {
-            color: #000000;
+            color: #000000 !important;
             border: 1px solid transparent;
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
             transition: all 0.3s ease;
+            font-weight: 500;
         }
         
         .nav-tabs .nav-link:hover {
-            color: #000000;
+            color: #000000 !important;
             background-color: #e9ecef;
             border-color: #dee2e6;
+        }
+        
+        .nav-tabs .nav-link:not(.active) {
+            color: #000000 !important;
         }
         
         .nav-tabs .nav-link.active {
