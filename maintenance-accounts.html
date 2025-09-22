@@ -116,6 +116,27 @@
         .account-row:hover {
             background-color: #f8f9fa;
         }
+        .amount-positive {
+            color: #28a745;
+            font-weight: 700;
+        }
+        .amount-negative {
+            color: #dc3545;
+            font-weight: 700;
+        }
+        .amount-neutral {
+            color: #6c757d;
+            font-weight: 700;
+        }
+        .badge {
+            font-size: 0.8em;
+        }
+        .text-muted {
+            font-size: 0.85em;
+        }
+        .alert-info {
+            border-left: 4px solid #17a2b8;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +158,13 @@
 
     <div class="container mt-4">
         <h2 class="text-center mb-4">حسابات الصيانة</h2>
+        
+        <!-- Info Alert -->
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i>
+            <strong>ملاحظة مهمة:</strong> هذه الصفحة تعرض حسابات الأعمال المكتملة فقط. 
+            الأموال المحسوبة تظهر بوضوح مع تفاصيل التقسيم بين المندوبين والفنيين والمحل.
+        </div>
         
         <!-- Summary Cards -->
         <div class="row mb-4">
@@ -434,17 +462,26 @@
                 const toDate = new Date(dateTo);
                 toDate.setHours(23, 59, 59, 999);
 
+                console.log('🔄 Loading accounts data...');
+                console.log('📅 Date range:', fromDate, 'to', toDate);
+
                 // Load reps accounts
+                console.log('📊 Loading reps settlements...');
                 repsAccounts = await window.firebaseDatabase.getRepSettlements(fromDate, toDate);
+                console.log('✅ Reps loaded:', repsAccounts.length);
                 
                 // Load techs accounts
+                console.log('📊 Loading techs settlements...');
                 techsAccounts = await window.firebaseDatabase.getTechSettlements(fromDate, toDate);
+                console.log('✅ Techs loaded:', techsAccounts.length);
                 
                 // Load payments
+                console.log('📊 Loading payments...');
                 payments = await window.firebaseDatabase.getPayments({
                     dateFrom: fromDate,
                     dateTo: toDate
                 });
+                console.log('✅ Payments loaded:', payments.length);
                 
                 // Calculate balances
                 calculateBalances();
@@ -458,9 +495,11 @@
                 displayPayments();
                 displaySummary();
                 
+                console.log('✅ All data loaded successfully');
+                
             } catch (error) {
-                console.error('Error loading accounts:', error);
-                showAlert('حدث خطأ في تحميل البيانات', 'error');
+                console.error('❌ Error loading accounts:', error);
+                showAlert(`حدث خطأ في تحميل البيانات: ${error.message}`, 'error');
             }
         }
 
@@ -508,6 +547,14 @@
             const totalPayments = totalRepPaid + totalTechPaid;
             const netProfit = totalShopProfit - totalPayments;
 
+            console.log('📊 Summary calculations:');
+            console.log('- Total reps:', totalReps);
+            console.log('- Total techs:', totalTechs);
+            console.log('- Rep amount:', totalRepAmount);
+            console.log('- Tech amount:', totalTechAmount);
+            console.log('- Shop profit:', totalShopProfit);
+            console.log('- Total payments:', totalPayments);
+
             document.getElementById('totalReps').textContent = totalReps;
             document.getElementById('totalRepAmount').textContent = totalRepAmount.toFixed(2) + ' ريال';
             document.getElementById('totalRepPaid').textContent = totalRepPaid.toFixed(2) + ' ريال';
@@ -532,7 +579,7 @@
             tbody.innerHTML = '';
 
             if (repsAccounts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center">لا توجد بيانات للمندوبين</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">لا توجد أعمال مكتملة للمندوبين في هذه الفترة</td></tr>';
                 return;
             }
 
@@ -540,12 +587,26 @@
                 const row = document.createElement('tr');
                 row.className = 'account-row';
                 row.innerHTML = `
-                    <td>${rep.repName || 'غير محدد'}</td>
+                    <td>
+                        <strong>${rep.repName || 'غير محدد'}</strong>
+                        <br><small class="text-muted">ID: ${rep.repId}</small>
+                    </td>
                     <td>${rep.phone || 'N/A'}</td>
-                    <td>${rep.jobsCount || 0}</td>
-                    <td class="amount-positive">${(rep.partCostSum || 0).toFixed(2)} ريال</td>
-                    <td class="amount-negative">${(rep.totalPaid || 0).toFixed(2)} ريال</td>
-                    <td class="${rep.balance > 0 ? 'amount-positive' : 'amount-neutral'}">${(rep.balance || 0).toFixed(2)} ريال</td>
+                    <td>
+                        <span class="badge bg-primary">${rep.jobsCount || 0} عمل</span>
+                    </td>
+                    <td class="amount-positive">
+                        <strong>${(rep.partCostSum || 0).toFixed(2)} ريال</strong>
+                        <br><small class="text-muted">تكلفة القطع</small>
+                    </td>
+                    <td class="amount-negative">
+                        <strong>${(rep.totalPaid || 0).toFixed(2)} ريال</strong>
+                        <br><small class="text-muted">المدفوع</small>
+                    </td>
+                    <td class="${rep.balance > 0 ? 'amount-positive' : 'amount-neutral'}">
+                        <strong>${(rep.balance || 0).toFixed(2)} ريال</strong>
+                        <br><small class="text-muted">المتبقي</small>
+                    </td>
                     <td><span class="status-badge status-${rep.status}">${rep.status === 'paid' ? 'مدفوع' : 'معلق'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="openPaymentModal('rep', '${rep.repId}', '${rep.repName}')">
@@ -565,7 +626,7 @@
             tbody.innerHTML = '';
 
             if (techsAccounts.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center">لا توجد بيانات للفنيين</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">لا توجد أعمال مكتملة للفنيين في هذه الفترة</td></tr>';
                 return;
             }
 
@@ -573,12 +634,26 @@
                 const row = document.createElement('tr');
                 row.className = 'account-row';
                 row.innerHTML = `
-                    <td>${tech.techName || 'غير محدد'}</td>
+                    <td>
+                        <strong>${tech.techName || 'غير محدد'}</strong>
+                        <br><small class="text-muted">ID: ${tech.techId}</small>
+                    </td>
                     <td>${tech.phone || 'N/A'}</td>
-                    <td>${tech.jobsCount || 0}</td>
-                    <td class="amount-positive">${(tech.techCommissionSum || 0).toFixed(2)} ريال</td>
-                    <td class="amount-negative">${(tech.totalPaid || 0).toFixed(2)} ريال</td>
-                    <td class="${tech.balance > 0 ? 'amount-positive' : 'amount-neutral'}">${(tech.balance || 0).toFixed(2)} ريال</td>
+                    <td>
+                        <span class="badge bg-success">${tech.jobsCount || 0} عمل</span>
+                    </td>
+                    <td class="amount-positive">
+                        <strong>${(tech.techCommissionSum || 0).toFixed(2)} ريال</strong>
+                        <br><small class="text-muted">عمولة الفني</small>
+                    </td>
+                    <td class="amount-negative">
+                        <strong>${(tech.totalPaid || 0).toFixed(2)} ريال</strong>
+                        <br><small class="text-muted">المدفوع</small>
+                    </td>
+                    <td class="${tech.balance > 0 ? 'amount-positive' : 'amount-neutral'}">
+                        <strong>${(tech.balance || 0).toFixed(2)} ريال</strong>
+                        <br><small class="text-muted">المتبقي</small>
+                    </td>
                     <td><span class="status-badge status-${tech.status}">${tech.status === 'paid' ? 'مدفوع' : 'معلق'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-primary" onclick="openPaymentModal('tech', '${tech.techId}', '${tech.techName}')">
@@ -598,7 +673,7 @@
             tbody.innerHTML = '';
 
             if (payments.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">لا توجد مدفوعات</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">لا توجد مدفوعات في هذه الفترة</td></tr>';
                 return;
             }
 
@@ -614,12 +689,31 @@
                     paymentDate = new Date();
                 }
                 
+                const methodMap = {
+                    'cash': 'نقداً',
+                    'bank_transfer': 'تحويل بنكي',
+                    'check': 'شيك',
+                    'other': 'أخرى'
+                };
+                
                 row.innerHTML = `
-                    <td>${paymentDate.toLocaleDateString('ar-SA')}</td>
-                    <td>${payment.entityType === 'rep' ? 'مندوب' : 'فني'}</td>
-                    <td>${payment.entityName || 'غير محدد'}</td>
-                    <td class="amount-negative">${(payment.amount || 0).toFixed(2)} ريال</td>
-                    <td>${payment.notes || 'N/A'}</td>
+                    <td>
+                        <strong>${paymentDate.toLocaleDateString('ar-SA')}</strong>
+                        <br><small class="text-muted">${paymentDate.toLocaleTimeString('ar-SA')}</small>
+                    </td>
+                    <td>
+                        <span class="badge ${payment.entityType === 'rep' ? 'bg-primary' : 'bg-success'}">
+                            ${payment.entityType === 'rep' ? 'مندوب' : 'فني'}
+                        </span>
+                    </td>
+                    <td>
+                        <strong>${payment.entityName || 'غير محدد'}</strong>
+                        <br><small class="text-muted">${methodMap[payment.paymentMethod] || payment.paymentMethod}</small>
+                    </td>
+                    <td class="amount-negative">
+                        <strong>${(payment.amount || 0).toFixed(2)} ريال</strong>
+                    </td>
+                    <td>${payment.notes || 'لا توجد ملاحظات'}</td>
                     <td>
                         <button class="btn btn-sm btn-danger" onclick="deletePayment('${payment.id}')">
                             <i class="fas fa-trash"></i> حذف
