@@ -109,9 +109,7 @@ function generateNavigation(role, currentPage = '') {
                     <li><a class="dropdown-item ${currentPage === 'maintenance-technicians' ? 'active' : ''}" href="maintenance-technicians.html"><i class="fas fa-hard-hat"></i> الفنيين</a></li>
                     <li><a class="dropdown-item ${currentPage === 'maintenance-jobs' ? 'active' : ''}" href="maintenance-jobs.html"><i class="fas fa-wrench"></i> أعمال الصيانة</a></li>
                     <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item ${currentPage === 'maintenance-settlements' ? 'active' : ''}" href="maintenance-settlements.html"><i class="fas fa-calculator"></i> التسويات</a></li>
                             <li><a class="dropdown-item ${currentPage === 'maintenance-accounts' ? 'active' : ''}" href="maintenance-accounts.html"><i class="fas fa-credit-card"></i> الحسابات</a></li>
-                            <li><a class="dropdown-item ${currentPage === 'maintenance-reports' ? 'active' : ''}" href="maintenance-reports.html"><i class="fas fa-chart-bar"></i> التقارير</a></li>
                 </ul>
             </li>
 
