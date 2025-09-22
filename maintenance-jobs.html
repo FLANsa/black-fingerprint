@@ -345,6 +345,17 @@
     <script src="js/navigation.js"></script>
     
     <script>
+        // ✅ دالة موحّدة لحساب القيم المشتقة
+        function computeDerived(partCost, amountCharged, techPercent) {
+            const pc = Number(partCost) || 0;
+            const ac = Number(amountCharged) || 0;
+            const tp = (typeof techPercent === 'number' && !isNaN(techPercent)) ? techPercent : 0.5; // افتراضي 50%
+            const profit = ac - pc;                                // الربح الإجمالي
+            const techCommission = Math.max(0, profit * tp);       // عمولة الفني
+            const shopProfit = profit - techCommission;            // أرباح المحل
+            return { profit, techCommission, shopProfit };
+        }
+
         let jobsData = [];
         let repsData = [];
         let techniciansData = [];
@@ -451,9 +462,7 @@
             const amountCharged = parseFloat(document.getElementById('amountCharged').value) || 0;
 
             if (partCost > 0 && amountCharged > 0 && selectedTechPercent > 0) {
-                const profit = window.firebaseDatabase.calcProfit(partCost, amountCharged);
-                const techCommission = window.firebaseDatabase.calcTechCommission(profit, selectedTechPercent);
-                const shopProfit = window.firebaseDatabase.calcShopProfit(profit, techCommission);
+                const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
 
                 document.getElementById('totalProfit').textContent = profit.toFixed(2) + ' ريال';
                 document.getElementById('techCommission').textContent = techCommission.toFixed(2) + ' ريال';
@@ -569,25 +578,43 @@
 
         // Save job
         async function saveJob() {
+            const partCost = parseFloat(document.getElementById('partCost').value);
+            const amountCharged = parseFloat(document.getElementById('amountCharged').value);
+            const repId = document.getElementById('repId').value;
+            const techId = document.getElementById('techId').value;
+
+            // تحقق أساسي
+            if (!repId || !techId || isNaN(partCost) || isNaN(amountCharged)) {
+                showAlert('error', 'يرجى تعبئة المندوب والفني وتكاليف/مبالغ صحيحة');
+                return;
+            }
+
+            // أسماء المندوب/الفني
+            const rep = repsData.find(r => r.id === repId);
+            const tech = techniciansData.find(t => t.id === techId);
+
+            // ✅ احسب القيم المشتقة
+            const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
+
             const jobData = {
                 customerName: document.getElementById('customerName').value,
                 customerPhone: document.getElementById('customerPhone').value,
                 visitDate: new Date(document.getElementById('visitDate').value),
                 partName: document.getElementById('partName').value,
-                repId: document.getElementById('repId').value,
-                techId: document.getElementById('techId').value,
-                partCost: parseFloat(document.getElementById('partCost').value),
-                amountCharged: parseFloat(document.getElementById('amountCharged').value),
-                techPercent: selectedTechPercent,
+                repId,
+                techId,
+                repName: rep ? rep.name : '',
+                techName: tech ? tech.name : '',
+                partCost,
+                amountCharged,
+                techPercent: selectedTechPercent,      // نخزّن النسبة لاستخدامها لاحقاً
+                // ✅ القيم المحسوبة
+                profit,
+                techCommission,
+                shopProfit,
                 status: document.getElementById('status').value,
                 notes: document.getElementById('notes').value
             };
-
-            // Add rep and tech names
-            const rep = repsData.find(r => r.id === jobData.repId);
-            const tech = techniciansData.find(t => t.id === jobData.techId);
-            jobData.repName = rep ? rep.name : '';
-            jobData.techName = tech ? tech.name : '';
 
             try {
                 if (currentEditId) {
@@ -597,7 +624,7 @@
                     await window.firebaseDatabase.addMaintenanceJob(jobData);
                     showAlert('success', 'تم إضافة عمل الصيانة بنجاح');
                 }
-                
+
                 bootstrap.Modal.getInstance(document.getElementById('jobModal')).hide();
                 loadData();
             } catch (error) {
@@ -627,47 +654,46 @@
             const job = jobsData.find(j => j.id === currentEditId);
             if (!job) return;
 
-            // Validate required fields
+            // تأكيد توفر البيانات الأساسية
             if (!job.partCost || !job.amountCharged || !job.repId || !job.techId) {
                 showAlert('error', 'يرجى التأكد من ملء جميع البيانات المطلوبة قبل إتمام العملية');
                 return;
             }
 
-            // Calculate profit breakdown
-            const profit = window.firebaseDatabase.calcProfit(job.partCost, job.amountCharged);
-            const techCommission = window.firebaseDatabase.calcTechCommission(profit, job.techPercent || 0.5);
-            const shopProfit = window.firebaseDatabase.calcShopProfit(profit, techCommission);
+            // استخدم النسبة المخزّنة إن وجدت، وإلا المختارة حالياً، وإلا 50%
+            const techPercent = (typeof job.techPercent === 'number') ? job.techPercent :
+                                (typeof selectedTechPercent === 'number' ? selectedTechPercent : 0.5);
 
-            // Show confirmation with profit breakdown
+            // ✅ احسب القيم المُشتقة نهائياً
+            const { profit, techCommission, shopProfit } = computeDerived(job.partCost, job.amountCharged, techPercent);
+
             const confirmMessage = `هل أنت متأكد من إتمام هذه العملية؟
-                
+            
 تفاصيل التقسيم:
 • الربح الإجمالي: ${profit.toFixed(2)} ريال
-• عمولة الفني: ${techCommission.toFixed(2)} ريال  
-• ربح المحل: ${shopProfit.toFixed(2)} ريال
+• عمولة الفني: ${techCommission.toFixed(2)} ريال
+• ربح المحل: ${shopProfit.toFixed(2)} ريال`;
 
-سيتم تحديث الحسابات تلقائياً.`;
-
-            if (!confirm(confirmMessage)) {
-                return;
-            }
+            if (!confirm(confirmMessage)) return;
 
             try {
-                // Update job status to done
                 const jobData = {
                     status: 'done',
-                    completedAt: new Date()
+                    completedAt: new Date(),
+                    // ✅ ثبّت القيم عند الإتمام
+                    profit,
+                    techCommission,
+                    shopProfit,
+                    techPercent
                 };
 
                 await window.firebaseDatabase.updateMaintenanceJob(currentEditId, jobData);
-                
-                // Show success message
-                showAlert('success', `تم إتمام العملية بنجاح! 
+
+                showAlert('success', `تم إتمام العملية بنجاح!
                     <br>✅ تم تحديث الحالة إلى "مكتملة"
-                    <br>💰 تم تقسيم الأرباح تلقائياً
+                    <br>💰 تم تثبيت عمولة الفني وربح المحل
                     <br>📊 يمكنك مراجعة الحسابات في صفحة "الحسابات"`);
 
-                // Close modal and reload data
                 bootstrap.Modal.getInstance(document.getElementById('jobModal')).hide();
                 loadData();
                 

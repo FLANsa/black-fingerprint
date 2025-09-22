@@ -513,10 +513,12 @@ class FirebaseDatabase {
   // ===== أعمال الصيانة =====
   async addMaintenanceJob(jobData) {
     try {
-      // حساب الأرباح
-      const profit = this.calcProfit(jobData.partCost, jobData.amountCharged);
-      const techCommission = this.calcTechCommission(profit, jobData.techPercent);
-      const shopProfit = this.calcShopProfit(profit, techCommission);
+      // ✅ حساب الأرباح باستخدام الدالة الموحدة
+      const { profit, techCommission, shopProfit } = this.computeDerived(
+        jobData.partCost, 
+        jobData.amountCharged, 
+        jobData.techPercent || 0.5
+      );
 
       const docRef = await addDoc(collection(this.db, 'maintenanceJobs'), {
         ...jobData,
@@ -592,16 +594,14 @@ class FirebaseDatabase {
 
   async updateMaintenanceJob(jobId, jobData) {
     try {
-      // إعادة حساب الأرباح إذا تغيرت القيم
+      // ✅ إعادة حساب الأرباح إذا تغيرت القيم باستخدام الدالة الموحدة
       if (jobData.partCost !== undefined || jobData.amountCharged !== undefined || jobData.techPercent !== undefined) {
         const currentJob = await this.getMaintenanceJob(jobId);
         const partCost = jobData.partCost !== undefined ? jobData.partCost : currentJob.partCost;
         const amountCharged = jobData.amountCharged !== undefined ? jobData.amountCharged : currentJob.amountCharged;
         const techPercent = jobData.techPercent !== undefined ? jobData.techPercent : currentJob.techPercent;
         
-        const profit = this.calcProfit(partCost, amountCharged);
-        const techCommission = this.calcTechCommission(profit, techPercent);
-        const shopProfit = this.calcShopProfit(profit, techCommission);
+        const { profit, techCommission, shopProfit } = this.computeDerived(partCost, amountCharged, techPercent);
         
         jobData.profit = profit;
         jobData.techCommission = techCommission;
@@ -706,6 +706,18 @@ class FirebaseDatabase {
   }
 
   // ===== دوال الحساب =====
+  // ✅ دالة موحّدة لحساب القيم المشتقة
+  computeDerived(partCost, amountCharged, techPercent) {
+    const pc = Number(partCost) || 0;
+    const ac = Number(amountCharged) || 0;
+    const tp = (typeof techPercent === 'number' && !isNaN(techPercent)) ? techPercent : 0.5; // افتراضي 50%
+    const profit = ac - pc;                                // الربح الإجمالي
+    const techCommission = Math.max(0, profit * tp);       // عمولة الفني
+    const shopProfit = profit - techCommission;            // أرباح المحل
+    return { profit, techCommission, shopProfit };
+  }
+
+  // دوال منفصلة للتوافق مع الكود القديم
   calcProfit(partCost, amountCharged) {
     return Math.max(0, Number((amountCharged - partCost).toFixed(2)));
   }
