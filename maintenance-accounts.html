@@ -104,9 +104,9 @@
             color: #721c24;
         }
         
-        /* Custom Tab Colors */
+        /* Custom Tab Colors - Matching Site Identity */
         .nav-tabs .nav-link {
-            color: #000000 !important;
+            color: #2c3e50 !important;
             border: 1px solid transparent;
             border-radius: 8px 8px 0 0;
             margin-right: 5px;
@@ -115,36 +115,28 @@
         }
         
         .nav-tabs .nav-link:hover {
-            color: #000000 !important;
-            background-color: #e9ecef;
-            border-color: #dee2e6;
+            color: #2c3e50 !important;
+            background-color: #f8f9fa;
+            border-color: #2c3e50;
         }
         
         .nav-tabs .nav-link:not(.active) {
-            color: #000000 !important;
+            color: #2c3e50 !important;
         }
         
         .nav-tabs .nav-link.active {
-            color: #fff;
+            color: #fff !important;
             background-color: #2c3e50;
             border-color: #2c3e50;
             font-weight: 600;
         }
         
-        /* Specific tab colors */
-        #reps-tab.active {
-            background-color: #28a745 !important;
-            border-color: #28a745 !important;
-        }
-        
-        #techs-tab.active {
-            background-color: #fd7e14 !important;
-            border-color: #fd7e14 !important;
-        }
-        
+        /* All tabs use the same site color when active */
+        #reps-tab.active,
+        #techs-tab.active,
         #payments-tab.active {
-            background-color: #6f42c1 !important;
-            border-color: #6f42c1 !important;
+            background-color: #2c3e50 !important;
+            border-color: #2c3e50 !important;
         }
         .filter-section {
             background: #f8f9fa;
