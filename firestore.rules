@@ -1,50 +1,7 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // قواعد للمنتجات (الهواتف والأكسسوارات)
-    match /products/{productId} {
-      allow read: if true; // السماح للجميع بقراءة المنتجات
-      allow write: if request.auth != null; // السماح بالكتابة للمستخدمين المسجلين فقط
-    }
-    
-    // قواعد للمبيعات
-    match /sales/{saleId} {
-      allow read: if request.auth != null; // السماح بالقراءة للمستخدمين المسجلين
-      allow write: if request.auth != null; // السماح بالكتابة للمستخدمين المسجلين
-    }
-    
-    // قواعد للعملاء
-    match /customers/{customerId} {
-      allow read: if request.auth != null; // السماح بالقراءة للمستخدمين المسجلين
-      allow write: if request.auth != null; // السماح بالكتابة للمستخدمين المسجلين
-    }
-    
-    // قواعد للمستخدمين
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      // السماح للمستخدم بقراءة وكتابة بياناته فقط
-    }
-    
-    // قواعد للإحصائيات والتقارير
-    match /reports/{reportId} {
-      allow read: if request.auth != null; // السماح بالقراءة للمستخدمين المسجلين
-      allow write: if request.auth != null; // السماح بالكتابة للمستخدمين المسجلين
-    }
-    
-    // قواعد للمخزون
-    match /inventory/{inventoryId} {
-      allow read: if request.auth != null; // السماح بالقراءة للمستخدمين المسجلين
-      allow write: if request.auth != null; // السماح بالكتابة للمستخدمين المسجلين
-    }
-    
-    // قواعد للباركود
-    match /barcodes/{barcodeId} {
-      allow read: if true; // السماح للجميع بقراءة الباركود
-      allow write: if request.auth != null; // السماح بالكتابة للمستخدمين المسجلين فقط
-    }
-    
-    // قواعد عامة - منع الوصول لجميع المجموعات الأخرى
     match /{document=**} {
       allow read, write: if false;
     }
