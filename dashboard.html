@@ -549,6 +549,7 @@
         const maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
         maintenanceProfit = maintenanceJobs.reduce((sum, job) => sum + (job.shopProfit || 0), 0);
         console.log('🔧 أرباح الصيانة (shopProfit):', maintenanceProfit);
+        console.log('🔧 عدد أعمال الصيانة المكتملة:', maintenanceJobs.length);
         console.log('🔧 تفاصيل أعمال الصيانة:', maintenanceJobs.map(job => ({
           customer: job.customerName,
           amountCharged: job.amountCharged,
@@ -558,6 +559,15 @@
           shopProfit: job.shopProfit,
           calculation: `${job.amountCharged} - ${job.partCost} = ${job.profit}, ${job.profit} - ${job.techCommission} = ${job.shopProfit}`
         })));
+        
+        // تشخيص إضافي للتأكد من الحساب
+        const totalShopProfit = maintenanceJobs.reduce((sum, job) => {
+          const shopProfit = job.shopProfit || 0;
+          console.log(`🔧 عمل صيانة: ${job.customerName}, shopProfit: ${shopProfit}`);
+          return sum + shopProfit;
+        }, 0);
+        console.log('🔧 إجمالي shopProfit محسوب يدوياً:', totalShopProfit);
+        
       } catch (error) {
         console.error('خطأ في جلب أرباح الصيانة:', error);
         maintenanceProfit = 0;
