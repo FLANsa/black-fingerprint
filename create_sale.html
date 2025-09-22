@@ -38,46 +38,7 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="dashboard.html"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</a>
-          </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="inventoryDropdown" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-boxes"></i> إدارة المخزون
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="inventory_summary.html"><i class="fas fa-chart-bar"></i> ملخص المخزون</a></li>
-              <li><a class="dropdown-item" href="search.html"><i class="fas fa-search"></i> البحث في المخزون</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="add_accessory.html"><i class="fas fa-plus"></i> إضافة أكسسوار</a></li>
-              <li><a class="dropdown-item" href="list_accessories_simple.html"><i class="fas fa-box"></i> مخزون الأكسسوارات</a></li>
-            </ul>
-          </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="salesDropdown" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-shopping-cart"></i> إدارة المبيعات
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="list_sales.html"><i class="fas fa-list"></i> قائمة المبيعات</a></li>
-              <li><a class="dropdown-item active" href="create_sale.html"><i class="fas fa-plus-circle"></i> إنشاء عملية بيع جديدة</a></li>
-            </ul>
-          </li>
-
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="phoneDropdown" role="button" data-bs-toggle="dropdown">
-              <i class="fas fa-mobile-alt"></i> إدارة الهواتف
-            </a>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="add_new_phone.html"><i class="fas fa-mobile"></i> هاتف جديد</a></li>
-              <li><a class="dropdown-item" href="add_used_phone.html"><i class="fas fa-mobile-alt"></i> هاتف مستعمل</a></li>
-            </ul>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
-          </li>
+          <!-- Navigation will be populated by navigation.js -->
         </ul>
       </div>
     </div>
@@ -925,6 +886,14 @@
         window.location.href = 'index.html';
       }
     }
+  </script>
+
+  <!-- Navigation Script -->
+  <script src="js/navigation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initNavigation('create_sale');
+    });
   </script>
   
 </body>

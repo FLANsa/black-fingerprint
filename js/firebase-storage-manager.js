@@ -721,6 +721,11 @@ if (typeof window !== 'undefined') {
   window.FirebaseStorageManager = FirebaseStorageManager;
 }
 
+// Make available globally for non-module usage
+window.FirebaseStorageManager = FirebaseStorageManager;
+window.storage = storage;
+
+// Also export for module usage
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { FirebaseStorageManager, storage };
 }
