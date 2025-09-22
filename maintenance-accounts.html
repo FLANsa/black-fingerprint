@@ -380,7 +380,7 @@
                         
                         <div class="mb-3">
                             <label for="paymentAmount" class="form-label">المبلغ (ريال) *</label>
-                            <input type="number" class="form-control" id="paymentAmount" min="0" step="0.01" required>
+                            <input type="number" class="form-control" id="paymentAmount" min="0.01" step="0.01" required>
                         </div>
                         
                         <div class="mb-3">
@@ -510,7 +510,8 @@
                 const repPayments = payments.filter(p => p.entityType === 'rep' && p.entityId === rep.repId);
                 rep.totalPaid = repPayments.reduce((sum, p) => sum + p.amount, 0);
                 rep.balance = rep.partCostSum - rep.totalPaid;
-                rep.status = rep.balance > 0 ? 'pending' : 'paid';
+                // Only mark as paid if there was actually money owed and it's fully paid
+                rep.status = (rep.partCostSum > 0 && rep.balance <= 0) ? 'paid' : 'pending';
             });
             
             // Calculate techs balances
@@ -518,7 +519,8 @@
                 const techPayments = payments.filter(p => p.entityType === 'tech' && p.entityId === tech.techId);
                 tech.totalPaid = techPayments.reduce((sum, p) => sum + p.amount, 0);
                 tech.balance = tech.techCommissionSum - tech.totalPaid;
-                tech.status = tech.balance > 0 ? 'pending' : 'paid';
+                // Only mark as paid if there was actually money owed and it's fully paid
+                tech.status = (tech.techCommissionSum > 0 && tech.balance <= 0) ? 'paid' : 'pending';
             });
         }
 
@@ -740,11 +742,19 @@
         // Save payment
         async function savePayment() {
             try {
+                const amount = parseFloat(document.getElementById('paymentAmount').value);
+                
+                // Validate amount
+                if (isNaN(amount) || amount <= 0) {
+                    showAlert('يرجى إدخال مبلغ صحيح أكبر من صفر', 'error');
+                    return;
+                }
+                
                 const paymentData = {
                     entityType: document.getElementById('paymentEntityType').value,
                     entityId: document.getElementById('paymentEntityId').value,
                     entityName: currentPayment.entityName,
-                    amount: parseFloat(document.getElementById('paymentAmount').value),
+                    amount: amount,
                     paymentDate: new Date(document.getElementById('paymentDate').value),
                     paymentMethod: document.getElementById('paymentMethod').value,
                     notes: document.getElementById('paymentNotes').value
