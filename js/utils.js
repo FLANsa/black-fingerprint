@@ -1,6 +1,6 @@
 /**
  * Utility Functions
- * الصقري للاتصالات - Phone Store Management System
+ * تجربة النظام للاتصالات - Phone Store Management System
  */
 
 // VAT Calculation Functions

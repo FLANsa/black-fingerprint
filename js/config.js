@@ -1,13 +1,13 @@
 /**
  * Configuration and Constants
- * الصقري للاتصالات - Phone Store Management System
+ * تجربة النظام للاتصالات - Phone Store Management System
  */
 
 // VAT Configuration for Saudi Arabia
 const CONFIG = {
     VAT_RATE: 0.15, // 15% VAT rate
     COMPANY_INFO: {
-        name: "الصقري للاتصالات",
+        name: "تجربة النظام للاتصالات",
         vatNumber: "1234567890",
         address: "الرياض، المملكة العربية السعودية",
         phone: "011-0000000"

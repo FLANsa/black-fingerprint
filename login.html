@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>تسجيل الدخول — الصقري للاتصالات</title>
+  <title>تسجيل الدخول — تجربة النظام للاتصالات</title>
 
   <!-- نفس الخط والمكتبات المستخدمة في بقية الصفحات -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <span class="navbar-brand">الصقري للاتصالات</span>
+      <span class="navbar-brand">تجربة النظام للاتصالات</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -113,9 +113,10 @@
 
     // بيانات المستخدمين الافتراضية (يمكن تطويرها لاحقاً)
     // كلمات المرور مخزنة كقِيَم SHA-256 (ليس نصاً واضحاً)
+    // كلمة المرور لكلا المستخدمين: 123123
     const validUsers = [
-      { username: 'admin', passwordHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', name: 'مدير النظام', role: 'admin', dashboard: 'dashboard.html' },
-      { username: 'user',  passwordHash: 'e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446', name: 'موظف المبيعات', role: 'user',  dashboard: 'limited_dashboard.html' }
+      { username: 'admin', passwordHash: '96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e', name: 'مدير النظام', role: 'admin', dashboard: 'dashboard.html' },
+      { username: 'user',  passwordHash: '96cae35ce8a9b0244178bf28e4966c2ce1b8385723a96a6b838858cdd6ca0a1e', name: 'موظف المبيعات', role: 'user',  dashboard: 'limited_dashboard.html' }
     ];
 
     // حساب SHA-256 محلياً لكلمة المرور المدخلة ثم المقارنة مع المخزن
