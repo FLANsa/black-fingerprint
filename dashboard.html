@@ -471,9 +471,10 @@
 
       // جلب أرباح الصيانة من قاعدة البيانات
       let maintenanceProfit = 0;
+      let maintenanceJobs = [];
       try {
         console.log('🔍 جلب أرباح الصيانة...');
-        const maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
+        maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
         console.log('🔍 تم جلب أعمال الصيانة:', maintenanceJobs.length, 'عمل');
         
         maintenanceProfit = maintenanceJobs.reduce((sum, job) => {
@@ -486,6 +487,7 @@
       } catch (error) {
         console.error('❌ خطأ في جلب أرباح الصيانة:', error);
         maintenanceProfit = 0;
+        maintenanceJobs = [];
       }
 
       // إضافة أرباح الصيانة إلى الربح الفعلي
@@ -499,7 +501,8 @@
       const actualProfitRatio = totalPurchaseCostAfterTax > 0 ? (salesProfit / totalPurchaseCostAfterTax) * 100 : 0;
       
       // حساب نسبة الربح الإجمالية (مبيعات + صيانة)
-      const totalRevenue = totalSalesAmount + (maintenanceJobs ? maintenanceJobs.reduce((sum, job) => sum + (job.amountCharged || 0), 0) : 0);
+      const maintenanceRevenue = maintenanceJobs ? maintenanceJobs.reduce((sum, job) => sum + (job.amountCharged || 0), 0) : 0;
+      const totalRevenue = totalSalesAmount + maintenanceRevenue;
       const totalProfitRatio = totalRevenue > 0 ? (totalActualProfit / totalRevenue) * 100 : 0;
 
       console.log('💰 إجمالي سعر البيع بعد الضريبة:', totalSalesAmount);
