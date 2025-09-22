@@ -469,8 +469,30 @@
         }
       });
 
-      // حساب ربح المبيعات
-      const salesProfit = totalActualProfit;
+      // جلب أرباح الصيانة من قاعدة البيانات
+      let maintenanceProfit = 0;
+      try {
+        console.log('🔍 جلب أرباح الصيانة...');
+        const maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
+        console.log('🔍 تم جلب أعمال الصيانة:', maintenanceJobs.length, 'عمل');
+        
+        maintenanceProfit = maintenanceJobs.reduce((sum, job) => {
+          const shopProfit = job.shopProfit || 0;
+          console.log(`🔧 أرباح الصيانة: ${job.customerName} = ${shopProfit} ريال`);
+          return sum + shopProfit;
+        }, 0);
+        
+        console.log('🔧 إجمالي أرباح الصيانة:', maintenanceProfit, 'ريال');
+      } catch (error) {
+        console.error('❌ خطأ في جلب أرباح الصيانة:', error);
+        maintenanceProfit = 0;
+      }
+
+      // إضافة أرباح الصيانة إلى الربح الفعلي
+      totalActualProfit += maintenanceProfit;
+      console.log('💰 ربح المبيعات:', totalActualProfit - maintenanceProfit);
+      console.log('💰 أرباح الصيانة:', maintenanceProfit);
+      console.log('💰 إجمالي الربح الفعلي (مبيعات + صيانة):', totalActualProfit);
 
       // حساب نسبة الربح الفعلية
       const actualProfitRatio = totalPurchaseCostAfterTax > 0 ? (totalActualProfit / totalPurchaseCostAfterTax) * 100 : 0;
@@ -490,7 +512,9 @@
       document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
 
       // إضافة معلومات إضافية للتشخيص
-      console.log('💰 ربح المبيعات:', salesProfit);
+      console.log('💰 ربح المبيعات:', totalActualProfit - maintenanceProfit);
+      console.log('💰 أرباح الصيانة:', maintenanceProfit);
+      console.log('💰 إجمالي الربح الفعلي:', totalActualProfit);
       console.log('💰 إيرادات المبيعات:', totalSalesAmount);
 
       // تحديث آخر المبيعات
