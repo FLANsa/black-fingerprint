@@ -211,6 +211,41 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Shop Profits Section -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="summary-card">
+                    <h5><i class="fas fa-store"></i> أرباح المحل من أعمال الصيانة</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="summary-item">
+                                <span>إجمالي المبالغ المحصلة:</span>
+                                <span id="totalRevenue">0.00 ريال</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-item">
+                                <span>إجمالي تكلفة القطع:</span>
+                                <span id="totalPartCosts">0.00 ريال</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-item">
+                                <span>إجمالي عمولة الفنيين:</span>
+                                <span id="totalTechCommissions">0.00 ريال</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="summary-item">
+                                <span class="text-success fw-bold">صافي أرباح المحل:</span>
+                                <span id="totalShopProfit" class="text-success fw-bold">0.00 ريال</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Filters -->
         <div class="filter-section">
@@ -528,6 +563,10 @@
             const totalTechCommissions = totalTechAmount; // عمولة الفنيين
             const totalProfit = [...repsAccounts, ...techsAccounts].reduce((sum, item) => sum + (item.profitSum || 0), 0);
             const totalPayments = totalRepPaid + totalTechPaid;
+            
+            // حساب أرباح المحل: إجمالي المبالغ المحصلة - تكلفة القطع - عمولة الفنيين
+            const totalRevenue = totalProfit + totalPartCosts + totalTechCommissions; // إجمالي المبالغ المحصلة
+            const totalShopProfit = totalRevenue - totalPartCosts - totalTechCommissions; // أرباح المحل
 
             console.log('📊 Summary calculations:');
             console.log('- Total reps:', totalReps);
@@ -536,6 +575,9 @@
             console.log('- Part costs (تكلفة القطع من المندوبين):', totalPartCosts);
             console.log('- Tech commissions (عمولة الفنيين):', totalTechCommissions);
             console.log('- Total payments:', totalPayments);
+            console.log('🏪 Shop profits:');
+            console.log('- Total revenue (إجمالي المبالغ المحصلة):', totalRevenue, '=', totalProfit, '+', totalPartCosts, '+', totalTechCommissions);
+            console.log('- Shop profit (أرباح المحل):', totalShopProfit, '=', totalRevenue, '-', totalPartCosts, '-', totalTechCommissions);
 
             document.getElementById('totalReps').textContent = totalReps;
             document.getElementById('totalRepAmount').textContent = totalRepAmount.toFixed(2) + ' ريال';
@@ -546,6 +588,12 @@
             document.getElementById('totalTechAmount').textContent = totalTechAmount.toFixed(2) + ' ريال';
             document.getElementById('totalTechPaid').textContent = totalTechPaid.toFixed(2) + ' ريال';
             document.getElementById('totalTechBalance').textContent = totalTechBalance.toFixed(2) + ' ريال';
+            
+            // تحديث أرباح المحل
+            document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(2) + ' ريال';
+            document.getElementById('totalPartCosts').textContent = totalPartCosts.toFixed(2) + ' ريال';
+            document.getElementById('totalTechCommissions').textContent = totalTechCommissions.toFixed(2) + ' ريال';
+            document.getElementById('totalShopProfit').textContent = totalShopProfit.toFixed(2) + ' ريال';
             
         }
 
