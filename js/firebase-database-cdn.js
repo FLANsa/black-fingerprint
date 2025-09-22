@@ -835,7 +835,8 @@ class FirebaseDatabase {
             partCostSum: 0,
             profitSum: 0,
             techCommissionSum: 0,
-            shopProfitSum: 0
+            shopProfitSum: 0,
+            revenueSum: 0
           };
         }
         
@@ -844,6 +845,7 @@ class FirebaseDatabase {
         repTotals[job.repId].profitSum += (job.profit || 0);
         repTotals[job.repId].techCommissionSum += (job.techCommission || 0);
         repTotals[job.repId].shopProfitSum += (job.shopProfit || 0);
+        repTotals[job.repId].revenueSum += (job.amountCharged || 0);
       });
 
       const result = Object.values(repTotals);
@@ -882,7 +884,8 @@ class FirebaseDatabase {
             partCostSum: 0,
             profitSum: 0,
             techCommissionSum: 0,
-            shopProfitSum: 0
+            shopProfitSum: 0,
+            revenueSum: 0
           };
         }
         
@@ -891,6 +894,7 @@ class FirebaseDatabase {
         techTotals[job.techId].profitSum += (job.profit || 0);
         techTotals[job.techId].techCommissionSum += (job.techCommission || 0);
         techTotals[job.techId].shopProfitSum += (job.shopProfit || 0);
+        techTotals[job.techId].revenueSum += (job.amountCharged || 0);
       });
 
       const result = Object.values(techTotals);

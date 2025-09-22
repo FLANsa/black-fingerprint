@@ -565,7 +565,8 @@
             const totalPayments = totalRepPaid + totalTechPaid;
             
             // حساب أرباح المحل: إجمالي المبالغ المحصلة - تكلفة القطع - عمولة الفنيين
-            const totalRevenue = totalProfit + totalPartCosts + totalTechCommissions; // إجمالي المبالغ المحصلة
+            // إجمالي المبالغ المحصلة = مجموع amountCharged من جميع أعمال الصيانة المكتملة
+            const totalRevenue = [...repsAccounts, ...techsAccounts].reduce((sum, item) => sum + (item.revenueSum || 0), 0);
             const totalShopProfit = totalRevenue - totalPartCosts - totalTechCommissions; // أرباح المحل
 
             console.log('📊 Summary calculations:');
@@ -576,7 +577,7 @@
             console.log('- Tech commissions (عمولة الفنيين):', totalTechCommissions);
             console.log('- Total payments:', totalPayments);
             console.log('🏪 Shop profits:');
-            console.log('- Total revenue (إجمالي المبالغ المحصلة):', totalRevenue, '=', totalProfit, '+', totalPartCosts, '+', totalTechCommissions);
+            console.log('- Total revenue (إجمالي المبالغ المحصلة):', totalRevenue, '= مجموع amountCharged من أعمال الصيانة');
             console.log('- Shop profit (أرباح المحل):', totalShopProfit, '=', totalRevenue, '-', totalPartCosts, '-', totalTechCommissions);
 
             document.getElementById('totalReps').textContent = totalReps;
