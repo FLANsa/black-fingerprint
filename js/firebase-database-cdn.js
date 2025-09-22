@@ -1,4 +1,4 @@
-// Firebase Database Manager for Phone Store Demo
+// Firebase Database Manager for Phone Store Demo - CDN Version
 import { 
   collection, 
   doc, 
@@ -12,7 +12,7 @@ import {
   orderBy,
   onSnapshot,
   serverTimestamp 
-} from 'firebase/firestore';
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 class FirebaseDatabase {
   constructor() {
@@ -306,17 +306,6 @@ class FirebaseDatabase {
     }
   }
 
-  // ===== تهيئة أشهر أنواع الهواتف (خصوصاً الآيفون) إن كانت القائمة فارغة =====
-  // seedCommonPhoneTypesIfEmpty removed per request
-
-  // نفس القائمة لكن مع دمج تجنّب التكرار وإمكانية الإضافة القسرية
-  // buildCommonPhoneTypesList removed per request
-
-  /**
-   * يضيف أشهر الأنواع مع تجنّب التكرار. إذا كان force=true سيتم محاولة دمج القائمة حتى لو كانت موجودة.
-   */
-  // seedCommonPhoneTypes removed per request
-
   // ===== البحث =====
   async searchPhones(searchTerm) {
     try {
@@ -407,9 +396,6 @@ class FirebaseDatabase {
   // ===== تهيئة البيانات الافتراضية =====
   async initializeDefaultData() {
     try {
-      // لا نضيف أنواع هواتف افتراضية - يجب إضافتها يدوياً من قاعدة البيانات
-      console.log('ℹ️ لا توجد أنواع هواتف افتراضية - يجب إضافتها يدوياً من قاعدة البيانات');
-
       // تهيئة فئات الأكسسوارات
       const defaultCategories = [
         { name: 'accessory', arabic_name: 'إكسسوار', description: 'إكسسوارات عامة' },
