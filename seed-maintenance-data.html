@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="requires-role" content="admin">
+    <title>إنشاء بيانات تجريبية — تجربة النظام للاتصالات</title>
+    
+    <!-- Page Guard -->
+    <script src="js/guard.js"></script>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Scripts -->
+    <script type="module" src="js/firebase-config-cdn.js"></script>
+    <script type="module" src="js/firebase-database-cdn.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f8f9fa; 
+            padding-top: 70px; 
+        }
+        .card { 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
+        }
+        .card-header { 
+            font-weight: 600; 
+        }
+        .btn-primary { 
+            background-color: #2c3e50; 
+            border-color: #2c3e50; 
+        }
+        .btn-primary:hover { 
+            background-color: #1a252f; 
+            border-color: #1a252f; 
+        }
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-seedling text-primary"></i> إنشاء بيانات تجريبية لنظام الصيانة
+                </h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-users"></i> بيانات المندوبين</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>سيتم إنشاء 3 مندوبين تجريبيين</p>
+                        <button class="btn btn-primary" onclick="seedReps()">
+                            <i class="fas fa-plus"></i> إنشاء المندوبين
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-hard-hat"></i> بيانات الفنيين</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>سيتم إنشاء 3 فنيين تجريبيين</p>
+                        <button class="btn btn-success" onclick="seedTechnicians()">
+                            <i class="fas fa-plus"></i> إنشاء الفنيين
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0"><i class="fas fa-wrench"></i> أعمال الصيانة</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>سيتم إنشاء 10 أعمال صيانة تجريبية</p>
+                        <button class="btn btn-warning" onclick="seedJobs()">
+                            <i class="fas fa-plus"></i> إنشاء الأعمال
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-database"></i> جميع البيانات</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>سيتم إنشاء جميع البيانات التجريبية</p>
+                        <button class="btn btn-info" onclick="seedAllData()">
+                            <i class="fas fa-database"></i> إنشاء جميع البيانات
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-info-circle"></i> ملاحظات</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>هذه البيانات تجريبية فقط ولا تؤثر على البيانات الحقيقية</li>
+                            <li>يمكنك حذف هذه البيانات لاحقاً من صفحات الإدارة</li>
+                            <li>تأكد من اتصال Firebase قبل إنشاء البيانات</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sample data
+        const sampleReps = [
+            { name: 'أحمد محمد', phone: '0501234567', email: 'ahmed@example.com', notes: 'مندوب متميز' },
+            { name: 'سارة أحمد', phone: '0502345678', email: 'sara@example.com', notes: 'خبرة 5 سنوات' },
+            { name: 'محمد علي', phone: '0503456789', email: 'mohammed@example.com', notes: 'جديد في العمل' }
+        ];
+
+        const sampleTechnicians = [
+            { name: 'خالد الصالح', phone: '0504567890', email: 'khalid@example.com', defaultCommissionPercent: 0.4, notes: 'فني متخصص في الأجهزة الذكية' },
+            { name: 'نورا العتيبي', phone: '0505678901', email: 'nora@example.com', defaultCommissionPercent: 0.5, notes: 'خبرة في إصلاح الشاشات' },
+            { name: 'عبدالله القحطاني', phone: '0506789012', email: 'abdullah@example.com', defaultCommissionPercent: 0.45, notes: 'متخصص في البطاريات' }
+        ];
+
+        const sampleJobs = [
+            {
+                customerName: 'فاطمة السعد',
+                customerPhone: '0507890123',
+                visitDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                partName: 'شاشة iPhone 14',
+                partCost: 450,
+                amountCharged: 650,
+                status: 'done',
+                notes: 'تم الإصلاح بنجاح'
+            },
+            {
+                customerName: 'سعد المطيري',
+                customerPhone: '0508901234',
+                visitDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                partName: 'بطارية Samsung Galaxy',
+                partCost: 120,
+                amountCharged: 200,
+                status: 'done',
+                notes: 'استبدال البطارية'
+            },
+            {
+                customerName: 'مريم الشمري',
+                customerPhone: '0509012345',
+                visitDate: new Date(),
+                partName: 'كاميرا iPhone 13',
+                partCost: 300,
+                amountCharged: 500,
+                status: 'pending',
+                notes: 'في انتظار القطعة'
+            },
+            {
+                customerName: 'عبدالرحمن النعيمي',
+                customerPhone: '0500123456',
+                visitDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                partName: 'سماعات AirPods',
+                partCost: 80,
+                amountCharged: 150,
+                status: 'done',
+                notes: 'إصلاح السماعات'
+            },
+            {
+                customerName: 'هند العتيبي',
+                customerPhone: '0501234567',
+                visitDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                partName: 'شاحن MacBook',
+                partCost: 200,
+                amountCharged: 350,
+                status: 'done',
+                notes: 'استبدال الشاحن'
+            },
+            {
+                customerName: 'يوسف الحربي',
+                customerPhone: '0502345678',
+                visitDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+                partName: 'لوحة مفاتيح iPad',
+                partCost: 150,
+                amountCharged: 280,
+                status: 'done',
+                notes: 'إصلاح لوحة المفاتيح'
+            },
+            {
+                customerName: 'لينا القحطاني',
+                customerPhone: '0503456789',
+                visitDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+                partName: 'مكبر صوت JBL',
+                partCost: 90,
+                amountCharged: 180,
+                status: 'done',
+                notes: 'إصلاح مكبر الصوت'
+            },
+            {
+                customerName: 'بدر المطيري',
+                customerPhone: '0504567890',
+                visitDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
+                partName: 'شاشة Samsung Galaxy',
+                partCost: 380,
+                amountCharged: 550,
+                status: 'done',
+                notes: 'استبدال الشاشة'
+            },
+            {
+                customerName: 'ريم الشمري',
+                customerPhone: '0505678901',
+                visitDate: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
+                partName: 'كاميرا Samsung',
+                partCost: 250,
+                amountCharged: 420,
+                status: 'done',
+                notes: 'إصلاح الكاميرا'
+            },
+            {
+                customerName: 'عبدالله النعيمي',
+                customerPhone: '0506789012',
+                visitDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                partName: 'سماعات Sony',
+                partCost: 110,
+                amountCharged: 200,
+                status: 'pending',
+                notes: 'في انتظار التشخيص'
+            }
+        ];
+
+        // Seed reps
+        async function seedReps() {
+            try {
+                if (!window.firebaseDatabase) {
+                    showAlert('error', 'Firebase غير متاح');
+                    return;
+                }
+
+                for (const rep of sampleReps) {
+                    await window.firebaseDatabase.addRep(rep);
+                }
+                showAlert('success', 'تم إنشاء المندوبين بنجاح');
+            } catch (error) {
+                console.error('Error seeding reps:', error);
+                showAlert('error', 'حدث خطأ في إنشاء المندوبين');
+            }
+        }
+
+        // Seed technicians
+        async function seedTechnicians() {
+            try {
+                if (!window.firebaseDatabase) {
+                    showAlert('error', 'Firebase غير متاح');
+                    return;
+                }
+
+                for (const tech of sampleTechnicians) {
+                    await window.firebaseDatabase.addTechnician(tech);
+                }
+                showAlert('success', 'تم إنشاء الفنيين بنجاح');
+            } catch (error) {
+                console.error('Error seeding technicians:', error);
+                showAlert('error', 'حدث خطأ في إنشاء الفنيين');
+            }
+        }
+
+        // Seed jobs
+        async function seedJobs() {
+            try {
+                if (!window.firebaseDatabase) {
+                    showAlert('error', 'Firebase غير متاح');
+                    return;
+                }
+
+                // Get reps and techs
+                const [reps, techs] = await Promise.all([
+                    window.firebaseDatabase.getReps(),
+                    window.firebaseDatabase.getTechnicians()
+                ]);
+
+                if (reps.length === 0 || techs.length === 0) {
+                    showAlert('warning', 'يرجى إنشاء المندوبين والفنيين أولاً');
+                    return;
+                }
+
+                for (let i = 0; i < sampleJobs.length; i++) {
+                    const job = sampleJobs[i];
+                    const rep = reps[i % reps.length];
+                    const tech = techs[i % techs.length];
+
+                    const jobData = {
+                        ...job,
+                        repId: rep.id,
+                        repName: rep.name,
+                        techId: tech.id,
+                        techName: tech.name,
+                        techPercent: tech.defaultCommissionPercent // Use tech's default commission
+                    };
+
+                    await window.firebaseDatabase.addMaintenanceJob(jobData);
+                }
+                showAlert('success', 'تم إنشاء أعمال الصيانة بنجاح');
+            } catch (error) {
+                console.error('Error seeding jobs:', error);
+                showAlert('error', 'حدث خطأ في إنشاء أعمال الصيانة');
+            }
+        }
+
+        // Seed all data
+        async function seedAllData() {
+            try {
+                await seedReps();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+                await seedTechnicians();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+                await seedJobs();
+                showAlert('success', 'تم إنشاء جميع البيانات بنجاح');
+            } catch (error) {
+                console.error('Error seeding all data:', error);
+                showAlert('error', 'حدث خطأ في إنشاء البيانات');
+            }
+        }
+
+        // Show alert
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.insertBefore(alertDiv, document.body.firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

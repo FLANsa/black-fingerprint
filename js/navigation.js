@@ -37,12 +37,17 @@ function generateNavigation(role, currentPage = '') {
         `;
     }
 
-    // For regular users - only الرئيسية and تسجيل الخروج
+    // For regular users - الرئيسية, أعمال الصيانة, and تسجيل الخروج
     if (role === 'user') {
         return `
             <li class="nav-item">
                 <a class="nav-link ${currentPage === 'dashboard' ? 'active' : ''}" href="limited_dashboard.html">
                     <i class="fas fa-home"></i> الرئيسية
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link ${currentPage === 'maintenance-jobs' ? 'active' : ''}" href="maintenance-jobs.html">
+                    <i class="fas fa-wrench"></i> أعمال الصيانة
                 </a>
             </li>
             <li class="nav-item">
@@ -90,6 +95,22 @@ function generateNavigation(role, currentPage = '') {
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item ${currentPage === 'add_new_phone' ? 'active' : ''}" href="add_new_phone.html"><i class="fas fa-mobile"></i> هاتف جديد</a></li>
                     <li><a class="dropdown-item ${currentPage === 'add_used_phone' ? 'active' : ''}" href="add_used_phone.html"><i class="fas fa-mobile-alt"></i> هاتف مستعمل</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle ${currentPage.includes('maintenance') ? 'active' : ''}" href="#" id="maintenanceDropdown" role="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-tools"></i> إدارة الصيانة
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item ${currentPage === 'maintenance' ? 'active' : ''}" href="maintenance.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item ${currentPage === 'maintenance-reps' ? 'active' : ''}" href="maintenance-reps.html"><i class="fas fa-users"></i> المندوبين</a></li>
+                    <li><a class="dropdown-item ${currentPage === 'maintenance-technicians' ? 'active' : ''}" href="maintenance-technicians.html"><i class="fas fa-hard-hat"></i> الفنيين</a></li>
+                    <li><a class="dropdown-item ${currentPage === 'maintenance-jobs' ? 'active' : ''}" href="maintenance-jobs.html"><i class="fas fa-wrench"></i> أعمال الصيانة</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item ${currentPage === 'maintenance-settlements' ? 'active' : ''}" href="maintenance-settlements.html"><i class="fas fa-calculator"></i> التسويات</a></li>
+                    <li><a class="dropdown-item ${currentPage === 'maintenance-reports' ? 'active' : ''}" href="maintenance-reports.html"><i class="fas fa-chart-bar"></i> التقارير</a></li>
                 </ul>
             </li>
 

@@ -393,6 +393,388 @@ class FirebaseDatabase {
     );
   }
 
+  // ===== نظام الصيانة =====
+  
+  // ===== إدارة المندوبين =====
+  async addRep(repData) {
+    try {
+      const docRef = await addDoc(collection(this.db, 'reps'), {
+        ...repData,
+        active: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Rep added with ID:', docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error('❌ Error adding rep:', error);
+      throw error;
+    }
+  }
+
+  async getReps() {
+    try {
+      const querySnapshot = await getDocs(collection(this.db, 'reps'));
+      const reps = [];
+      querySnapshot.forEach(doc => {
+        reps.push({ id: doc.id, ...doc.data() });
+      });
+      console.log('✅ Reps loaded:', reps.length);
+      return reps;
+    } catch (error) {
+      console.error('❌ Error getting reps:', error);
+      throw error;
+    }
+  }
+
+  async updateRep(repId, repData) {
+    try {
+      const repRef = doc(this.db, 'reps', repId);
+      await updateDoc(repRef, {
+        ...repData,
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Rep updated:', repId);
+    } catch (error) {
+      console.error('❌ Error updating rep:', error);
+      throw error;
+    }
+  }
+
+  async deleteRep(repId) {
+    try {
+      const repRef = doc(this.db, 'reps', repId);
+      await deleteDoc(repRef);
+      console.log('✅ Rep deleted:', repId);
+    } catch (error) {
+      console.error('❌ Error deleting rep:', error);
+      throw error;
+    }
+  }
+
+  // ===== إدارة الفنيين =====
+  async addTechnician(techData) {
+    try {
+      const docRef = await addDoc(collection(this.db, 'technicians'), {
+        ...techData,
+        active: true,
+        defaultCommissionPercent: techData.defaultCommissionPercent || 0.5,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Technician added with ID:', docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error('❌ Error adding technician:', error);
+      throw error;
+    }
+  }
+
+  async getTechnicians() {
+    try {
+      const querySnapshot = await getDocs(collection(this.db, 'technicians'));
+      const technicians = [];
+      querySnapshot.forEach(doc => {
+        technicians.push({ id: doc.id, ...doc.data() });
+      });
+      console.log('✅ Technicians loaded:', technicians.length);
+      return technicians;
+    } catch (error) {
+      console.error('❌ Error getting technicians:', error);
+      throw error;
+    }
+  }
+
+  async updateTechnician(techId, techData) {
+    try {
+      const techRef = doc(this.db, 'technicians', techId);
+      await updateDoc(techRef, {
+        ...techData,
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Technician updated:', techId);
+    } catch (error) {
+      console.error('❌ Error updating technician:', error);
+      throw error;
+    }
+  }
+
+  async deleteTechnician(techId) {
+    try {
+      const techRef = doc(this.db, 'technicians', techId);
+      await deleteDoc(techRef);
+      console.log('✅ Technician deleted:', techId);
+    } catch (error) {
+      console.error('❌ Error deleting technician:', error);
+      throw error;
+    }
+  }
+
+  // ===== أعمال الصيانة =====
+  async addMaintenanceJob(jobData) {
+    try {
+      // حساب الأرباح
+      const profit = this.calcProfit(jobData.partCost, jobData.amountCharged);
+      const techCommission = this.calcTechCommission(profit, jobData.techPercent);
+      const shopProfit = this.calcShopProfit(profit, techCommission);
+
+      const docRef = await addDoc(collection(this.db, 'maintenanceJobs'), {
+        ...jobData,
+        profit,
+        techCommission,
+        shopProfit,
+        status: 'pending',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Maintenance job added with ID:', docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error('❌ Error adding maintenance job:', error);
+      throw error;
+    }
+  }
+
+  async getMaintenanceJobs(filters = {}) {
+    try {
+      let query = collection(this.db, 'maintenanceJobs');
+      
+      // تطبيق الفلاتر
+      if (filters.status) {
+        query = query(query, where('status', '==', filters.status));
+      }
+      
+      if (filters.repId) {
+        query = query(query, where('repId', '==', filters.repId));
+      }
+      
+      if (filters.techId) {
+        query = query(query, where('techId', '==', filters.techId));
+      }
+      
+      if (filters.dateFrom) {
+        query = query(query, where('visitDate', '>=', filters.dateFrom));
+      }
+      
+      if (filters.dateTo) {
+        query = query(query, where('visitDate', '<=', filters.dateTo));
+      }
+
+      const querySnapshot = await getDocs(query);
+      const jobs = [];
+      querySnapshot.forEach(doc => {
+        jobs.push({ id: doc.id, ...doc.data() });
+      });
+      
+      console.log('✅ Maintenance jobs loaded:', jobs.length);
+      return jobs;
+    } catch (error) {
+      console.error('❌ Error getting maintenance jobs:', error);
+      throw error;
+    }
+  }
+
+  async updateMaintenanceJob(jobId, jobData) {
+    try {
+      // إعادة حساب الأرباح إذا تغيرت القيم
+      if (jobData.partCost !== undefined || jobData.amountCharged !== undefined || jobData.techPercent !== undefined) {
+        const currentJob = await this.getMaintenanceJob(jobId);
+        const partCost = jobData.partCost !== undefined ? jobData.partCost : currentJob.partCost;
+        const amountCharged = jobData.amountCharged !== undefined ? jobData.amountCharged : currentJob.amountCharged;
+        const techPercent = jobData.techPercent !== undefined ? jobData.techPercent : currentJob.techPercent;
+        
+        const profit = this.calcProfit(partCost, amountCharged);
+        const techCommission = this.calcTechCommission(profit, techPercent);
+        const shopProfit = this.calcShopProfit(profit, techCommission);
+        
+        jobData.profit = profit;
+        jobData.techCommission = techCommission;
+        jobData.shopProfit = shopProfit;
+      }
+
+      const jobRef = doc(this.db, 'maintenanceJobs', jobId);
+      await updateDoc(jobRef, {
+        ...jobData,
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Maintenance job updated:', jobId);
+    } catch (error) {
+      console.error('❌ Error updating maintenance job:', error);
+      throw error;
+    }
+  }
+
+  async getMaintenanceJob(jobId) {
+    try {
+      const jobRef = doc(this.db, 'maintenanceJobs', jobId);
+      const jobSnap = await getDoc(jobRef);
+      if (jobSnap.exists()) {
+        return { id: jobSnap.id, ...jobSnap.data() };
+      } else {
+        throw new Error('Job not found');
+      }
+    } catch (error) {
+      console.error('❌ Error getting maintenance job:', error);
+      throw error;
+    }
+  }
+
+  async deleteMaintenanceJob(jobId) {
+    try {
+      const jobRef = doc(this.db, 'maintenanceJobs', jobId);
+      await deleteDoc(jobRef);
+      console.log('✅ Maintenance job deleted:', jobId);
+    } catch (error) {
+      console.error('❌ Error deleting maintenance job:', error);
+      throw error;
+    }
+  }
+
+  // ===== التسويات =====
+  async createSettlement(settlementData) {
+    try {
+      const docRef = await addDoc(collection(this.db, 'settlements'), {
+        ...settlementData,
+        status: 'open',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Settlement created with ID:', docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error('❌ Error creating settlement:', error);
+      throw error;
+    }
+  }
+
+  async getSettlements(filters = {}) {
+    try {
+      let query = collection(this.db, 'settlements');
+      
+      if (filters.type) {
+        query = query(query, where('type', '==', filters.type));
+      }
+      
+      if (filters.status) {
+        query = query(query, where('status', '==', filters.status));
+      }
+
+      const querySnapshot = await getDocs(query);
+      const settlements = [];
+      querySnapshot.forEach(doc => {
+        settlements.push({ id: doc.id, ...doc.data() });
+      });
+      
+      console.log('✅ Settlements loaded:', settlements.length);
+      return settlements;
+    } catch (error) {
+      console.error('❌ Error getting settlements:', error);
+      throw error;
+    }
+  }
+
+  async markSettlementPaid(settlementId, notes = '') {
+    try {
+      const settlementRef = doc(this.db, 'settlements', settlementId);
+      await updateDoc(settlementRef, {
+        status: 'paid',
+        paidAt: serverTimestamp(),
+        notes,
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Settlement marked as paid:', settlementId);
+    } catch (error) {
+      console.error('❌ Error marking settlement as paid:', error);
+      throw error;
+    }
+  }
+
+  // ===== دوال الحساب =====
+  calcProfit(partCost, amountCharged) {
+    return Math.max(0, Number((amountCharged - partCost).toFixed(2)));
+  }
+
+  calcTechCommission(profit, percent) {
+    return Number((profit * percent).toFixed(2));
+  }
+
+  calcShopProfit(profit, techCommission) {
+    return Number((profit - techCommission).toFixed(2));
+  }
+
+  // ===== تقارير التسويات =====
+  async getRepSettlements(dateFrom, dateTo) {
+    try {
+      const jobs = await this.getMaintenanceJobs({
+        status: 'done',
+        dateFrom,
+        dateTo
+      });
+
+      const repTotals = {};
+      jobs.forEach(job => {
+        if (!repTotals[job.repId]) {
+          repTotals[job.repId] = {
+            repId: job.repId,
+            repName: job.repName,
+            jobsCount: 0,
+            partCostSum: 0,
+            profitSum: 0,
+            techCommissionSum: 0,
+            shopProfitSum: 0
+          };
+        }
+        
+        repTotals[job.repId].jobsCount++;
+        repTotals[job.repId].partCostSum += job.partCost;
+        repTotals[job.repId].profitSum += job.profit;
+        repTotals[job.repId].techCommissionSum += job.techCommission;
+        repTotals[job.repId].shopProfitSum += job.shopProfit;
+      });
+
+      return Object.values(repTotals);
+    } catch (error) {
+      console.error('❌ Error getting rep settlements:', error);
+      throw error;
+    }
+  }
+
+  async getTechSettlements(dateFrom, dateTo) {
+    try {
+      const jobs = await this.getMaintenanceJobs({
+        status: 'done',
+        dateFrom,
+        dateTo
+      });
+
+      const techTotals = {};
+      jobs.forEach(job => {
+        if (!techTotals[job.techId]) {
+          techTotals[job.techId] = {
+            techId: job.techId,
+            techName: job.techName,
+            jobsCount: 0,
+            partCostSum: 0,
+            profitSum: 0,
+            techCommissionSum: 0,
+            shopProfitSum: 0
+          };
+        }
+        
+        techTotals[job.techId].jobsCount++;
+        techTotals[job.techId].partCostSum += job.partCost;
+        techTotals[job.techId].profitSum += job.profit;
+        techTotals[job.techId].techCommissionSum += job.techCommission;
+        techTotals[job.techId].shopProfitSum += job.shopProfit;
+      });
+
+      return Object.values(techTotals);
+    } catch (error) {
+      console.error('❌ Error getting tech settlements:', error);
+      throw error;
+    }
+  }
+
   // ===== تهيئة البيانات الافتراضية =====
   async initializeDefaultData() {
     try {
