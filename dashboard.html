@@ -109,6 +109,40 @@
     </div>
   </div>
 
+  <!-- Maintenance Profit Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card bg-secondary text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-tools fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">أرباح الصيانة</h6>
+          <h3 class="mb-0" id="maintenance_profit">0</h3>
+          <small>ريال</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-dark text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-calculator fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">إجمالي الربح</h6>
+          <h3 class="mb-0" id="total_combined_profit">0</h3>
+          <small>ريال (مبيعات + صيانة)</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card bg-info text-white h-100">
+        <div class="card-body text-center py-3">
+          <i class="fas fa-percentage fa-2x mb-2"></i>
+          <h6 class="card-title mb-1">نسبة الربح الإجمالية</h6>
+          <h3 class="mb-0" id="total_profit_ratio">0%</h3>
+          <small>من إجمالي الإيرادات</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Financial Details Cards -->
   <div class="row mb-4">
     <div class="col-md-4">
@@ -246,9 +280,9 @@
     </div>
   </div>
 
-  <!-- Recent Sales -->
+  <!-- Recent Sales and Maintenance -->
   <div class="row">
-    <div class="col-12">
+    <div class="col-md-6">
       <div class="card">
         <div class="card-header bg-success text-white">
           <h5 class="mb-0"><i class="fas fa-history"></i> آخر المبيعات</h5>
@@ -258,6 +292,19 @@
           <div class="text-center py-4">
             <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
             <h5 class="text-muted">لا توجد مبيعات حديثة</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0"><i class="fas fa-tools"></i> آخر أعمال الصيانة</h5>
+        </div>
+        <div class="card-body" id="recent_maintenance_wrap">
+          <div class="text-center py-4">
+            <i class="fas fa-wrench fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">لا توجد أعمال صيانة حديثة</h5>
           </div>
         </div>
       </div>
@@ -460,9 +507,10 @@
       const totalSalesSubtotal = effectiveSales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
       const totalVatAmount = effectiveSales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
 
-      // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة
+      // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة + أرباح الصيانة
       let totalActualProfit = 0;
       let totalPurchaseCostAfterTax = 0;
+      let maintenanceProfit = 0;
       
       effectiveSales.forEach(sale => {
         if (sale.items && Array.isArray(sale.items)) {
@@ -496,6 +544,19 @@
         }
       });
 
+      // جلب أرباح الصيانة من قاعدة البيانات
+      try {
+        const maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
+        maintenanceProfit = maintenanceJobs.reduce((sum, job) => sum + (job.shopProfit || 0), 0);
+        console.log('🔧 أرباح الصيانة:', maintenanceProfit);
+      } catch (error) {
+        console.error('خطأ في جلب أرباح الصيانة:', error);
+        maintenanceProfit = 0;
+      }
+
+      // إضافة أرباح الصيانة إلى الربح الفعلي
+      totalActualProfit += maintenanceProfit;
+
       // حساب نسبة الربح الفعلية
       const actualProfitRatio = totalPurchaseCostAfterTax > 0 ? (totalActualProfit / totalPurchaseCostAfterTax) * 100 : 0;
 
@@ -513,12 +574,76 @@
       // حساب نسبة الربح
       document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
 
+      // تحديث كروت الصيانة
+      document.getElementById('maintenance_profit').textContent = convertToLatinNumbers(maintenanceProfit.toFixed(2)) + ' ريال';
+      
+      // حساب إجمالي الربح (مبيعات + صيانة)
+      const salesProfit = totalActualProfit - maintenanceProfit;
+      const totalCombinedProfit = salesProfit + maintenanceProfit;
+      document.getElementById('total_combined_profit').textContent = convertToLatinNumbers(totalCombinedProfit.toFixed(2)) + ' ريال';
+      
+      // حساب نسبة الربح الإجمالية
+      const totalRevenue = totalSalesAmount + (maintenanceJobs ? maintenanceJobs.reduce((sum, job) => sum + (job.amountCharged || 0), 0) : 0);
+      const totalProfitRatio = totalRevenue > 0 ? (totalCombinedProfit / totalRevenue) * 100 : 0;
+      document.getElementById('total_profit_ratio').textContent = convertToLatinNumbers(totalProfitRatio.toFixed(1)) + '%';
+
       // تحديث آخر المبيعات
       updateRecentSales(effectiveSales);
+      
+      // تحديث آخر أعمال الصيانة
+      updateRecentMaintenance(maintenanceJobs || []);
 
     } catch (error) {
       console.error('خطأ في تحديث لوحة التحكم:', error);
     }
+  }
+
+  // تحديث قسم آخر أعمال الصيانة
+  function updateRecentMaintenance(maintenanceJobs) {
+    const recentMaintenanceContainer = document.getElementById('recent_maintenance_wrap');
+    
+    if (!maintenanceJobs || maintenanceJobs.length === 0) {
+      recentMaintenanceContainer.innerHTML = `
+        <div class="text-center py-4">
+          <i class="fas fa-wrench fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">لا توجد أعمال صيانة حديثة</h5>
+        </div>
+      `;
+      return;
+    }
+
+    // ترتيب أعمال الصيانة حسب التاريخ (الأحدث أولاً) واختيار آخر 5
+    const sortedJobs = maintenanceJobs
+      .sort((a, b) => {
+        const dateA = a.visitDate?.seconds ? new Date(a.visitDate.seconds * 1000) : new Date(a.visitDate || 0);
+        const dateB = b.visitDate?.seconds ? new Date(b.visitDate.seconds * 1000) : new Date(b.visitDate || 0);
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+
+    let maintenanceHTML = '';
+    
+    sortedJobs.forEach(job => {
+      const visitDate = job.visitDate?.seconds ? new Date(job.visitDate.seconds * 1000) : new Date(job.visitDate || 0);
+      const statusBadge = job.status === 'done' ? 'bg-success' : job.status === 'pending' ? 'bg-warning' : 'bg-secondary';
+      const statusText = job.status === 'done' ? 'مكتمل' : job.status === 'pending' ? 'معلق' : 'غير محدد';
+      
+      maintenanceHTML += `
+        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+          <div>
+            <h6 class="mb-1">${job.customerName || 'غير محدد'}</h6>
+            <small class="text-muted">${job.deviceType || 'غير محدد'} - ${job.deviceBrand || 'غير محدد'}</small>
+            <br><small class="text-muted">${visitDate.toLocaleDateString('ar-SA')}</small>
+          </div>
+          <div class="text-end">
+            <span class="badge ${statusBadge} mb-1">${statusText}</span>
+            <br><strong class="text-success">${(job.shopProfit || 0).toFixed(2)} ريال</strong>
+          </div>
+        </div>
+      `;
+    });
+
+    recentMaintenanceContainer.innerHTML = maintenanceHTML;
   }
 
   // تحديث قسم آخر المبيعات
