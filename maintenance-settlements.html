@@ -309,28 +309,47 @@
             const today = new Date();
             const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
             
-            document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-            document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+            // Set default dates for both tabs
+            const repDateTo = document.getElementById('repDateTo');
+            const repDateFrom = document.getElementById('repDateFrom');
+            const techDateTo = document.getElementById('techDateTo');
+            const techDateFrom = document.getElementById('techDateFrom');
+            
+            if (repDateTo) repDateTo.value = today.toISOString().split('T')[0];
+            if (repDateFrom) repDateFrom.value = thirtyDaysAgo.toISOString().split('T')[0];
+            if (techDateTo) techDateTo.value = today.toISOString().split('T')[0];
+            if (techDateFrom) techDateFrom.value = thirtyDaysAgo.toISOString().split('T')[0];
+            
+            // Add event listeners
+            document.getElementById('applyRepFilter').addEventListener('click', loadRepSettlements);
+            document.getElementById('applyTechFilter').addEventListener('click', loadTechSettlements);
             
             // Initialize navigation
             if (typeof initNavigation === 'function') {
                 initNavigation('maintenance-settlements');
             }
+            
+            // Wait a bit for Firebase to initialize, then load data
+            setTimeout(() => {
+                loadRepSettlements();
+                loadTechSettlements();
+            }, 1000);
         });
 
-        // Load settlements
-        async function loadSettlements() {
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
+        // Load reps settlements
+        async function loadRepSettlements() {
+            const dateFrom = document.getElementById('repDateFrom').value;
+            const dateTo = document.getElementById('repDateTo').value;
 
             if (!dateFrom || !dateTo) {
-                showAlert('warning', 'يرجى تحديد الفترة الزمنية');
+                showAlert('warning', 'يرجى تحديد الفترة الزمنية للمندوبين');
                 return;
             }
 
             try {
                 if (!window.firebaseDatabase) {
                     console.error('Firebase database not initialized');
+                    showAlert('error', 'خطأ في الاتصال بقاعدة البيانات - يرجى المحاولة مرة أخرى');
                     return;
                 }
 
@@ -338,18 +357,44 @@
                 const toDate = new Date(dateTo);
                 toDate.setHours(23, 59, 59, 999); // End of day
 
-                [repsSettlements, techsSettlements] = await Promise.all([
-                    window.firebaseDatabase.getRepSettlements(fromDate, toDate),
-                    window.firebaseDatabase.getTechSettlements(fromDate, toDate)
-                ]);
-
-                displaySummary();
+                console.log('Loading rep settlements from', fromDate, 'to', toDate);
+                repsSettlements = await window.firebaseDatabase.getRepSettlements(fromDate, toDate);
+                console.log('Rep settlements loaded:', repsSettlements);
                 displayRepsSettlements();
-                displayTechsSettlements();
-                document.getElementById('summaryCards').style.display = 'block';
             } catch (error) {
-                console.error('Error loading settlements:', error);
-                showAlert('error', 'حدث خطأ في تحميل التسويات');
+                console.error('Error loading rep settlements:', error);
+                showAlert('error', 'حدث خطأ في تحميل تسويات المندوبين');
+            }
+        }
+
+        // Load techs settlements
+        async function loadTechSettlements() {
+            const dateFrom = document.getElementById('techDateFrom').value;
+            const dateTo = document.getElementById('techDateTo').value;
+
+            if (!dateFrom || !dateTo) {
+                showAlert('warning', 'يرجى تحديد الفترة الزمنية للفنيين');
+                return;
+            }
+
+            try {
+                if (!window.firebaseDatabase) {
+                    console.error('Firebase database not initialized');
+                    showAlert('error', 'خطأ في الاتصال بقاعدة البيانات - يرجى المحاولة مرة أخرى');
+                    return;
+                }
+
+                const fromDate = new Date(dateFrom);
+                const toDate = new Date(dateTo);
+                toDate.setHours(23, 59, 59, 999); // End of day
+
+                console.log('Loading tech settlements from', fromDate, 'to', toDate);
+                techsSettlements = await window.firebaseDatabase.getTechSettlements(fromDate, toDate);
+                console.log('Tech settlements loaded:', techsSettlements);
+                displayTechsSettlements();
+            } catch (error) {
+                console.error('Error loading tech settlements:', error);
+                showAlert('error', 'حدث خطأ في تحميل تسويات الفنيين');
             }
         }
 
@@ -373,24 +418,29 @@
         // Display reps settlements
         function displayRepsSettlements() {
             const tbody = document.getElementById('repsSettlements');
+            if (!tbody) {
+                console.error('repsSettlements element not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
 
             if (repsSettlements.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">لا توجد بيانات</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">لا توجد بيانات للمندوبين</td></tr>';
                 return;
             }
 
             repsSettlements.forEach(rep => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${rep.repName}</td>
-                    <td>${rep.jobsCount}</td>
-                    <td class="amount-positive">${rep.partCostSum.toFixed(2)} ريال</td>
-                    <td class="amount-positive">${rep.profitSum.toFixed(2)} ريال</td>
-                    <td class="amount-negative">${rep.techCommissionSum.toFixed(2)} ريال</td>
-                    <td class="amount-positive">${rep.shopProfitSum.toFixed(2)} ريال</td>
+                    <td>${rep.repName || 'غير محدد'}</td>
+                    <td>${rep.jobsCount || 0}</td>
+                    <td class="amount-positive">${(rep.partCostSum || 0).toFixed(2)} ريال</td>
+                    <td class="amount-positive">${(rep.profitSum || 0).toFixed(2)} ريال</td>
+                    <td class="amount-negative">${(rep.techCommissionSum || 0).toFixed(2)} ريال</td>
+                    <td class="amount-positive">${(rep.shopProfitSum || 0).toFixed(2)} ريال</td>
                     <td>
-                        <button class="btn btn-sm btn-success" onclick="openMarkPaidModal('rep', '${rep.repId}', '${rep.partCostSum.toFixed(2)}')">
+                        <button class="btn btn-sm btn-success" onclick="openMarkPaidModal('rep', '${rep.repId}', '${(rep.partCostSum || 0).toFixed(2)}')">
                             <i class="fas fa-check"></i> تسوية مدفوعة
                         </button>
                     </td>
@@ -402,24 +452,29 @@
         // Display techs settlements
         function displayTechsSettlements() {
             const tbody = document.getElementById('techsSettlements');
+            if (!tbody) {
+                console.error('techsSettlements element not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
 
             if (techsSettlements.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center">لا توجد بيانات</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">لا توجد بيانات للفنيين</td></tr>';
                 return;
             }
 
             techsSettlements.forEach(tech => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${tech.techName}</td>
-                    <td>${tech.jobsCount}</td>
-                    <td class="amount-negative">${tech.partCostSum.toFixed(2)} ريال</td>
-                    <td class="amount-positive">${tech.profitSum.toFixed(2)} ريال</td>
-                    <td class="amount-positive">${tech.techCommissionSum.toFixed(2)} ريال</td>
-                    <td class="amount-positive">${tech.shopProfitSum.toFixed(2)} ريال</td>
+                    <td>${tech.techName || 'غير محدد'}</td>
+                    <td>${tech.jobsCount || 0}</td>
+                    <td class="amount-positive">${(tech.techCommissionSum || 0).toFixed(2)} ريال</td>
+                    <td class="amount-positive">${(tech.profitSum || 0).toFixed(2)} ريال</td>
+                    <td class="amount-positive">${(tech.partCostSum || 0).toFixed(2)} ريال</td>
+                    <td class="amount-positive">${(tech.shopProfitSum || 0).toFixed(2)} ريال</td>
                     <td>
-                        <button class="btn btn-sm btn-success" onclick="openMarkPaidModal('tech', '${tech.techId}', '${tech.techCommissionSum.toFixed(2)}')">
+                        <button class="btn btn-sm btn-success" onclick="openMarkPaidModal('tech', '${tech.techId}', '${(tech.techCommissionSum || 0).toFixed(2)}')">
                             <i class="fas fa-check"></i> تسوية مدفوعة
                         </button>
                     </td>
@@ -514,7 +569,7 @@
         }
 
         // Show alert
-        function showAlert(type, message) {
+        function showAlert(message, type) {
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
             alertDiv.innerHTML = `
@@ -522,10 +577,19 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             
-            document.body.insertBefore(alertDiv, document.body.firstChild);
+            // Insert at the top of the container
+            const container = document.querySelector('.container');
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+            } else {
+                document.body.insertBefore(alertDiv, document.body.firstChild);
+            }
             
+            // Auto dismiss after 5 seconds
             setTimeout(() => {
-                alertDiv.remove();
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
             }, 5000);
         }
     </script>
