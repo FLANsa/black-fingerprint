@@ -548,12 +548,24 @@
       try {
         const maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
         maintenanceProfit = maintenanceJobs.reduce((sum, job) => sum + (job.shopProfit || 0), 0);
-        console.log('🔧 أرباح الصيانة:', maintenanceProfit);
+        console.log('🔧 أرباح الصيانة (shopProfit):', maintenanceProfit);
+        console.log('🔧 تفاصيل أعمال الصيانة:', maintenanceJobs.map(job => ({
+          customer: job.customerName,
+          amountCharged: job.amountCharged,
+          partCost: job.partCost,
+          profit: job.profit,
+          techCommission: job.techCommission,
+          shopProfit: job.shopProfit,
+          calculation: `${job.amountCharged} - ${job.partCost} = ${job.profit}, ${job.profit} - ${job.techCommission} = ${job.shopProfit}`
+        })));
       } catch (error) {
         console.error('خطأ في جلب أرباح الصيانة:', error);
         maintenanceProfit = 0;
       }
 
+      // حساب ربح المبيعات فقط (بدون الصيانة)
+      const salesProfit = totalActualProfit;
+      
       // إضافة أرباح الصيانة إلى الربح الفعلي
       totalActualProfit += maintenanceProfit;
 
@@ -578,14 +590,24 @@
       document.getElementById('maintenance_profit').textContent = convertToLatinNumbers(maintenanceProfit.toFixed(2)) + ' ريال';
       
       // حساب إجمالي الربح (مبيعات + صيانة)
-      const salesProfit = totalActualProfit - maintenanceProfit;
       const totalCombinedProfit = salesProfit + maintenanceProfit;
       document.getElementById('total_combined_profit').textContent = convertToLatinNumbers(totalCombinedProfit.toFixed(2)) + ' ريال';
       
+      // حساب الإيرادات الإجمالية (مبيعات + صيانة)
+      const maintenanceRevenue = maintenanceJobs ? maintenanceJobs.reduce((sum, job) => sum + (job.amountCharged || 0), 0) : 0;
+      const totalRevenue = totalSalesAmount + maintenanceRevenue;
+      
       // حساب نسبة الربح الإجمالية
-      const totalRevenue = totalSalesAmount + (maintenanceJobs ? maintenanceJobs.reduce((sum, job) => sum + (job.amountCharged || 0), 0) : 0);
       const totalProfitRatio = totalRevenue > 0 ? (totalCombinedProfit / totalRevenue) * 100 : 0;
       document.getElementById('total_profit_ratio').textContent = convertToLatinNumbers(totalProfitRatio.toFixed(1)) + '%';
+      
+      // إضافة معلومات إضافية للتشخيص
+      console.log('💰 ربح المبيعات:', salesProfit);
+      console.log('💰 أرباح الصيانة:', maintenanceProfit);
+      console.log('💰 إجمالي الربح:', totalCombinedProfit);
+      console.log('💰 إيرادات المبيعات:', totalSalesAmount);
+      console.log('💰 إيرادات الصيانة:', maintenanceRevenue);
+      console.log('💰 إجمالي الإيرادات:', totalRevenue);
 
       // تحديث آخر المبيعات
       updateRecentSales(effectiveSales);
