@@ -210,27 +210,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="summary-card">
-                    <h5><i class="fas fa-store"></i> المحل</h5>
-                    <div class="summary-item">
-                        <span>إجمالي الربح:</span>
-                        <span id="totalShopProfit">0.00 ريال</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>إجمالي الإيرادات:</span>
-                        <span id="totalRevenue">0.00 ريال</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>إجمالي المدفوعات:</span>
-                        <span id="totalPayments">0.00 ريال</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>صافي الربح:</span>
-                        <span id="netProfit">0.00 ريال</span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Filters -->
@@ -544,15 +523,11 @@
             const totalTechPaid = techsAccounts.reduce((sum, tech) => sum + (tech.totalPaid || 0), 0);
             const totalTechBalance = totalTechAmount - totalTechPaid;
             
-            // حساب أرباح المحل الصحيح: إجمالي المبالغ المحصلة - تكلفة القطع من المندوبين - عمولة الفنيين
-            // إجمالي المبالغ المحصلة = إجمالي الأرباح + تكلفة القطع + عمولة الفنيين
+            // حساب المبالغ الأساسية فقط
             const totalPartCosts = totalRepAmount; // تكلفة القطع من المندوبين
             const totalTechCommissions = totalTechAmount; // عمولة الفنيين
             const totalProfit = [...repsAccounts, ...techsAccounts].reduce((sum, item) => sum + (item.profitSum || 0), 0);
-            const totalRevenue = totalProfit + totalPartCosts + totalTechCommissions; // إجمالي المبالغ المحصلة
-            const totalShopProfit = totalRevenue - totalPartCosts - totalTechCommissions; // أرباح المحل
             const totalPayments = totalRepPaid + totalTechPaid;
-            const netProfit = totalShopProfit - totalPayments;
 
             console.log('📊 Summary calculations:');
             console.log('- Total reps:', totalReps);
@@ -560,8 +535,6 @@
             console.log('- Total profit (إجمالي الأرباح):', totalProfit);
             console.log('- Part costs (تكلفة القطع من المندوبين):', totalPartCosts);
             console.log('- Tech commissions (عمولة الفنيين):', totalTechCommissions);
-            console.log('- Total revenue (إجمالي المبالغ المحصلة):', totalRevenue, '=', totalProfit, '+', totalPartCosts, '+', totalTechCommissions);
-            console.log('- Shop profit (أرباح المحل):', totalShopProfit, '=', totalRevenue, '-', totalPartCosts, '-', totalTechCommissions);
             console.log('- Total payments:', totalPayments);
 
             document.getElementById('totalReps').textContent = totalReps;
@@ -574,10 +547,6 @@
             document.getElementById('totalTechPaid').textContent = totalTechPaid.toFixed(2) + ' ريال';
             document.getElementById('totalTechBalance').textContent = totalTechBalance.toFixed(2) + ' ريال';
             
-            document.getElementById('totalShopProfit').textContent = totalShopProfit.toFixed(2) + ' ريال';
-            document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(2) + ' ريال';
-            document.getElementById('totalPayments').textContent = totalPayments.toFixed(2) + ' ريال';
-            document.getElementById('netProfit').textContent = netProfit.toFixed(2) + ' ريال';
         }
 
         // Display reps accounts
