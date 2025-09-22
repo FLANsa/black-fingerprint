@@ -1,6 +1,6 @@
 services:
   - type: static
-    name: alsaqri-phones
+    name: phone-store-demo
     buildCommand: echo "No build required for static site"
     staticPublishPath: ./
     routes:
