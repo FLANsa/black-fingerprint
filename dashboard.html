@@ -109,40 +109,6 @@
     </div>
   </div>
 
-  <!-- Maintenance Profit Cards -->
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <div class="card bg-secondary text-white h-100">
-        <div class="card-body text-center py-3">
-          <i class="fas fa-tools fa-2x mb-2"></i>
-          <h6 class="card-title mb-1">أرباح الصيانة</h6>
-          <h3 class="mb-0" id="maintenance_profit">0</h3>
-          <small>ريال</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card bg-dark text-white h-100">
-        <div class="card-body text-center py-3">
-          <i class="fas fa-calculator fa-2x mb-2"></i>
-          <h6 class="card-title mb-1">إجمالي الربح</h6>
-          <h3 class="mb-0" id="total_combined_profit">0</h3>
-          <small>ريال (مبيعات + صيانة)</small>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card bg-info text-white h-100">
-        <div class="card-body text-center py-3">
-          <i class="fas fa-percentage fa-2x mb-2"></i>
-          <h6 class="card-title mb-1">نسبة الربح الإجمالية</h6>
-          <h3 class="mb-0" id="total_profit_ratio">0%</h3>
-          <small>من إجمالي الإيرادات</small>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Financial Details Cards -->
   <div class="row mb-4">
     <div class="col-md-4">
@@ -494,10 +460,9 @@
       const totalSalesSubtotal = effectiveSales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
       const totalVatAmount = effectiveSales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
 
-      // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة + أرباح الصيانة
+      // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة
       let totalActualProfit = 0;
       let totalPurchaseCostAfterTax = 0;
-      let maintenanceProfit = 0;
       
       effectiveSales.forEach(sale => {
         if (sale.items && Array.isArray(sale.items)) {
@@ -531,77 +496,8 @@
         }
       });
 
-      // جلب أرباح الصيانة من قاعدة البيانات
-      let maintenanceJobs = [];
-      try {
-        console.log('🔍 بدء جلب أعمال الصيانة...');
-        console.log('🔍 Firebase Database متاح:', !!window.firebaseDatabase);
-        
-        maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
-        console.log('🔍 تم جلب أعمال الصيانة:', maintenanceJobs.length, 'عمل');
-        
-        // فحص تفصيلي لكل عمل
-        maintenanceJobs.forEach((job, index) => {
-          console.log(`🔍 عمل صيانة ${index + 1}:`, {
-            id: job.id,
-            customer: job.customerName,
-            status: job.status,
-            amountCharged: job.amountCharged,
-            partCost: job.partCost,
-            profit: job.profit,
-            techCommission: job.techCommission,
-            shopProfit: job.shopProfit,
-            hasShopProfit: 'shopProfit' in job,
-            shopProfitType: typeof job.shopProfit
-          });
-        });
-        
-        maintenanceProfit = maintenanceJobs.reduce((sum, job) => {
-          const shopProfit = job.shopProfit || 0;
-          console.log(`🔧 حساب shopProfit: ${job.customerName} = ${shopProfit}`);
-          return sum + shopProfit;
-        }, 0);
-        
-        console.log('🔧 أرباح الصيانة النهائية (shopProfit):', maintenanceProfit);
-        console.log('🔧 عدد أعمال الصيانة المكتملة:', maintenanceJobs.length);
-        
-        // اختبار حساب بديل
-        const alternativeCalculation = maintenanceJobs.reduce((sum, job) => {
-          const amountCharged = Number(job.amountCharged) || 0;
-          const partCost = Number(job.partCost) || 0;
-          const profit = Math.max(0, amountCharged - partCost);
-          const techCommission = Number(job.techCommission) || 0;
-          const shopProfit = Math.max(0, profit - techCommission);
-          console.log(`🔧 حساب بديل: ${job.customerName} = ${amountCharged} - ${partCost} = ${profit}, ${profit} - ${techCommission} = ${shopProfit}`);
-          return sum + shopProfit;
-        }, 0);
-        
-        console.log('🔧 حساب بديل لأرباح الصيانة:', alternativeCalculation);
-        
-        // استخدام الحساب البديل إذا كان أفضل
-        if (alternativeCalculation > maintenanceProfit) {
-          console.log('🔧 استخدام الحساب البديل لأنه أعلى');
-          maintenanceProfit = alternativeCalculation;
-        }
-        
-      } catch (error) {
-        console.error('❌ خطأ في جلب أرباح الصيانة:', error);
-        console.error('❌ تفاصيل الخطأ:', error.message);
-        console.error('❌ stack trace:', error.stack);
-        maintenanceProfit = 0;
-        maintenanceJobs = [];
-      }
-
-      // حساب ربح المبيعات فقط (بدون الصيانة)
+      // حساب ربح المبيعات
       const salesProfit = totalActualProfit;
-      
-      console.log('💰 ربح المبيعات قبل إضافة الصيانة:', salesProfit);
-      console.log('💰 أرباح الصيانة المراد إضافتها:', maintenanceProfit);
-      
-      // إضافة أرباح الصيانة إلى الربح الفعلي
-      totalActualProfit += maintenanceProfit;
-      
-      console.log('💰 صافي الربح بعد إضافة الصيانة:', totalActualProfit);
 
       // حساب نسبة الربح الفعلية
       const actualProfitRatio = totalPurchaseCostAfterTax > 0 ? (totalActualProfit / totalPurchaseCostAfterTax) * 100 : 0;
@@ -620,30 +516,9 @@
       // حساب نسبة الربح
       document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
 
-      // تحديث كروت الصيانة
-      document.getElementById('maintenance_profit').textContent = convertToLatinNumbers(maintenanceProfit.toFixed(2)) + ' ريال';
-      console.log('🔧 تم تحديث كارت أرباح الصيانة:', maintenanceProfit);
-      
-      // حساب إجمالي الربح (مبيعات + صيانة)
-      const totalCombinedProfit = salesProfit + maintenanceProfit;
-      document.getElementById('total_combined_profit').textContent = convertToLatinNumbers(totalCombinedProfit.toFixed(2)) + ' ريال';
-      console.log('🔧 تم تحديث كارت إجمالي الربح:', totalCombinedProfit);
-      
-      // حساب الإيرادات الإجمالية (مبيعات + صيانة)
-      const maintenanceRevenue = maintenanceJobs.reduce((sum, job) => sum + (job.amountCharged || 0), 0);
-      const totalRevenue = totalSalesAmount + maintenanceRevenue;
-      
-      // حساب نسبة الربح الإجمالية
-      const totalProfitRatio = totalRevenue > 0 ? (totalCombinedProfit / totalRevenue) * 100 : 0;
-      document.getElementById('total_profit_ratio').textContent = convertToLatinNumbers(totalProfitRatio.toFixed(1)) + '%';
-      
       // إضافة معلومات إضافية للتشخيص
       console.log('💰 ربح المبيعات:', salesProfit);
-      console.log('💰 أرباح الصيانة:', maintenanceProfit);
-      console.log('💰 إجمالي الربح:', totalCombinedProfit);
       console.log('💰 إيرادات المبيعات:', totalSalesAmount);
-      console.log('💰 إيرادات الصيانة:', maintenanceRevenue);
-      console.log('💰 إجمالي الإيرادات:', totalRevenue);
 
       // تحديث آخر المبيعات
       updateRecentSales(effectiveSales);
