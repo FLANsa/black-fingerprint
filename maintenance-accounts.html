@@ -544,17 +544,24 @@
             const totalTechPaid = techsAccounts.reduce((sum, tech) => sum + (tech.totalPaid || 0), 0);
             const totalTechBalance = totalTechAmount - totalTechPaid;
             
-            const totalShopProfit = [...repsAccounts, ...techsAccounts].reduce((sum, item) => sum + (item.shopProfitSum || 0), 0);
-            const totalRevenue = [...repsAccounts, ...techsAccounts].reduce((sum, item) => sum + (item.profitSum || 0), 0);
+            // حساب أرباح المحل الصحيح: إجمالي المبالغ المحصلة - تكلفة القطع من المندوبين - عمولة الفنيين
+            // إجمالي المبالغ المحصلة = إجمالي الأرباح + تكلفة القطع + عمولة الفنيين
+            const totalPartCosts = totalRepAmount; // تكلفة القطع من المندوبين
+            const totalTechCommissions = totalTechAmount; // عمولة الفنيين
+            const totalProfit = [...repsAccounts, ...techsAccounts].reduce((sum, item) => sum + (item.profitSum || 0), 0);
+            const totalRevenue = totalProfit + totalPartCosts + totalTechCommissions; // إجمالي المبالغ المحصلة
+            const totalShopProfit = totalRevenue - totalPartCosts - totalTechCommissions; // أرباح المحل
             const totalPayments = totalRepPaid + totalTechPaid;
             const netProfit = totalShopProfit - totalPayments;
 
             console.log('📊 Summary calculations:');
             console.log('- Total reps:', totalReps);
             console.log('- Total techs:', totalTechs);
-            console.log('- Rep amount:', totalRepAmount);
-            console.log('- Tech amount:', totalTechAmount);
-            console.log('- Shop profit:', totalShopProfit);
+            console.log('- Total profit (إجمالي الأرباح):', totalProfit);
+            console.log('- Part costs (تكلفة القطع من المندوبين):', totalPartCosts);
+            console.log('- Tech commissions (عمولة الفنيين):', totalTechCommissions);
+            console.log('- Total revenue (إجمالي المبالغ المحصلة):', totalRevenue, '=', totalProfit, '+', totalPartCosts, '+', totalTechCommissions);
+            console.log('- Shop profit (أرباح المحل):', totalShopProfit, '=', totalRevenue, '-', totalPartCosts, '-', totalTechCommissions);
             console.log('- Total payments:', totalPayments);
 
             document.getElementById('totalReps').textContent = totalReps;
