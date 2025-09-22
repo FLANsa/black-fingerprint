@@ -537,30 +537,33 @@ class FirebaseDatabase {
 
   async getMaintenanceJobs(filters = {}) {
     try {
-      let query = collection(this.db, 'maintenanceJobs');
+      let q = collection(this.db, 'maintenanceJobs');
       
       // تطبيق الفلاتر
       if (filters.status) {
-        query = query(query, where('status', '==', filters.status));
+        q = query(q, where('status', '==', filters.status));
       }
       
       if (filters.repId) {
-        query = query(query, where('repId', '==', filters.repId));
+        q = query(q, where('repId', '==', filters.repId));
       }
       
       if (filters.techId) {
-        query = query(query, where('techId', '==', filters.techId));
+        q = query(q, where('techId', '==', filters.techId));
       }
       
       if (filters.dateFrom) {
-        query = query(query, where('visitDate', '>=', filters.dateFrom));
+        q = query(q, where('visitDate', '>=', filters.dateFrom));
       }
       
       if (filters.dateTo) {
-        query = query(query, where('visitDate', '<=', filters.dateTo));
+        q = query(q, where('visitDate', '<=', filters.dateTo));
       }
+      
+      // إضافة ترتيب افتراضي
+      q = query(q, orderBy('visitDate', 'desc'));
 
-      const querySnapshot = await getDocs(query);
+      const querySnapshot = await getDocs(q);
       const jobs = [];
       querySnapshot.forEach(doc => {
         jobs.push({ id: doc.id, ...doc.data() });
@@ -705,18 +708,27 @@ class FirebaseDatabase {
   // ===== تقارير التسويات =====
   async getRepSettlements(dateFrom, dateTo) {
     try {
+      console.log('🔍 Getting rep settlements from', dateFrom, 'to', dateTo);
+      
       const jobs = await this.getMaintenanceJobs({
         status: 'done',
         dateFrom,
         dateTo
       });
 
+      console.log('📊 Found jobs for rep settlements:', jobs.length);
+
       const repTotals = {};
       jobs.forEach(job => {
+        if (!job.repId) {
+          console.warn('⚠️ Job missing repId:', job);
+          return;
+        }
+        
         if (!repTotals[job.repId]) {
           repTotals[job.repId] = {
             repId: job.repId,
-            repName: job.repName,
+            repName: job.repName || 'غير محدد',
             jobsCount: 0,
             partCostSum: 0,
             profitSum: 0,
@@ -726,13 +738,15 @@ class FirebaseDatabase {
         }
         
         repTotals[job.repId].jobsCount++;
-        repTotals[job.repId].partCostSum += job.partCost;
-        repTotals[job.repId].profitSum += job.profit;
-        repTotals[job.repId].techCommissionSum += job.techCommission;
-        repTotals[job.repId].shopProfitSum += job.shopProfit;
+        repTotals[job.repId].partCostSum += (job.partCost || 0);
+        repTotals[job.repId].profitSum += (job.profit || 0);
+        repTotals[job.repId].techCommissionSum += (job.techCommission || 0);
+        repTotals[job.repId].shopProfitSum += (job.shopProfit || 0);
       });
 
-      return Object.values(repTotals);
+      const result = Object.values(repTotals);
+      console.log('✅ Rep settlements calculated:', result);
+      return result;
     } catch (error) {
       console.error('❌ Error getting rep settlements:', error);
       throw error;
@@ -741,18 +755,27 @@ class FirebaseDatabase {
 
   async getTechSettlements(dateFrom, dateTo) {
     try {
+      console.log('🔍 Getting tech settlements from', dateFrom, 'to', dateTo);
+      
       const jobs = await this.getMaintenanceJobs({
         status: 'done',
         dateFrom,
         dateTo
       });
 
+      console.log('📊 Found jobs for tech settlements:', jobs.length);
+
       const techTotals = {};
       jobs.forEach(job => {
+        if (!job.techId) {
+          console.warn('⚠️ Job missing techId:', job);
+          return;
+        }
+        
         if (!techTotals[job.techId]) {
           techTotals[job.techId] = {
             techId: job.techId,
-            techName: job.techName,
+            techName: job.techName || 'غير محدد',
             jobsCount: 0,
             partCostSum: 0,
             profitSum: 0,
@@ -762,13 +785,15 @@ class FirebaseDatabase {
         }
         
         techTotals[job.techId].jobsCount++;
-        techTotals[job.techId].partCostSum += job.partCost;
-        techTotals[job.techId].profitSum += job.profit;
-        techTotals[job.techId].techCommissionSum += job.techCommission;
-        techTotals[job.techId].shopProfitSum += job.shopProfit;
+        techTotals[job.techId].partCostSum += (job.partCost || 0);
+        techTotals[job.techId].profitSum += (job.profit || 0);
+        techTotals[job.techId].techCommissionSum += (job.techCommission || 0);
+        techTotals[job.techId].shopProfitSum += (job.shopProfit || 0);
       });
 
-      return Object.values(techTotals);
+      const result = Object.values(techTotals);
+      console.log('✅ Tech settlements calculated:', result);
+      return result;
     } catch (error) {
       console.error('❌ Error getting tech settlements:', error);
       throw error;

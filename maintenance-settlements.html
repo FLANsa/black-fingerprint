@@ -361,6 +361,7 @@
                 repsSettlements = await window.firebaseDatabase.getRepSettlements(fromDate, toDate);
                 console.log('Rep settlements loaded:', repsSettlements);
                 displayRepsSettlements();
+                displaySummary();
             } catch (error) {
                 console.error('Error loading rep settlements:', error);
                 showAlert('error', 'حدث خطأ في تحميل تسويات المندوبين');
@@ -392,6 +393,7 @@
                 techsSettlements = await window.firebaseDatabase.getTechSettlements(fromDate, toDate);
                 console.log('Tech settlements loaded:', techsSettlements);
                 displayTechsSettlements();
+                displaySummary();
             } catch (error) {
                 console.error('Error loading tech settlements:', error);
                 showAlert('error', 'حدث خطأ في تحميل تسويات الفنيين');
@@ -402,10 +404,10 @@
         function displaySummary() {
             const totalReps = repsSettlements.length;
             const totalTechs = techsSettlements.length;
-            const totalRepAmount = repsSettlements.reduce((sum, rep) => sum + rep.partCostSum, 0);
-            const totalTechAmount = techsSettlements.reduce((sum, tech) => sum + tech.techCommissionSum, 0);
-            const totalShopProfit = [...repsSettlements, ...techsSettlements].reduce((sum, item) => sum + item.shopProfitSum, 0);
-            const totalRevenue = [...repsSettlements, ...techsSettlements].reduce((sum, item) => sum + item.profitSum, 0);
+            const totalRepAmount = repsSettlements.reduce((sum, rep) => sum + (rep.partCostSum || 0), 0);
+            const totalTechAmount = techsSettlements.reduce((sum, tech) => sum + (tech.techCommissionSum || 0), 0);
+            const totalShopProfit = [...repsSettlements, ...techsSettlements].reduce((sum, item) => sum + (item.shopProfitSum || 0), 0);
+            const totalRevenue = [...repsSettlements, ...techsSettlements].reduce((sum, item) => sum + (item.profitSum || 0), 0);
 
             document.getElementById('totalReps').textContent = totalReps;
             document.getElementById('totalRepAmount').textContent = totalRepAmount.toFixed(2) + ' ريال';
@@ -413,6 +415,12 @@
             document.getElementById('totalTechAmount').textContent = totalTechAmount.toFixed(2) + ' ريال';
             document.getElementById('totalShopProfit').textContent = totalShopProfit.toFixed(2) + ' ريال';
             document.getElementById('totalRevenue').textContent = totalRevenue.toFixed(2) + ' ريال';
+            
+            // Show summary cards
+            const summaryCards = document.getElementById('summaryCards');
+            if (summaryCards) {
+                summaryCards.style.display = 'block';
+            }
         }
 
         // Display reps settlements
