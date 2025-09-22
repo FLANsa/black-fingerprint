@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الحسابات — تجربة النظام للاتصالات</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f8f9fa; 
+            padding-top: 70px; 
+        }
+        .navbar { 
+            background-color: #2c3e50; 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            z-index: 1030; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand, .nav-link { color: white !important; }
+        .card { 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
+        }
+        .card-header { 
+            font-weight: 600; 
+        }
+        .btn-primary { 
+            background-color: #2c3e50; 
+            border-color: #2c3e50; 
+        }
+        .btn-primary:hover { 
+            background-color: #1a252f; 
+            border-color: #1a252f; 
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <span class="navbar-brand">تجربة النظام للاتصالات</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">اختبار نظام الحسابات</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">اختبار المدفوعات</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary mb-2" onclick="testPayments()">
+                            <i class="fas fa-credit-card"></i> اختبار المدفوعات
+                        </button>
+                        <p class="text-muted">سيتم اختبار إضافة وعرض المدفوعات</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">اختبار الحسابات</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-success mb-2" onclick="testAccounts()">
+                            <i class="fas fa-calculator"></i> اختبار الحسابات
+                        </button>
+                        <p class="text-muted">سيتم اختبار حساب المبالغ المستحقة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">النتائج</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="results"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Firebase Scripts -->
+    <script type="module" src="js/firebase-config-cdn.js"></script>
+    <script type="module" src="js/firebase-database-cdn.js"></script>
+    
+    <script>
+        let resultsDiv = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const alertClass = type === 'error' ? 'alert-danger' : type === 'success' ? 'alert-success' : 'alert-info';
+            resultsDiv.innerHTML += `
+                <div class="alert ${alertClass}">
+                    <strong>[${timestamp}]</strong> ${message}
+                </div>
+            `;
+        }
+        
+        async function testPayments() {
+            try {
+                log('بدء اختبار المدفوعات...', 'info');
+                
+                // اختبار إضافة دفعة
+                const paymentData = {
+                    entityType: 'rep',
+                    entityId: 'test-rep-id',
+                    entityName: 'مندوب تجريبي',
+                    amount: 100,
+                    paymentDate: new Date(),
+                    paymentMethod: 'cash',
+                    notes: 'دفعة تجريبية'
+                };
+                
+                const paymentId = await window.firebaseDatabase.addPayment(paymentData);
+                log(`تم إضافة دفعة: ${paymentId}`, 'success');
+                
+                // اختبار جلب المدفوعات
+                const payments = await window.firebaseDatabase.getPayments({
+                    dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                    dateTo: new Date()
+                });
+                
+                log(`تم جلب ${payments.length} دفعة`, 'success');
+                
+                // اختبار حذف الدفعة
+                await window.firebaseDatabase.deletePayment(paymentId);
+                log('تم حذف الدفعة التجريبية', 'success');
+                
+                log('تم اختبار المدفوعات بنجاح!', 'success');
+                
+            } catch (error) {
+                log(`خطأ في اختبار المدفوعات: ${error.message}`, 'error');
+                console.error('Error testing payments:', error);
+            }
+        }
+        
+        async function testAccounts() {
+            try {
+                log('بدء اختبار الحسابات...', 'info');
+                
+                const today = new Date();
+                const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+                
+                // اختبار حسابات المندوبين
+                const repSettlements = await window.firebaseDatabase.getRepSettlements(thirtyDaysAgo, today);
+                log(`تم جلب حسابات ${repSettlements.length} مندوب`, 'success');
+                
+                // اختبار حسابات الفنيين
+                const techSettlements = await window.firebaseDatabase.getTechSettlements(thirtyDaysAgo, today);
+                log(`تم جلب حسابات ${techSettlements.length} فني`, 'success');
+                
+                // اختبار المدفوعات
+                const payments = await window.firebaseDatabase.getPayments({
+                    dateFrom: thirtyDaysAgo,
+                    dateTo: today
+                });
+                log(`تم جلب ${payments.length} دفعة`, 'success');
+                
+                // حساب المبالغ المستحقة
+                let totalRepAmount = 0;
+                let totalTechAmount = 0;
+                let totalPaid = 0;
+                
+                repSettlements.forEach(rep => {
+                    totalRepAmount += rep.partCostSum || 0;
+                });
+                
+                techSettlements.forEach(tech => {
+                    totalTechAmount += tech.techCommissionSum || 0;
+                });
+                
+                payments.forEach(payment => {
+                    totalPaid += payment.amount || 0;
+                });
+                
+                log(`إجمالي مستحقات المندوبين: ${totalRepAmount.toFixed(2)} ريال`, 'info');
+                log(`إجمالي مستحقات الفنيين: ${totalTechAmount.toFixed(2)} ريال`, 'info');
+                log(`إجمالي المدفوعات: ${totalPaid.toFixed(2)} ريال`, 'info');
+                
+                log('تم اختبار الحسابات بنجاح!', 'success');
+                
+            } catch (error) {
+                log(`خطأ في اختبار الحسابات: ${error.message}`, 'error');
+                console.error('Error testing accounts:', error);
+            }
+        }
+        
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            log('تم تحميل صفحة اختبار الحسابات', 'info');
+        });
+    </script>
+</body>
+</html>

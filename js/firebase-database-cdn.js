@@ -705,6 +705,83 @@ class FirebaseDatabase {
     return Number((profit - techCommission).toFixed(2));
   }
 
+  // ===== إدارة المدفوعات =====
+  async addPayment(paymentData) {
+    try {
+      const docRef = await addDoc(collection(this.db, 'payments'), {
+        ...paymentData,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Payment added with ID:', docRef.id);
+      return docRef.id;
+    } catch (error) {
+      console.error('❌ Error adding payment:', error);
+      throw error;
+    }
+  }
+
+  async getPayments(filters = {}) {
+    try {
+      let q = collection(this.db, 'payments');
+      
+      if (filters.dateFrom) {
+        q = query(q, where('paymentDate', '>=', filters.dateFrom));
+      }
+      
+      if (filters.dateTo) {
+        q = query(q, where('paymentDate', '<=', filters.dateTo));
+      }
+      
+      if (filters.entityType) {
+        q = query(q, where('entityType', '==', filters.entityType));
+      }
+      
+      if (filters.entityId) {
+        q = query(q, where('entityId', '==', filters.entityId));
+      }
+      
+      q = query(q, orderBy('paymentDate', 'desc'));
+
+      const querySnapshot = await getDocs(q);
+      const payments = [];
+      querySnapshot.forEach(doc => {
+        payments.push({ id: doc.id, ...doc.data() });
+      });
+      
+      console.log('✅ Payments loaded:', payments.length);
+      return payments;
+    } catch (error) {
+      console.error('❌ Error getting payments:', error);
+      throw error;
+    }
+  }
+
+  async updatePayment(paymentId, paymentData) {
+    try {
+      const paymentRef = doc(this.db, 'payments', paymentId);
+      await updateDoc(paymentRef, {
+        ...paymentData,
+        updatedAt: serverTimestamp()
+      });
+      console.log('✅ Payment updated:', paymentId);
+    } catch (error) {
+      console.error('❌ Error updating payment:', error);
+      throw error;
+    }
+  }
+
+  async deletePayment(paymentId) {
+    try {
+      const paymentRef = doc(this.db, 'payments', paymentId);
+      await deleteDoc(paymentRef);
+      console.log('✅ Payment deleted:', paymentId);
+    } catch (error) {
+      console.error('❌ Error deleting payment:', error);
+      throw error;
+    }
+  }
+
   // ===== تقارير التسويات =====
   async getRepSettlements(dateFrom, dateTo) {
     try {
