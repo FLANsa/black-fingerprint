@@ -143,6 +143,27 @@
     </div>
   </div>
 
+  <!-- Test Button -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center">
+          <h5 class="card-title">اختبار أرباح الصيانة</h5>
+          <p class="card-text">اضغط على الزر لاختبار حساب أرباح الصيانة ومعرفة التفاصيل</p>
+          <button class="btn btn-primary btn-lg" onclick="testMaintenanceProfits()">
+            <i class="fas fa-flask"></i> اختبار أرباح الصيانة
+          </button>
+          <div id="test-results" class="mt-3" style="display: none;">
+            <div class="alert alert-info">
+              <h6>نتائج الاختبار:</h6>
+              <div id="test-details"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Financial Details Cards -->
   <div class="row mb-4">
     <div class="col-md-4">
@@ -815,6 +836,132 @@
       return `${convertToLatinNumbers(year)}-${convertToLatinNumbers(month)}-${convertToLatinNumbers(day)} ${convertToLatinNumbers(hours)}:${convertToLatinNumbers(minutes)}`;
     } catch {
       return '-';
+    }
+  }
+
+  // دالة اختبار أرباح الصيانة
+  async function testMaintenanceProfits() {
+    console.log('🧪 بدء اختبار أرباح الصيانة...');
+    
+    const testResults = document.getElementById('test-results');
+    const testDetails = document.getElementById('test-details');
+    
+    testResults.style.display = 'block';
+    testDetails.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> جاري الاختبار...';
+    
+    try {
+      // 1. فحص توفر Firebase
+      const firebaseAvailable = !!window.firebaseDatabase;
+      console.log('🧪 Firebase متاح:', firebaseAvailable);
+      
+      // 2. جلب أعمال الصيانة
+      const maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
+      console.log('🧪 عدد أعمال الصيانة:', maintenanceJobs.length);
+      
+      // 3. فحص تفصيلي لكل عمل
+      let totalShopProfit = 0;
+      let alternativeTotal = 0;
+      let jobDetails = [];
+      
+      maintenanceJobs.forEach((job, index) => {
+        const amountCharged = Number(job.amountCharged) || 0;
+        const partCost = Number(job.partCost) || 0;
+        const profit = Math.max(0, amountCharged - partCost);
+        const techCommission = Number(job.techCommission) || 0;
+        const shopProfit = Number(job.shopProfit) || 0;
+        const alternativeShopProfit = Math.max(0, profit - techCommission);
+        
+        totalShopProfit += shopProfit;
+        alternativeTotal += alternativeShopProfit;
+        
+        jobDetails.push({
+          index: index + 1,
+          customer: job.customerName || 'غير محدد',
+          amountCharged,
+          partCost,
+          profit,
+          techCommission,
+          shopProfit,
+          alternativeShopProfit,
+          hasShopProfit: 'shopProfit' in job,
+          status: job.status
+        });
+        
+        console.log(`🧪 عمل ${index + 1}:`, {
+          customer: job.customerName,
+          amountCharged,
+          partCost,
+          profit,
+          techCommission,
+          shopProfit,
+          alternativeShopProfit
+        });
+      });
+      
+      // 4. عرض النتائج
+      let html = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6>📊 الإحصائيات العامة:</h6>
+            <ul class="list-unstyled">
+              <li><strong>Firebase متاح:</strong> ${firebaseAvailable ? '✅ نعم' : '❌ لا'}</li>
+              <li><strong>عدد أعمال الصيانة:</strong> ${maintenanceJobs.length}</li>
+              <li><strong>إجمالي shopProfit:</strong> ${totalShopProfit.toFixed(2)} ريال</li>
+              <li><strong>الحساب البديل:</strong> ${alternativeTotal.toFixed(2)} ريال</li>
+              <li><strong>الفرق:</strong> ${Math.abs(totalShopProfit - alternativeTotal).toFixed(2)} ريال</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6>🔧 تفاصيل الأعمال:</h6>
+            <div style="max-height: 300px; overflow-y: auto;">
+      `;
+      
+      jobDetails.forEach(job => {
+        html += `
+          <div class="border p-2 mb-2 rounded">
+            <strong>العمل ${job.index}:</strong> ${job.customer}<br>
+            <small>
+              المحصل: ${job.amountCharged} | التكلفة: ${job.partCost} | الربح: ${job.profit}<br>
+              عمولة الفني: ${job.techCommission} | ربح المحل: ${job.shopProfit}<br>
+              الحساب البديل: ${job.alternativeShopProfit} | الحالة: ${job.status}
+            </small>
+          </div>
+        `;
+      });
+      
+      html += `
+            </div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <h6>🎯 التوصيات:</h6>
+          <ul>
+            ${totalShopProfit === 0 ? '<li class="text-danger">⚠️ أرباح الصيانة صفر - تحقق من البيانات</li>' : ''}
+            ${alternativeTotal > totalShopProfit ? '<li class="text-warning">⚠️ الحساب البديل أعلى - استخدمه</li>' : ''}
+            ${maintenanceJobs.length === 0 ? '<li class="text-info">ℹ️ لا توجد أعمال صيانة مكتملة</li>' : ''}
+            ${firebaseAvailable ? '<li class="text-success">✅ Firebase يعمل بشكل صحيح</li>' : '<li class="text-danger">❌ مشكلة في Firebase</li>'}
+          </ul>
+        </div>
+      `;
+      
+      testDetails.innerHTML = html;
+      
+      console.log('🧪 انتهى الاختبار - النتائج:', {
+        firebaseAvailable,
+        jobsCount: maintenanceJobs.length,
+        totalShopProfit,
+        alternativeTotal
+      });
+      
+    } catch (error) {
+      console.error('🧪 خطأ في الاختبار:', error);
+      testDetails.innerHTML = `
+        <div class="alert alert-danger">
+          <h6>❌ خطأ في الاختبار:</h6>
+          <p><strong>الرسالة:</strong> ${error.message}</p>
+          <p><strong>التفاصيل:</strong> ${error.stack}</p>
+        </div>
+      `;
     }
   }
 
