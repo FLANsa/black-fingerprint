@@ -1,6 +1,6 @@
 /**
  * Barcode Generation and Management
- * تجربة النظام للاتصالات - Phone Store Management System
+ * الصقري للاتصالات - Phone Store Management System
  */
 
 class BarcodeGenerator {

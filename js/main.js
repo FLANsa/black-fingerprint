@@ -1,6 +1,6 @@
 /**
  * Main Application Entry Point
- * تجربة النظام للاتصالات - Phone Store Management System
+ * الصقري للاتصالات - Phone Store Management System
  */
 
 // Global application state

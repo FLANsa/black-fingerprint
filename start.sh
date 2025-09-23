@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# تجربة النظام للاتصالات - نظام إدارة متجر الهواتف
+# الصقري للاتصالات - نظام إدارة متجر الهواتف
 # Render Deployment Script
 
-echo "🚀 Starting تجربة النظام للاتصالات Phone Store Management System..."
+echo "🚀 Starting الصقري للاتصالات Phone Store Management System..."
 
 # Check if Python is available
 if command -v python3 &> /dev/null; then

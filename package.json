@@ -1,7 +1,7 @@
 {
   "name": "تجربة-النظام-للإتصالات",
   "version": "1.0.0",
-  "description": "تجربة النظام للاتصالات - A web application for managing phone inventory and sales",
+  "description": "الصقري للاتصالات - A web application for managing phone inventory and sales",
   "main": "index.html",
   "scripts": {
     "start": "python3 -m http.server 8000",
@@ -19,7 +19,7 @@
     "firebase",
     "demo"
   ],
-  "author": "تجربة النظام للاتصالات",
+  "author": "الصقري للاتصالات",
   "license": "MIT",
   "repository": {
     "type": "git",

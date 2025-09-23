@@ -1,6 +1,6 @@
 /**
  * Authentication Module
- * تجربة النظام للاتصالات - Phone Store Management System
+ * الصقري للاتصالات - Phone Store Management System
  */
 
 class AuthManager {

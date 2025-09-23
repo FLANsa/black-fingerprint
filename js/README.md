@@ -1,4 +1,4 @@
-# JavaScript Architecture - تجربة النظام للاتصالات
+# JavaScript Architecture - الصقري للاتصالات
 
 ## 📁 File Structure
 
@@ -344,5 +344,5 @@ To extend the system:
 
 ---
 
-**تجربة النظام للاتصالات - Phone Store Management System**
+**الصقري للاتصالات - Phone Store Management System**
 *Modular JavaScript Architecture v1.0*
