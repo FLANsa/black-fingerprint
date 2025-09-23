@@ -294,9 +294,6 @@
                         <button class="btn btn-primary" onclick="loadAccounts()">
                             <i class="fas fa-search"></i> بحث
                         </button>
-                        <button class="btn btn-success" onclick="exportToCSV()">
-                            <i class="fas fa-download"></i> تصدير
-                        </button>
                     </div>
                 </div>
             </div>
@@ -836,53 +833,6 @@
             }
         }
 
-        // Export to CSV
-        function exportToCSV() {
-            const csvData = [];
-            
-            // Add reps data
-            repsAccounts.forEach(rep => {
-                csvData.push([
-                    'مندوب',
-                    rep.repName || 'غير محدد',
-                    rep.phone || 'N/A',
-                    rep.jobsCount || 0,
-                    rep.partCostSum || 0,
-                    rep.totalPaid || 0,
-                    rep.balance || 0,
-                    rep.status === 'paid' ? 'مدفوع' : 'معلق'
-                ]);
-            });
-            
-            // Add techs data
-            techsAccounts.forEach(tech => {
-                csvData.push([
-                    'فني',
-                    tech.techName || 'غير محدد',
-                    tech.phone || 'N/A',
-                    tech.jobsCount || 0,
-                    tech.techCommissionSum || 0,
-                    tech.totalPaid || 0,
-                    tech.balance || 0,
-                    tech.status === 'paid' ? 'مدفوع' : 'معلق'
-                ]);
-            });
-            
-            const csvContent = [
-                ['النوع', 'الاسم', 'رقم الهاتف', 'عدد الأعمال', 'المستحقات', 'المدفوعات', 'المتبقي', 'الحالة'],
-                ...csvData
-            ].map(row => row.join(',')).join('\n');
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `حسابات_الصيانة_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
 
         // Show alert
         function showAlert(message, type) {
