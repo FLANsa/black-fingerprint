@@ -177,9 +177,6 @@
                                 <button class="btn btn-secondary me-2" onclick="clearFilters()">
                                     <i class="fas fa-times"></i> مسح الفلاتر
                                 </button>
-                                <button class="btn btn-success" onclick="exportToCSV()">
-                                    <i class="fas fa-download"></i> تصدير CSV
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -297,34 +294,12 @@
                                     <option value="canceled">ملغية</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">نسبة عمولة الفني</label>
-                                <div class="form-control-plaintext" id="techPercentDisplay">
-                                    سيتم تحديدها تلقائياً عند اختيار الفني
-                                </div>
-                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="notes" class="form-label">ملاحظات</label>
                             <textarea class="form-control" id="notes" rows="3"></textarea>
                         </div>
                         
-                        <!-- Profit Calculation Display -->
-                        <div class="profit-card" id="profitCalculation" style="display: none;">
-                            <h6><i class="fas fa-calculator"></i> حساب الأرباح:</h6>
-                            <div class="profit-item">
-                                <span>الربح الإجمالي:</span>
-                                <span id="totalProfit">0.00 ريال</span>
-                            </div>
-                            <div class="profit-item">
-                                <span>عمولة الفني:</span>
-                                <span id="techCommission">0.00 ريال</span>
-                            </div>
-                            <div class="profit-item">
-                                <span>ربح المحل:</span>
-                                <span id="shopProfit">0.00 ريال</span>
-                            </div>
-                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -733,37 +708,6 @@
             loadData();
         }
 
-        // Export to CSV
-        function exportToCSV() {
-            if (jobsData.length === 0) {
-                showAlert('warning', 'لا توجد بيانات للتصدير');
-                return;
-            }
-
-            const headers = ['التاريخ', 'العميل', 'المندوب', 'الفني', 'القطعة', 'تكلفة القطعة', 'المبلغ المحصل', 'الربح', 'عمولة الفني', 'ربح المحل', 'الحالة'];
-            const csvContent = [
-                headers.join(','),
-                ...jobsData.map(job => [
-                    job.visitDate ? new Date(job.visitDate.seconds * 1000).toLocaleDateString('ar-SA') : '',
-                    job.customerName,
-                    job.repName || '',
-                    job.techName || '',
-                    job.partName,
-                    job.partCost.toFixed(2),
-                    job.amountCharged.toFixed(2),
-                    job.profit.toFixed(2),
-                    job.techCommission.toFixed(2),
-                    job.shopProfit.toFixed(2),
-                    getStatusText(job.status)
-                ].join(','))
-            ].join('\n');
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `maintenance-jobs-${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
 
         // Show alert
         function showAlert(type, message) {
