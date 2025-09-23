@@ -108,7 +108,7 @@
               <div class="col-md-12">
                 <label for="barcode_search" class="form-label">البحث بالباركود (اختياري)</label>
                 <div class="input-group">
-                  <input type="text" class="form-control" id="barcode_search" placeholder="أدخل رقم الباركود للبحث السريع" onkeypress="if(event.key==='Enter') searchByBarcode()">
+                  <input type="text" class="form-control arabic-number-field" id="barcode_search" placeholder="أدخل رقم الباركود للبحث السريع" onkeypress="if(event.key==='Enter') searchByBarcode()">
                   <button class="btn btn-outline-primary" type="button" onclick="searchByBarcode()">
                     <i class="fas fa-search"></i> بحث
                   </button>
@@ -461,6 +461,11 @@
       const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
       return str.toString().replace(/[٠-٩]/g, m => map[m] ?? m);
     }
+    function convertEnglishToArabicNumbers(str) {
+      if (!str) return '';
+      const map = {'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};
+      return str.toString().replace(/[0-9]/g, m => map[m] ?? m);
+    }
     function parseArabicNumber(value) {
       if (!value || value.trim() === '') return 0;
       const converted = convertArabicToEnglishNumbers(value.toString());
@@ -666,10 +671,20 @@
       const resultDiv = document.getElementById('barcode_search_result');
       if (!barcode) { resultDiv.style.display = 'none'; return; }
   
+      // تحويل الأرقام العربية إلى إنجليزية للبحث
+      const englishBarcode = convertArabicToEnglishNumbers(barcode);
+      const arabicBarcode = convertEnglishToArabicNumbers(barcode);
+      
+      // البحث في كلا النسختين (عربية وإنجليزية)
+      const searchTerms = [barcode, englishBarcode, arabicBarcode];
+      const uniqueTerms = [...new Set(searchTerms)]; // إزالة التكرار
+  
       const foundPhone = (phones || []).find(ph => {
         const phBarcode = ph.phone_number || ph.serial_number;
         const pid = ph.id || ph.phone_number;
-        return phBarcode && String(phBarcode) === barcode && !isPhoneSold(pid);
+        
+        // البحث في جميع النسخ (الأصلية، الإنجليزية، العربية)
+        return phBarcode && uniqueTerms.some(term => String(phBarcode) === term) && !isPhoneSold(pid);
       });
   
       if (foundPhone) {
@@ -691,7 +706,10 @@
         `;
         resultDiv.style.display = 'block';
       } else {
-        const anyPhone = (phones || []).find(ph => (ph.phone_number || ph.serial_number) && String(ph.phone_number || ph.serial_number) === barcode);
+        const anyPhone = (phones || []).find(ph => {
+          const phBarcode = ph.phone_number || ph.serial_number;
+          return phBarcode && uniqueTerms.some(term => String(phBarcode) === term);
+        });
         if (anyPhone && isPhoneSold(anyPhone.id || anyPhone.phone_number)) {
           resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> هذا الهاتف تم بيعه مسبقاً</div>`;
         } else {
