@@ -504,9 +504,7 @@
             currentEditId = null;
             document.getElementById('jobModalTitle').textContent = 'إضافة عمل صيانة جديد';
             document.getElementById('jobForm').reset();
-            document.getElementById('profitCalculation').style.display = 'none';
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('techPercentDisplay').textContent = 'سيتم تحديدها تلقائياً عند اختيار الفني';
             selectedTechPercent = 0.5; // Reset to default
             
             // Hide complete button for new jobs
@@ -536,8 +534,6 @@
 
             // Set the tech percent for editing
             selectedTechPercent = job.techPercent || 0.5;
-            document.getElementById('techPercentDisplay').textContent = 
-                `نسبة العمولة: ${(selectedTechPercent * 100).toFixed(1)}%`;
 
             // Show complete button only if job is not done
             const completeBtn = document.getElementById('completeJobBtn');
