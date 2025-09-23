@@ -128,14 +128,74 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="phone_color" class="form-label">لون الجوال</label>
-                    <select class="form-select" id="phone_color" name="phone_color">
-                      <option value="">اختر اللون</option>
-                      <option value="أسود">أسود</option><option value="أبيض">أبيض</option><option value="أزرق">أزرق</option>
-                      <option value="أحمر">أحمر</option><option value="أخضر">أخضر</option><option value="أصفر">أصفر</option>
-                      <option value="رمادي">رمادي</option><option value="ذهبي">ذهبي</option><option value="فضي">فضي</option>
-                      <option value="وردي">وردي</option><option value="بنفسجي">بنفسجي</option><option value="برتقالي">برتقالي</option>
-                      <option value="أخرى">أخرى</option>
-                    </select>
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="phone_color" name="phone_color" list="color-suggestions" placeholder="أدخل لون الهاتف">
+                      <datalist id="color-suggestions">
+                        <option value="أسود">
+                        <option value="أبيض">
+                        <option value="أزرق">
+                        <option value="أحمر">
+                        <option value="أخضر">
+                        <option value="أصفر">
+                        <option value="رمادي">
+                        <option value="ذهبي">
+                        <option value="فضي">
+                        <option value="وردي">
+                        <option value="بنفسجي">
+                        <option value="برتقالي">
+                        <option value="أزرق داكن">
+                        <option value="أخضر داكن">
+                        <option value="بني">
+                        <option value="أحمر داكن">
+                        <option value="أزرق فاتح">
+                        <option value="أخضر فاتح">
+                        <option value="أصفر ذهبي">
+                        <option value="فضي داكن">
+                        <option value="ذهبي فاتح">
+                        <option value="أبيض لؤلؤي">
+                        <option value="أسود لامع">
+                        <option value="أحمر لامع">
+                        <option value="أزرق لامع">
+                        <option value="أخضر لامع">
+                        <option value="أصفر لامع">
+                        <option value="رمادي داكن">
+                        <option value="رمادي فاتح">
+                        <option value="وردي فاتح">
+                        <option value="وردي داكن">
+                        <option value="بنفسجي فاتح">
+                        <option value="بنفسجي داكن">
+                        <option value="برتقالي فاتح">
+                        <option value="برتقالي داكن">
+                        <option value="أحمر وردي">
+                        <option value="أزرق سماوي">
+                        <option value="أخضر زمردي">
+                        <option value="أصفر ليموني">
+                        <option value="أحمر قرمزي">
+                        <option value="أزرق نيلي">
+                        <option value="أخضر زيتوني">
+                        <option value="أصفر كهرماني">
+                        <option value="رمادي فضي">
+                        <option value="ذهبي برونزي">
+                        <option value="فضي بلاتيني">
+                        <option value="وردي مرجاني">
+                        <option value="بنفسجي لافندي">
+                        <option value="برتقالي يوسفي">
+                        <option value="أحمر كرزي">
+                        <option value="أزرق تركوازي">
+                        <option value="أخضر نعناعي">
+                        <option value="أصفر ذهبي">
+                        <option value="رمادي فولاذي">
+                        <option value="ذهبي كلاسيكي">
+                        <option value="فضي ميتاليك">
+                        <option value="وردي فوشيا">
+                        <option value="بنفسجي بنفسجي">
+                        <option value="برتقالي مشمشي">
+                      </datalist>
+                      <button class="btn btn-outline-secondary" type="button" onclick="addCustomColor()" title="إضافة لون مخصص">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                    <small class="form-text text-muted">يمكنك كتابة أي لون تريده أو اختيار من القائمة المقترحة</small>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -593,6 +653,7 @@
       
       setupArabicNumberSupport(); calculateVAT(); await populateBrandsFromFirebase();
       setupInputValidation();
+      loadCustomColors();
       
       // تحميل بيانات الهاتف للتعديل إذا كان هناك معامل edit
       if (editPhoneNumber) {
@@ -602,6 +663,49 @@
       const form = document.querySelector('form');
       form.addEventListener('submit', async (e)=>{ e.preventDefault(); if(await savePhoneToFirebase()){ form.reset(); await populateBrandsFromFirebase(); } });
     });
+
+    // ===== إضافة لون مخصص =====
+    function addCustomColor() {
+      const customColor = prompt('أدخل اللون الجديد:');
+      if (customColor && customColor.trim()) {
+        const colorInput = document.getElementById('phone_color');
+        const datalist = document.getElementById('color-suggestions');
+        
+        // إضافة اللون الجديد إلى القائمة
+        const newOption = document.createElement('option');
+        newOption.value = customColor.trim();
+        datalist.appendChild(newOption);
+        
+        // تعيين اللون الجديد في الحقل
+        colorInput.value = customColor.trim();
+        
+        // حفظ اللون في localStorage للاستخدام المستقبلي
+        saveCustomColor(customColor.trim());
+        
+        showAlert('success', `تم إضافة اللون "${customColor.trim()}" بنجاح!`);
+      }
+    }
+
+    // ===== حفظ الألوان المخصصة =====
+    function saveCustomColor(color) {
+      let customColors = JSON.parse(localStorage.getItem('customColors') || '[]');
+      if (!customColors.includes(color)) {
+        customColors.push(color);
+        localStorage.setItem('customColors', JSON.stringify(customColors));
+      }
+    }
+
+    // ===== تحميل الألوان المخصصة =====
+    function loadCustomColors() {
+      const customColors = JSON.parse(localStorage.getItem('customColors') || '[]');
+      const datalist = document.getElementById('color-suggestions');
+      
+      customColors.forEach(color => {
+        const option = document.createElement('option');
+        option.value = color;
+        datalist.appendChild(option);
+      });
+    }
 
     function logout(){ if(confirm('هل أنت متأكد من تسجيل الخروج؟')){ localStorage.removeItem('current_user'); alert('تم تسجيل الخروج'); window.location.href='index.html'; } }
   </script>
