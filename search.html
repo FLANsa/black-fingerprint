@@ -126,7 +126,6 @@
   let allPhones = [];
   let allAccessories = [];
   let allSales = [];
-  let soldPhonesSet = new Set();
 
   // ===== دعم الأرقام العربية =====
   function convertArabicToEnglishNumbers(str) {
@@ -162,21 +161,37 @@
     return arr.some(x => s.includes((x||'').toString().toLowerCase()));
   }
 
-  // تجميع أرقام الأجهزة/الباركود المباعة من المبيعات
-  function buildSoldPhonesSet(sales){
-    const set = new Set();
-    (sales||[]).forEach(sale => {
-      (sale.items||[]).forEach(item => {
-        // نحاول العثور على رقم الجهاز/الباركود في أكثر من حقل محتمل
-        const phoneNum = item.barcode || item.phone_number || item.device_number || item.serial_number || null;
-        const productType = item.product_type || item.type || '';
-        if (phoneNum && (productType === 'phone' || productType === 'هاتف' || !productType)) {
-          set.add(String(phoneNum));
-        }
-      });
-    });
-    return set;
+  // ===== هل الهاتف مباع؟ (نفس منطق صفحة المبيعات مع شوية مرونة في الحقول) =====
+  function isPhoneSold(phoneId) {
+    if (!phoneId) return false;
+    if (!allSales || allSales.length === 0) return false;
+
+    // استبعدنا العمليات المسترجعة
+    const effectiveSales = allSales.filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
+
+    // ابحث عن هاتف ضمن items يطابق المعرّف
+    return effectiveSales.some(sale =>
+      Array.isArray(sale.items) &&
+      sale.items.some(item => {
+        const isPhoneType =
+          item.type === 'phone' ||
+          item.product_type === 'phone' ||
+          item.type === 'هاتف';
+
+        const candidateIds = [
+          item.id,
+          item.phone_id,
+          item.barcode,
+          item.phone_number,
+          item.device_number,
+          item.serial_number
+        ].filter(Boolean).map(String);
+
+        return isPhoneType && candidateIds.includes(String(phoneId));
+      })
+    );
   }
+
 
   // (تمت إزالة عناصر نوع البحث وحالة الهاتف من واجهة البحث)
 
@@ -214,7 +229,7 @@
         console.log('🧾 المبيعات من localStorage:', allSales);
       }
 
-      soldPhonesSet = buildSoldPhonesSet(allSales);
+      // لم نعد نحتاج Set لأننا سنستخدم isPhoneSold مباشرة
 
       const tokens = term.toLowerCase().split(/\s+/);
       console.log('🔤 الرموز المطلوب البحث عنها:', tokens);
@@ -300,9 +315,14 @@
                     <td>${p.manufacturer || p.brand || 'غير محدد'}</td>
                     <td>${p.model || 'غير محدد'}</td>
                     <td>
-                      ${ (p.phone_number && soldPhonesSet.has(String(p.phone_number)))
-                          ? '<span class="badge bg-danger">مباع</span>'
-                          : '<span class="badge bg-success">متاح</span>' }
+                      ${
+                        (() => {
+                          const pid = p.id || p.phone_number || p.device_number || p.serial_number;
+                          return (pid && isPhoneSold(String(pid)))
+                            ? '<span class="badge bg-danger">مباع</span>'
+                            : '<span class="badge bg-success">متاح</span>';
+                        })()
+                      }
                     </td>
                     <td><span class="text-success">${fmtMoney(p.purchase_price || 0)} ريال</span></td>
                     <td><span class="text-primary">${fmtMoney(p.selling_price || p.price || 0)} ريال</span></td>
@@ -503,17 +523,21 @@
         console.log('🔥 تحميل جميع البيانات من Firebase...');
         allPhones = await window.storage.getPhones();
         allAccessories = await window.storage.getAccessories();
+        allSales = await window.storage.getSales(); // ✅ مهم
         console.log('📱 جميع الهواتف:', allPhones);
         console.log('📦 جميع الأكسسوارات:', allAccessories);
+        console.log('🧾 جميع المبيعات:', allSales);
       } else {
         console.log('💾 Firebase غير متاح، تحميل من localStorage...');
         allPhones = JSON.parse(localStorage.getItem('phones') || '[]');
         allAccessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        allSales = JSON.parse(localStorage.getItem('sales') || '[]'); // ✅ مهم
         console.log('📱 الهواتف من localStorage:', allPhones);
         console.log('📦 الأكسسوارات من localStorage:', allAccessories);
+        console.log('🧾 المبيعات من localStorage:', allSales);
       }
-      
-      // عرض جميع البيانات
+
+      // عرض جميع البيانات (الـ isPhoneSold بتقرأ من allSales)
       renderResults(allPhones, allAccessories);
       
     } catch (error) {
