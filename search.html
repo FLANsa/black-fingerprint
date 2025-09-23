@@ -389,6 +389,12 @@
                                 title="طباعة الباركود">
                           <i class="fas fa-barcode"></i>
                         </button>
+                        <!-- ✅ زر حذف الجهاز -->
+                        <button type="button" class="btn btn-sm btn-outline-danger"
+                                onclick="deletePhone('${p.id || p.phone_number}')"
+                                title="حذف الجهاز">
+                          <i class="fas fa-trash"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -657,6 +663,74 @@
     }
     // ✅ نوجّه بنفس الشكل المطلوب
     window.location.href = `print_barcode.html?edit=${encodeURIComponent(code)}`;
+  }
+
+  // ===== حذف الجهاز =====
+  async function deletePhone(phoneId) {
+    console.log('🗑️ محاولة حذف الجهاز:', phoneId);
+    
+    if (!phoneId) {
+      console.error('❌ معرف الجهاز غير صالح');
+      showAlert('danger', 'معرف الجهاز غير صالح');
+      return;
+    }
+
+    // العثور على الجهاز للتأكد من وجوده
+    const phone = allPhones.find(p => p.id === phoneId || p.phone_number === phoneId);
+    if (!phone) {
+      console.error('❌ لم يتم العثور على الجهاز:', phoneId);
+      showAlert('danger', 'لم يتم العثور على الجهاز المطلوب');
+      return;
+    }
+
+    // التحقق من أن الجهاز غير مباع
+    const phoneIdentifier = phone.id || phone.phone_number || phone.device_number || phone.serial_number;
+    if (phoneIdentifier && isPhoneSold(String(phoneIdentifier))) {
+      showAlert('warning', 'لا يمكن حذف جهاز تم بيعه مسبقاً');
+      return;
+    }
+
+    // تأكيد الحذف
+    const confirmMessage = `هل أنت متأكد من حذف هذا الجهاز؟
+
+الجهاز: ${phone.manufacturer || phone.brand || 'غير محدد'} ${phone.model || 'غير محدد'}
+الباركود: ${phone.phone_number || 'غير محدد'}
+الرقم التسلسلي: ${phone.serial_number || 'غير محدد'}
+
+⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!`;
+
+    if (!confirm(confirmMessage)) {
+      console.log('❌ تم إلغاء عملية الحذف');
+      return;
+    }
+
+    try {
+      console.log('🔄 بدء عملية الحذف...');
+      
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        // حذف من Firebase
+        console.log('🔥 حذف من Firebase...');
+        await window.storage.deletePhone(phoneId);
+        console.log('✅ تم الحذف من Firebase بنجاح');
+      } else {
+        // حذف من localStorage
+        console.log('💾 حذف من localStorage...');
+        const phones = JSON.parse(localStorage.getItem('phones') || '[]');
+        const updatedPhones = phones.filter(p => p.id !== phoneId && p.phone_number !== phoneId);
+        localStorage.setItem('phones', JSON.stringify(updatedPhones));
+        console.log('✅ تم الحذف من localStorage بنجاح');
+      }
+
+      // إعادة تحميل البيانات وعرض النتائج
+      await loadAllData();
+      
+      showAlert('success', 'تم حذف الجهاز بنجاح');
+      console.log('✅ تم حذف الجهاز بنجاح');
+      
+    } catch (error) {
+      console.error('❌ خطأ في حذف الجهاز:', error);
+      showAlert('danger', 'حدث خطأ في حذف الجهاز. حاول مرة أخرى.');
+    }
   }
 </script>
 
