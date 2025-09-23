@@ -278,11 +278,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="partCost" class="form-label">تكلفة القطعة (ريال) *</label>
-                                <input type="number" class="form-control" id="partCost" min="0" step="0.01" required>
+                                <input type="number" class="form-control arabic-number-field" id="partCost" min="0" step="0.01" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="amountCharged" class="form-label">المبلغ المحصل (ريال) *</label>
-                                <input type="number" class="form-control" id="amountCharged" min="0" step="0.01" required>
+                                <input type="number" class="form-control arabic-number-field" id="amountCharged" min="0" step="0.01" required>
                             </div>
                         </div>
                         <div class="row">
@@ -340,6 +340,7 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            setupArabicNumberSupport(); // ✅ دعم الأرقام العربية والإنجليزية
             loadData();
             setupEventListeners();
             // Initialize navigation
@@ -704,6 +705,40 @@
             loadData();
         }
 
+
+        // ===== دعم الأرقام العربية والإنجليزية =====
+        function convertArabicToEnglishNumbers(str) {
+            if (!str) return '';
+            const map = {
+                '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+                '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+            };
+            return str.toString().replace(/[٠-٩]/g, m => map[m] || m);
+        }
+
+        function convertEnglishToArabicNumbers(str) {
+            if (!str) return '';
+            const map = {
+                '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
+                '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩'
+            };
+            return str.toString().replace(/[0-9]/g, m => map[m] || m);
+        }
+
+        function setupArabicNumberSupport() {
+            document.querySelectorAll('.arabic-number-field').forEach(field => {
+                field.addEventListener('input', function() {
+                    const pos = this.selectionStart;
+                    const cv = convertArabicToEnglishNumbers(this.value);
+                    if (cv !== this.value) {
+                        this.value = cv;
+                        this.setSelectionRange(pos, pos);
+                    }
+                    // إعادة حساب الأرباح عند تغيير القيم
+                    calculateProfit();
+                });
+            });
+        }
 
         // Show alert
         function showAlert(type, message) {
