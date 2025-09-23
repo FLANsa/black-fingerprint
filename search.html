@@ -334,6 +334,12 @@
                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="editPhone('${p.phone_number || p.id}')" title="تعديل">
                           <i class="fas fa-edit"></i>
                         </button>
+                        <!-- ✅ زر طباعة الباركود -->
+                        <button type="button" class="btn btn-sm btn-outline-dark"
+                                onclick="goPrintBarcode('${p.phone_number || p.device_number || p.serial_number || p.id}')"
+                                title="طباعة الباركود">
+                          <i class="fas fa-barcode"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -590,6 +596,17 @@
     
     // لا تُظهر النتائج افتراضياً — تُعرض فقط بعد البحث أو عند النقر على "عرض الكل"
   });
+
+  // ===== طباعة الباركود =====
+  function goPrintBarcode(rawCode) {
+    const code = String(rawCode || '').trim();
+    if (!code) { 
+      showAlert('warning', 'لا يوجد رقم باركود صالح لهذا الجهاز'); 
+      return; 
+    }
+    // ✅ نوجّه بنفس الشكل المطلوب
+    window.location.href = `print_barcode.html?edit=${encodeURIComponent(code)}`;
+  }
 </script>
 
 <!-- Navigation Script -->

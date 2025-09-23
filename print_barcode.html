@@ -221,7 +221,7 @@
     await new Promise(r => setTimeout(r, 300));
 
     const urlParams = new URLSearchParams(window.location.search);
-    const pn = urlParams.get('phone_number');
+    const pn = urlParams.get('phone_number') || urlParams.get('edit');
 
     if(pn){
       const phone = await findPhoneByNumber(pn);
