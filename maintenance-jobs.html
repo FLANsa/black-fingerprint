@@ -352,8 +352,11 @@
         // Load all data
         async function loadData() {
             try {
+                console.log('🔄 بدء تحميل البيانات...');
+                
                 if (!window.firebaseDatabase) {
-                    console.error('Firebase database not initialized');
+                    console.error('❌ Firebase database not initialized');
+                    showAlert('error', 'قاعدة البيانات غير متاحة');
                     return;
                 }
 
@@ -363,10 +366,16 @@
                     window.firebaseDatabase.getMaintenanceJobs()
                 ]);
 
+                console.log('✅ تم تحميل البيانات:', {
+                    reps: repsData.length,
+                    technicians: techniciansData.length,
+                    jobs: jobsData.length
+                });
+
                 populateDropdowns();
                 displayJobs();
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('❌ خطأ في تحميل البيانات:', error);
                 showAlert('error', 'حدث خطأ في تحميل البيانات');
             }
         }
@@ -439,13 +448,22 @@
 
             if (partCost > 0 && amountCharged > 0 && selectedTechPercent > 0) {
                 const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
-
-                document.getElementById('totalProfit').textContent = profit.toFixed(2) + ' ريال';
-                document.getElementById('techCommission').textContent = techCommission.toFixed(2) + ' ريال';
-                document.getElementById('shopProfit').textContent = shopProfit.toFixed(2) + ' ريال';
-                document.getElementById('profitCalculation').style.display = 'block';
+                
+                // تحديث القيم في النموذج إذا كانت العناصر موجودة
+                const totalProfitEl = document.getElementById('totalProfit');
+                const techCommissionEl = document.getElementById('techCommission');
+                const shopProfitEl = document.getElementById('shopProfit');
+                const profitCalculationEl = document.getElementById('profitCalculation');
+                
+                if (totalProfitEl) totalProfitEl.textContent = profit.toFixed(2) + ' ريال';
+                if (techCommissionEl) techCommissionEl.textContent = techCommission.toFixed(2) + ' ريال';
+                if (shopProfitEl) shopProfitEl.textContent = shopProfit.toFixed(2) + ' ريال';
+                if (profitCalculationEl) profitCalculationEl.style.display = 'block';
+                
+                console.log('💰 تم حساب الأرباح:', { profit, techCommission, shopProfit });
             } else {
-                document.getElementById('profitCalculation').style.display = 'none';
+                const profitCalculationEl = document.getElementById('profitCalculation');
+                if (profitCalculationEl) profitCalculationEl.style.display = 'none';
             }
         }
 
@@ -478,10 +496,10 @@
                         </span>
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-warning me-1" onclick="editJob('${job.id}')">
+                        <button class="btn btn-sm btn-warning me-1" onclick="editJob('${job.id.replace(/'/g, "\\'")}')">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteJob('${job.id}')">
+                        <button class="btn btn-sm btn-danger" onclick="deleteJob('${job.id.replace(/'/g, "\\'")}')">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
@@ -516,36 +534,90 @@
 
         // Edit job
         function editJob(jobId) {
+            console.log('🔧 محاولة تعديل عمل الصيانة:', jobId);
+            
             const job = jobsData.find(j => j.id === jobId);
-            if (!job) return;
-
-            currentEditId = jobId;
-            document.getElementById('jobModalTitle').textContent = 'تعديل عمل الصيانة';
-            document.getElementById('jobId').value = jobId;
-            document.getElementById('customerName').value = job.customerName;
-            document.getElementById('customerPhone').value = job.customerPhone || '';
-            document.getElementById('visitDate').value = job.visitDate ? new Date(job.visitDate.seconds * 1000).toISOString().split('T')[0] : '';
-            document.getElementById('partName').value = job.partName;
-            document.getElementById('repId').value = job.repId || '';
-            document.getElementById('techId').value = job.techId || '';
-            document.getElementById('partCost').value = job.partCost;
-            document.getElementById('amountCharged').value = job.amountCharged;
-            document.getElementById('status').value = job.status;
-            document.getElementById('notes').value = job.notes || '';
-
-            // Set the tech percent for editing
-            selectedTechPercent = job.techPercent || 0.5;
-
-            // Show complete button only if job is not done
-            const completeBtn = document.getElementById('completeJobBtn');
-            if (job.status !== 'done') {
-                completeBtn.style.display = 'inline-block';
-            } else {
-                completeBtn.style.display = 'none';
+            if (!job) {
+                console.error('❌ لم يتم العثور على عمل الصيانة:', jobId);
+                showAlert('error', 'لم يتم العثور على عمل الصيانة المطلوب');
+                return;
             }
 
-            calculateProfit();
-            new bootstrap.Modal(document.getElementById('jobModal')).show();
+            console.log('✅ تم العثور على عمل الصيانة:', job);
+
+            try {
+                currentEditId = jobId;
+                
+                // تحديث عنوان النافذة
+                const modalTitle = document.getElementById('jobModalTitle');
+                if (modalTitle) modalTitle.textContent = 'تعديل عمل الصيانة';
+                
+                // ملء البيانات في النموذج
+                const jobIdField = document.getElementById('jobId');
+                if (jobIdField) jobIdField.value = jobId;
+                
+                const customerNameField = document.getElementById('customerName');
+                if (customerNameField) customerNameField.value = job.customerName || '';
+                
+                const customerPhoneField = document.getElementById('customerPhone');
+                if (customerPhoneField) customerPhoneField.value = job.customerPhone || '';
+                
+                const visitDateField = document.getElementById('visitDate');
+                if (visitDateField) {
+                    visitDateField.value = job.visitDate ? new Date(job.visitDate.seconds * 1000).toISOString().split('T')[0] : '';
+                }
+                
+                const partNameField = document.getElementById('partName');
+                if (partNameField) partNameField.value = job.partName || '';
+                
+                const repIdField = document.getElementById('repId');
+                if (repIdField) repIdField.value = job.repId || '';
+                
+                const techIdField = document.getElementById('techId');
+                if (techIdField) techIdField.value = job.techId || '';
+                
+                const partCostField = document.getElementById('partCost');
+                if (partCostField) partCostField.value = job.partCost || 0;
+                
+                const amountChargedField = document.getElementById('amountCharged');
+                if (amountChargedField) amountChargedField.value = job.amountCharged || 0;
+                
+                const statusField = document.getElementById('status');
+                if (statusField) statusField.value = job.status || 'pending';
+                
+                const notesField = document.getElementById('notes');
+                if (notesField) notesField.value = job.notes || '';
+
+                // Set the tech percent for editing
+                selectedTechPercent = job.techPercent || 0.5;
+                console.log('💰 نسبة عمولة الفني:', selectedTechPercent);
+
+                // Show complete button only if job is not done
+                const completeBtn = document.getElementById('completeJobBtn');
+                if (completeBtn) {
+                    if (job.status !== 'done') {
+                        completeBtn.style.display = 'inline-block';
+                    } else {
+                        completeBtn.style.display = 'none';
+                    }
+                }
+
+                // إعادة حساب الأرباح
+                calculateProfit();
+                
+                // فتح النافذة
+                const modal = document.getElementById('jobModal');
+                if (modal) {
+                    new bootstrap.Modal(modal).show();
+                    console.log('✅ تم فتح نافذة التعديل بنجاح');
+                } else {
+                    console.error('❌ لم يتم العثور على نافذة التعديل');
+                }
+                
+            } catch (error) {
+                console.error('❌ خطأ في تعديل عمل الصيانة:', error);
+                showAlert('error', 'حدث خطأ في فتح نافذة التعديل');
+            }
         }
 
         // Save job
@@ -607,14 +679,23 @@
 
         // Delete job
         async function deleteJob(jobId) {
+            console.log('🗑️ محاولة حذف عمل الصيانة:', jobId);
+            
+            if (!jobId) {
+                console.error('❌ معرف عمل الصيانة غير صالح');
+                showAlert('error', 'معرف عمل الصيانة غير صالح');
+                return;
+            }
+            
             if (!confirm('هل أنت متأكد من حذف عمل الصيانة هذا؟')) return;
 
             try {
                 await window.firebaseDatabase.deleteMaintenanceJob(jobId);
                 showAlert('success', 'تم حذف عمل الصيانة بنجاح');
                 loadData();
+                console.log('✅ تم حذف عمل الصيانة بنجاح');
             } catch (error) {
-                console.error('Error deleting job:', error);
+                console.error('❌ خطأ في حذف عمل الصيانة:', error);
                 showAlert('error', 'حدث خطأ في حذف عمل الصيانة');
             }
         }
