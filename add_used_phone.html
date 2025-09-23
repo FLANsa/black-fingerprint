@@ -43,15 +43,6 @@
           <div class="card-body">
 
             <form method="POST" action="#" onsubmit="return false;">
-              <div class="mb-3">
-                <label for="barcode_input" class="form-label">الباركود (اختياري)</label>
-                <div class="input-group">
-                  <input type="text" class="form-control" id="barcode_input" name="barcode_input"
-                         placeholder="أدخل الباركود الموجود أو اتركه فارغاً لتوليد باركود جديد" value="">
-                  <button class="btn btn-outline-secondary" type="button" onclick="clearBarcode()">مسح</button>
-                </div>
-                <div class="form-text">أدخل الباركود الموجود على الهاتف أو اتركه فارغاً لتوليد باركود جديد</div>
-              </div>
 
               <div class="mb-3">
                 <label for="brand" class="form-label">الشركة المصنعة</label>
@@ -212,7 +203,6 @@
   <script type="module" src="js/firebase-storage-manager.js"></script>
 
   <script>
-    function clearBarcode(){ document.getElementById('barcode_input').value = ''; }
 
     // تحويل الأرقام العربية إلى إنجليزية
     function convertArabicToEnglishNumbers(str) {
@@ -418,7 +408,7 @@
           return false;
         }
 
-        const phone_number = (document.getElementById('barcode_input').value||'').trim() || generatePhoneNumber();
+        const phone_number = generatePhoneNumber();
         const ageMonths = parseInt(document.getElementById('age').value)||0;
 
         const phoneData = {
@@ -567,7 +557,6 @@
           console.log('✅ تم العثور على الهاتف المستعمل:', phone);
           
           // ملء النموذج بالبيانات
-          document.getElementById('barcode_input').value = phone.phone_number || '';
           document.getElementById('brand').value = phone.manufacturer || phone.brand || '';
           document.getElementById('model').value = phone.model || '';
           document.getElementById('color').value = phone.phone_color || '';
@@ -661,7 +650,6 @@
         await loadPhoneForEdit(editPhoneNumber);
       }
       
-      if(!document.getElementById('barcode_input').value){ document.getElementById('barcode_input').focus(); }
     });
 
     function logout(){ if(confirm('هل أنت متأكد من تسجيل الخروج؟')){ localStorage.removeItem('current_user'); alert('تم تسجيل الخروج'); window.location.href='index.html'; } }
