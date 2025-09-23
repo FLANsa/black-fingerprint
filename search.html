@@ -161,6 +161,26 @@
     return arr.some(x => s.includes((x||'').toString().toLowerCase()));
   }
 
+  // ===== تحويل الأرقام العربية إلى إنجليزية =====
+  function convertArabicToEnglishNumbers(str) {
+    if (!str) return '';
+    const map = {
+      '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+      '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+    };
+    return str.toString().replace(/[٠-٩]/g, m => map[m] || m);
+  }
+
+  // ===== تحويل الأرقام الإنجليزية إلى عربية =====
+  function convertEnglishToArabicNumbers(str) {
+    if (!str) return '';
+    const map = {
+      '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
+      '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩'
+    };
+    return str.toString().replace(/[0-9]/g, m => map[m] || m);
+  }
+
   // ===== هل الهاتف مباع؟ (نفس منطق صفحة المبيعات مع شوية مرونة في الحقول) =====
   function isPhoneSold(phoneId) {
     if (!phoneId) return false;
@@ -231,8 +251,15 @@
 
       // لم نعد نحتاج Set لأننا سنستخدم isPhoneSold مباشرة
 
-      const tokens = term.toLowerCase().split(/\s+/);
-      console.log('🔤 الرموز المطلوب البحث عنها:', tokens);
+      // تحويل الأرقام العربية إلى إنجليزية للبحث
+      const englishTerm = convertArabicToEnglishNumbers(term);
+      const arabicTerm = convertEnglishToArabicNumbers(term);
+      
+      // البحث في كلا النسختين (عربية وإنجليزية)
+      const searchTerms = [term.toLowerCase(), englishTerm.toLowerCase(), arabicTerm.toLowerCase()];
+      const uniqueTerms = [...new Set(searchTerms)]; // إزالة التكرار
+      
+      console.log('🔤 الرموز المطلوب البحث عنها:', uniqueTerms);
 
       let phones = [];
       let accessories = [];
@@ -240,18 +267,36 @@
       if (type === 'all' || type === 'phones') {
         phones = allPhones.filter(p => {
           
-          // البحث في النص
+          // البحث في النص مع دعم الأرقام العربية والإنجليزية
           const searchText = `${p.phone_number || ''} ${p.manufacturer || p.brand || ''} ${p.model || ''} ${p.condition || p.phone_type || ''}`.toLowerCase();
+          const englishSearchText = convertArabicToEnglishNumbers(searchText);
+          const arabicSearchText = convertEnglishToArabicNumbers(searchText);
+          
           console.log('🔍 البحث في الهاتف:', p.phone_number, 'النص:', searchText, 'الحالة:', p.status || 'available');
-          return tokens.some(token => searchText.includes(token));
+          
+          // البحث في جميع النسخ (الأصلية، الإنجليزية، العربية)
+          return uniqueTerms.some(term => 
+            searchText.includes(term) || 
+            englishSearchText.includes(term) || 
+            arabicSearchText.includes(term)
+          );
         });
       }
 
       if (type === 'all' || type === 'accessories') {
         accessories = allAccessories.filter(a => {
           const searchText = `${a.name || ''} ${a.arabic_name || ''} ${a.category || ''}`.toLowerCase();
+          const englishSearchText = convertArabicToEnglishNumbers(searchText);
+          const arabicSearchText = convertEnglishToArabicNumbers(searchText);
+          
           console.log('🔍 البحث في الأكسسوار:', a.name || a.arabic_name, 'النص:', searchText);
-          return tokens.some(token => searchText.includes(token));
+          
+          // البحث في جميع النسخ (الأصلية، الإنجليزية، العربية)
+          return uniqueTerms.some(term => 
+            searchText.includes(term) || 
+            englishSearchText.includes(term) || 
+            arabicSearchText.includes(term)
+          );
         });
       }
 
