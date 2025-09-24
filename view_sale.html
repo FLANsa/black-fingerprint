@@ -539,7 +539,7 @@
     <!-- Action Buttons -->
   <div class="row mt-4">
     <div class="col-md-12 text-center">
-      <button class="btn btn-success btn-lg me-3" onclick="printReceipt()">
+      <button class="btn btn-success btn-lg me-3" id="printBtn" onclick="printReceipt()">
         <i class="fas fa-print"></i> طباعة الفاتورة
       </button>
       <button class="btn btn-danger btn-lg me-3" onclick="returnCurrentSale()">
@@ -914,11 +914,30 @@
     }
   }
 
+  // متغير لمنع الطباعة المتعددة
+  let isPrinting = false;
+
   // طباعة الفاتورة
   function printReceipt() {
+    // منع الطباعة المتعددة
+    if (isPrinting) {
+      showAlert('info', 'جاري الطباعة... يرجى الانتظار');
+      return;
+    }
+
     if (!currentSale) {
       showAlert('warning', 'لا توجد بيانات للطباعة');
       return;
+    }
+
+    // تعيين حالة الطباعة
+    isPrinting = true;
+    
+    // تحديث حالة الزر
+    const printBtn = document.getElementById('printBtn');
+    if (printBtn) {
+      printBtn.disabled = true;
+      printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطباعة...';
     }
 
     populateReceiptTemplate();
@@ -1008,7 +1027,22 @@
     
     setTimeout(() => {
       printWindow.print();
-      printWindow.close();
+      
+      // إغلاق النافذة بعد الطباعة
+      setTimeout(() => {
+        printWindow.close();
+        // إعادة تعيين حالة الطباعة
+        isPrinting = false;
+        
+        // إعادة تعيين الزر
+        const printBtn = document.getElementById('printBtn');
+        if (printBtn) {
+          printBtn.disabled = false;
+          printBtn.innerHTML = '<i class="fas fa-print"></i> طباعة الفاتورة';
+        }
+        
+        showAlert('success', 'تم إرسال الفاتورة للطباعة بنجاح');
+      }, 1000);
     }, 500);
   }
 
