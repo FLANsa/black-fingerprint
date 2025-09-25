@@ -802,19 +802,11 @@
         
         // البحث عن الرقم التسلسلي من قاعدة البيانات إذا لم يكن موجوداً
         let serialNumber = item.serial_number || item.barcode || 'لا يوجد';
-        console.log('🔍 Serial Number Debug:', {
-          itemId: item.id,
-          itemSerial: item.serial_number,
-          itemBarcode: item.barcode,
-          initialSerialNumber: serialNumber
-        });
         
         if (item.type === 'phone' && (!item.serial_number && !item.barcode)) {
           const phone = phones.find(p => (p.id === item.id || p.phone_number === item.id));
-          console.log('📱 Found phone:', phone);
           if (phone) {
             serialNumber = phone.serial_number || phone.phone_number || 'لا يوجد';
-            console.log('✅ Updated serial number:', serialNumber);
           }
         }
         
@@ -824,8 +816,6 @@
           productName += ` (البطارية: ${item.battery_level}%)`;
         }
         
-        // Debug: Show serial number in alert
-        console.log('🔍 Final serial number for', productName, ':', serialNumber);
         
         row.innerHTML = `
           <td>${getProductTypeBadge(item.type || item.product_type)}</td>
