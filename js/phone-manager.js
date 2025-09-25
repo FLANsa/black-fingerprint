@@ -64,6 +64,7 @@ class PhoneManager {
                 warranty: phoneData.warranty ? parseInt(phoneData.warranty) : null,
                 phone_condition: phoneData.phone_condition || null,
                 age: phoneData.age ? parseInt(phoneData.age) : null,
+                battery_level: phoneData.battery_level || null,
                 customer_name: phoneData.customer_name || '',
                 customer_id: phoneData.customer_id || '',
                 phone_color: phoneData.phone_color || '',

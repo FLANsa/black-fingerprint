@@ -1110,19 +1110,8 @@
         
         // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
-        
-        // Debug: Log the item data to console
-        console.log('Receipt item debug:', {
-          type: item.type,
-          battery_level: item.battery_level,
-          condition: item.condition,
-          phone_type: item.phone_type,
-          name: productName
-        });
-        
         if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
           productName += ` (البطارية: ${item.battery_level}%)`;
-          console.log('Added battery percentage to:', productName);
         }
         
         row.innerHTML = `
