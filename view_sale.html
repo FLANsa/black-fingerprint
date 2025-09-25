@@ -787,7 +787,8 @@
     const itemsContainer = document.getElementById('sale_items');
     itemsContainer.innerHTML = '';
 
-    if (currentSale.items && currentSale.items.length > 0) {
+    try {
+      if (currentSale.items && currentSale.items.length > 0) {
       // جلب بيانات الهواتف من قاعدة البيانات للرقم التسلسلي
       let phones = [];
       if (window.storage && window.storage.isFirebaseAvailable) {
@@ -839,6 +840,11 @@
       }
     } else {
       itemsContainer.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا توجد منتجات</td></tr>';
+    }
+    
+    } catch (error) {
+      console.error('❌ خطأ في عرض منتجات البيع:', error);
+      itemsContainer.innerHTML = '<tr><td colspan="7" class="text-center text-danger">خطأ في تحميل المنتجات</td></tr>';
     }
   }
 
@@ -981,12 +987,13 @@
       printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطباعة...';
     }
 
-    await populateReceiptTemplate();
-    
-    // التأكد من جاهزية QR Code للطباعة
-    ensureQrReadyForPrint();
-    
-    const printWindow = window.open('', '_blank');
+    try {
+      await populateReceiptTemplate();
+      
+      // التأكد من جاهزية QR Code للطباعة
+      ensureQrReadyForPrint();
+      
+      const printWindow = window.open('', '_blank');
     const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
     
     printWindow.document.write(`
@@ -1092,11 +1099,28 @@
         showAlert('success', 'تم إرسال الفاتورة للطباعة بنجاح');
       }, 1000);
     }, 500);
+    
+    } catch (error) {
+      console.error('❌ خطأ في طباعة الفاتورة:', error);
+      showAlert('danger', 'حدث خطأ في طباعة الفاتورة: ' + error.message);
+      
+      // إعادة تعيين حالة الطباعة
+      isPrinting = false;
+      
+      // إعادة تعيين الزر
+      const printBtn = document.getElementById('printBtn');
+      if (printBtn) {
+        printBtn.disabled = false;
+        printBtn.innerHTML = '<i class="fas fa-print"></i> طباعة الفاتورة';
+      }
+    }
   }
 
   // تعبئة قالب الفاتورة
   async function populateReceiptTemplate() {
     if (!currentSale) return;
+    
+    try {
 
     // رقم الفاتورة
     document.getElementById('receipt_sale_number').textContent = currentSale.sale_number || currentSale.id;
@@ -1182,6 +1206,11 @@
     document.getElementById('receipt_subtotal').textContent = subtotal.toFixed(2) + ' ريال';
     document.getElementById('receipt_vat').textContent = vatAmount.toFixed(2) + ' ريال';
     document.getElementById('receipt_total').textContent = totalAmount.toFixed(2) + ' ريال';
+    
+    } catch (error) {
+      console.error('❌ خطأ في تعبئة قالب الفاتورة:', error);
+      throw error; // إعادة رمي الخطأ للدالة المستدعية
+    }
   }
 
 
