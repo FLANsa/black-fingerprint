@@ -779,9 +779,9 @@
       currentSale.items.forEach(item => {
         const row = document.createElement('tr');
         
-        // Add battery percentage for phones
+        // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
-        if (item.type === 'phone' && item.battery_level) {
+        if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
           productName += ` (البطارية: ${item.battery_level}%)`;
         }
         
@@ -1092,9 +1092,9 @@
         const unitPrice = item.unitPrice || item.unit_price || 0;
         const unitPriceWithoutVAT = unitPrice / 1.15;
         
-        // Add battery percentage for phones
+        // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
-        if (item.type === 'phone' && item.battery_level) {
+        if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
           productName += ` (البطارية: ${item.battery_level}%)`;
         }
         
