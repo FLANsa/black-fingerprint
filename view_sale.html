@@ -1113,8 +1113,28 @@
         
         // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
+        
+        // Debug: Log item data
+        console.log('🔍 Receipt Item Debug:', {
+          type: item.type,
+          name: productName,
+          battery_level: item.battery_level,
+          condition: item.condition,
+          phone_type: item.phone_type,
+          isPhone: item.type === 'phone',
+          hasBattery: !!item.battery_level,
+          isUsed: item.condition === 'used' || item.phone_type === 'used'
+        });
+        
         if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
           productName += ` (البطارية: ${item.battery_level}%)`;
+          console.log('✅ Added battery percentage:', productName);
+        } else {
+          console.log('❌ Battery percentage NOT added. Reasons:', {
+            isPhone: item.type === 'phone',
+            hasBattery: !!item.battery_level,
+            isUsed: item.condition === 'used' || item.phone_type === 'used'
+          });
         }
         
         row.innerHTML = `
