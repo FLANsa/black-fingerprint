@@ -525,6 +525,7 @@
       <p>في حال وجود عطل داخلي يشمل ضمان</p>
       <p>المستخدم في حال وجود كامل الملحقات</p>
       <div class="qr-block">
+        <p style="font-size: 14px; margin: 5px 0; font-weight: bold;">QR Code الضريبي</p>
         <div id="tax-qr" aria-label="QR code for tax number"></div>
       </div>
       <p>شكرا لزيارتكم الصقري للاتصالات</p>
@@ -1064,16 +1065,28 @@
   // Generate the QR into #tax-qr using available QR library
   function generateTaxQR() {
     const container = document.getElementById('tax-qr');
-    if (!container || typeof QRCode === 'undefined' || !QRCode.toCanvas) return;
+    if (!container) {
+      console.log('❌ QR container not found');
+      return;
+    }
     
+    if (typeof QRCode === 'undefined' || !QRCode.toCanvas) {
+      console.log('❌ QRCode library not loaded');
+      return;
+    }
+    
+    console.log('✅ Generating QR Code...');
     container.innerHTML = '';
     const canvas = document.createElement('canvas');
     QRCode.toCanvas(canvas, "310105614500003", { width: 120, height: 120, margin: 2 }, (err) => {
       if (!err) {
+        console.log('✅ QR Code generated successfully');
         const img = new Image();
         img.width = 120; img.height = 120; img.alt = 'Tax QR';
         img.src = canvas.toDataURL('image/png');
         container.innerHTML = ''; container.appendChild(img);
+      } else {
+        console.log('❌ QR Code generation failed:', err);
       }
     });
   }
