@@ -709,7 +709,7 @@
       const lastSale = localStorage.getItem('lastSale');
       if (lastSale) {
         currentSale = JSON.parse(lastSale);
-        displaySaleData();
+        await displaySaleData();
       } else {
         showAlert('warning', 'لا توجد بيانات للعرض');
       }
@@ -728,7 +728,7 @@
       }
       
       if (currentSale) {
-        displaySaleData();
+        await displaySaleData();
       } else {
         showAlert('danger', 'لم يتم العثور على عملية البيع المطلوبة');
       }
@@ -738,7 +738,7 @@
   }
 
   // عرض بيانات البيع
-  function displaySaleData() {
+  async function displaySaleData() {
     if (!currentSale) return;
 
     document.getElementById('sale_number').textContent = currentSale.sale_number || currentSale.id;
@@ -759,7 +759,7 @@
     document.getElementById('customer_email').textContent = currentSale.customer_email || 'غير محدد';
     document.getElementById('customer_address').textContent = currentSale.customer_address || 'غير محدد';
 
-    displaySaleItems();
+    await displaySaleItems();
 
     const subtotal = currentSale.subtotal || 0;
     const vatAmount = currentSale.vat_amount || 0;
@@ -783,13 +783,30 @@
   }
 
   // عرض منتجات البيع
-  function displaySaleItems() {
+  async function displaySaleItems() {
     const itemsContainer = document.getElementById('sale_items');
     itemsContainer.innerHTML = '';
 
     if (currentSale.items && currentSale.items.length > 0) {
-      currentSale.items.forEach(item => {
+      // جلب بيانات الهواتف من قاعدة البيانات للرقم التسلسلي
+      let phones = [];
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        phones = await window.storage.getPhones();
+      } else {
+        phones = JSON.parse(localStorage.getItem('phones') || '[]');
+      }
+
+      for (const item of currentSale.items) {
         const row = document.createElement('tr');
+        
+        // البحث عن الرقم التسلسلي من قاعدة البيانات إذا لم يكن موجوداً
+        let serialNumber = item.serial_number || item.barcode || 'لا يوجد';
+        if (item.type === 'phone' && (!item.serial_number && !item.barcode)) {
+          const phone = phones.find(p => (p.id === item.id || p.phone_number === item.id));
+          if (phone) {
+            serialNumber = phone.serial_number || phone.phone_number || 'لا يوجد';
+          }
+        }
         
         // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
@@ -801,13 +818,13 @@
           <td>${getProductTypeBadge(item.type || item.product_type)}</td>
           <td>${productName}</td>
           <td>${item.description || item.product_description || 'لا يوجد وصف'}</td>
-          <td>${item.serial_number || item.barcode || 'لا يوجد'}</td>
+          <td>${serialNumber}</td>
           <td>${(item.unitPrice || item.unit_price || 0).toFixed(2)} ريال</td>
           <td>${item.quantity || 1}</td>
           <td class="fw-bold text-success">${(item.totalPrice || item.total_price || 0).toFixed(2)} ريال</td>
         `;
         itemsContainer.appendChild(row);
-      });
+      }
     } else {
       itemsContainer.innerHTML = '<tr><td colspan="7" class="text-center text-muted">لا توجد منتجات</td></tr>';
     }
@@ -930,7 +947,7 @@
   let isPrinting = false;
 
   // طباعة الفاتورة
-  function printReceipt() {
+  async function printReceipt() {
     // منع الطباعة المتعددة
     if (isPrinting) {
       showAlert('info', 'جاري الطباعة... يرجى الانتظار');
@@ -952,7 +969,7 @@
       printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطباعة...';
     }
 
-    populateReceiptTemplate();
+    await populateReceiptTemplate();
     
     // التأكد من جاهزية QR Code للطباعة
     ensureQrReadyForPrint();
@@ -1066,7 +1083,7 @@
   }
 
   // تعبئة قالب الفاتورة
-  function populateReceiptTemplate() {
+  async function populateReceiptTemplate() {
     if (!currentSale) return;
 
     // رقم الفاتورة
@@ -1106,10 +1123,27 @@
     receiptItems.innerHTML = '';
     
     if (currentSale.items && currentSale.items.length > 0) {
-      currentSale.items.forEach(item => {
+      // جلب بيانات الهواتف من قاعدة البيانات للرقم التسلسلي
+      let phones = [];
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        phones = await window.storage.getPhones();
+      } else {
+        phones = JSON.parse(localStorage.getItem('phones') || '[]');
+      }
+
+      for (const item of currentSale.items) {
         const row = document.createElement('tr');
         const unitPrice = item.unitPrice || item.unit_price || 0;
         const unitPriceWithoutVAT = unitPrice / 1.15;
+        
+        // البحث عن الرقم التسلسلي من قاعدة البيانات إذا لم يكن موجوداً
+        let serialNumber = item.serial_number || item.barcode || 'غير محدد';
+        if (item.type === 'phone' && (!item.serial_number && !item.barcode)) {
+          const phone = phones.find(p => (p.id === item.id || p.phone_number === item.id));
+          if (phone) {
+            serialNumber = phone.serial_number || phone.phone_number || 'غير محدد';
+          }
+        }
         
         // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
@@ -1120,12 +1154,12 @@
         row.innerHTML = `
           <td>${item.quantity || 1}</td>
           <td>${productName}</td>
-          <td>${item.serial_number || item.barcode || 'غير محدد'}</td>
+          <td>${serialNumber}</td>
           <td>${unitPriceWithoutVAT.toFixed(2)}</td>
           <td>${unitPrice.toFixed(2)}</td>
         `;
         receiptItems.appendChild(row);
-      });
+      }
     }
 
     // المجاميع
