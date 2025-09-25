@@ -9,63 +9,12 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   
-  <!-- QRCode.js CDN - Multiple fallbacks with better error handling -->
+  <!-- QRCode Library -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script>
-    let qrLibrariesLoaded = 0;
-    const maxRetries = 3;
-    
-    function loadQRCodeLibrary() {
-      // Try multiple CDN sources
-      const cdnSources = [
-        'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
-        'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
-      ];
-      
-      let currentSource = 0;
-      
-      function tryNextSource() {
-        if (currentSource >= cdnSources.length) {
-          loadQRCodeJSFallback();
-          return;
-        }
-        
-        const script = document.createElement('script');
-        script.src = cdnSources[currentSource];
-        script.onload = function() {
-          qrLibrariesLoaded++;
-          setTimeout(generateTaxQR, 100);
-        };
-        script.onerror = function() {
-          currentSource++;
-          tryNextSource();
-        };
-        document.head.appendChild(script);
-      }
-      
-      tryNextSource();
-    }
-    
-    function loadQRCodeJSFallback() {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      script.onload = function() {
-        qrLibrariesLoaded++;
-        setTimeout(generateTaxQR, 100);
-      };
-      script.onerror = function() {
-        // QR library failed to load
-      };
-      document.head.appendChild(script);
-    }
-    
-    
-    // Start loading when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadQRCodeLibrary);
-    } else {
-      loadQRCodeLibrary();
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(generateTaxQR, 100);
+    });
   </script>
 
   <style>
@@ -88,57 +37,27 @@
       display: none;
     }
     
-    /* QR block for receipt */
-    .qr-block {
-      text-align: center;
-      margin: 8px 0 0 0;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      padding-left: 30px;
+    /* QR centered (one source of truth) */
+    .qr-block{
+      text-align:center;
+      margin:8px 0 0 0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
     }
-    #tax-qr {
-      width: 120px; 
-      height: 120px;
-      margin: 0 0 6px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #tax-qr img, #tax-qr canvas {
-      width: 120px; 
-      height: 120px; /* lock size for thermal printers */
-      display: block; 
-      margin: 0 auto;
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    /* Ensure visible in print */
-    @media print {
-      .qr-block {
-        text-align: left !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        justify-content: center !important;
-        margin: 8px 0 !important;
-        padding-left: 30px !important;
-      }
-      #tax-qr, #tax-qr img, #tax-qr canvas {
-        width: 120px !important; 
-        height: 120px !important;
-        display: block !important;
-        margin: 0 !important;
-        text-align: left !important;
-      }
+    #tax-qr{ width:120px; height:120px; margin:0 auto 6px; display:block; }
+    #tax-qr img, #tax-qr canvas{
+      width:120px; height:120px; display:block; margin:0 auto; max-width:100%; max-height:100%;
     }
     
     @media print {
       .container, .btn, .d-flex, .card {
         display: none !important;
       }
+      .qr-block{ text-align:center !important; align-items:center !important; justify-content:center !important; margin:8px 0 !important; width:100% !important; }
+      #tax-qr, #tax-qr img, #tax-qr canvas{ width:120px !important; height:120px !important; display:block !important; margin:0 auto !important; }
+    }
       
       .receipt-template {
         display: block !important;
@@ -154,31 +73,6 @@
         page-break-inside: avoid !important;
       }
       
-      .receipt-template .qr-block {
-        text-align: left !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        justify-content: center !important;
-        margin: 8px 0 !important;
-        width: 100% !important;
-        padding-left: 30px !important;
-      }
-      
-      .receipt-template #tax-qr {
-        margin: 0 !important;
-        text-align: left !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-      }
-      
-      .receipt-template #tax-qr img,
-      .receipt-template #tax-qr canvas {
-        margin: 0 !important;
-        display: block !important;
-        text-align: left !important;
-      }
       
       .receipt-header {
         text-align: center !important;
@@ -642,7 +536,6 @@
 
 <!-- مكتبات JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Firebase Configuration -->
 <script type="module" src="js/firebase-config-cdn.js"></script>
@@ -953,153 +846,118 @@
 
   // طباعة الفاتورة
   async function printReceipt() {
-    // منع الطباعة المتعددة
-    if (isPrinting) {
-      showAlert('info', 'جاري الطباعة... يرجى الانتظار');
-      return;
-    }
+    if (isPrinting) { showAlert('info','جاري الطباعة...'); return; }
+    if (!currentSale) { showAlert('warning','لا توجد بيانات للطباعة'); return; }
 
-    if (!currentSale) {
-      showAlert('warning', 'لا توجد بيانات للطباعة');
-      return;
-    }
-
-    // تعيين حالة الطباعة
     isPrinting = true;
-    
-    // تحديث حالة الزر
     const printBtn = document.getElementById('printBtn');
-    if (printBtn) {
-      printBtn.disabled = true;
-      printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطباعة...';
-    }
+    if (printBtn) { printBtn.disabled = true; printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطباعة...'; }
 
     try {
+      // 1) افتح النافذة فورًا (ضمن حدث الضغط) قبل أي await
+      const popup = window.open('', 'printWindow', 'width=420,height=800');
+      const willUsePopup = !!popup;
+
+      // 2) جهّز المحتوى (قد يأخذ وقت)
       await populateReceiptTemplate();
-      
-      // التأكد من جاهزية QR Code للطباعة
       ensureQrReadyForPrint();
-      
-      const printWindow = window.open('', '_blank');
-    const receiptContent = document.getElementById('receipt-roll-template').innerHTML;
-    
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html dir="rtl" lang="ar">
-      <head>
-        <meta charset="UTF-8">
-        <title>فاتورة مبيعات</title>
-        <style>
-          /* Base */
-          body {
-            margin: 0; padding: 0;
-            font-family: 'Arial','Tahoma',sans-serif;
-            font-size: 22px; line-height: 1.4;
-            color: black; background: white;
-            direction: rtl; text-align: right;
-            -webkit-print-color-adjust: exact;
-            color-adjust: exact;
-          }
+      const receiptHTML = document.getElementById('receipt-roll-template').innerHTML;
 
-          /* Page = 80mm roll; no extra margins */
-          @media print { @page { size: 80mm auto; margin: 0; } }
-
-          /* Make content narrower (58mm) and shift exactly 15mm right (revert one step) */
-          .receipt-container {
-            width: 58mm !important;
-            max-width: 58mm !important;
-            margin: 0 0 0 15mm !important;   /* was 10mm → back to 15mm */
-            padding: 0 !important;           /* avoid extra width */
-            box-sizing: border-box;
-          }
-
-          .receipt-header { text-align: center; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 10px; }
-          .company-info h1 { font-size: 32px; margin: 0 0 8px 0; font-weight: bold; text-align: center; }
-          .company-info p { margin: 2px 0; font-size: 20px; text-align: center; }
-          .sale-info h2 { font-size: 29px; margin: 12px 0 8px 0; font-weight: bold; text-align: center; }
-          .sale-info p { margin: 2px 0; font-size: 20px; text-align: center; }
-          .customer-info h3 { font-size: 25px; margin: 12px 0 6px 0; font-weight: bold; text-align: right; }
-          .customer-info p { margin: 1px 0; font-size: 20px; text-align: right; }
-
-          .receipt-items { margin: 15px 0; }
-          .receipt-items h3 { font-size: 25px; margin: 0 0 8px 0; font-weight: bold; text-align: center; }
-
-          /* Prevent overflow on narrow paper */
-          .items-table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
-          .items-table th { border-bottom: 1px solid #000; padding: 3px 1px; text-align: center; font-weight: bold; font-size: 14px; }
-          .items-table td { padding: 2px 1px; text-align: center; border-bottom: 1px dotted #ccc; font-size: 14px; }
-          .items-table th, .items-table td { word-break: break-word; overflow-wrap: break-word; }
-          
-          /* Column widths for 5 columns */
-          .items-table th:nth-child(1), .items-table td:nth-child(1) { width: 10%; } /* الكمية */
-          .items-table th:nth-child(2), .items-table td:nth-child(2) { width: 35%; } /* المنتج */
-          .items-table th:nth-child(3), .items-table td:nth-child(3) { width: 25%; } /* الرقم التسلسلي */
-          .items-table th:nth-child(4), .items-table td:nth-child(4) { width: 15%; } /* السعر غير شامل الضريبة */
-          .items-table th:nth-child(5), .items-table td:nth-child(5) { width: 15%; } /* السعر شامل الضريبة */
-
-          .receipt-summary { margin: 15px 0; border-top: 1px solid #000; padding-top: 10px; }
-          .summary-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 20px; }
-          .summary-row.total { font-weight: bold; font-size: 25px; border-top: 1px solid #000; padding-top: 8px; margin-top: 15px; }
-
-          .seller-info { margin: 10px 0; text-align: right; font-size: 20px; }
-          .seller-info p { margin: 2px 0; }
-
-          .receipt-footer { text-align: center; margin-top: 20px; border-top: 1px solid #000; padding-top: 10px; }
-          .receipt-footer h4 { font-size: 22px; margin: 0 0 8px 0; font-weight: bold; }
-          .receipt-footer p { margin: 3px 0; font-size: 18px; }
-
-          /* Center QR (still fits in 58mm) */
-          .qr-block{
-            text-align:center; margin:10px 0;
-            display:flex; flex-direction:column; align-items:center; justify-content:center;
-          }
-          #tax-qr, #tax-qr img, #tax-qr canvas{
-            width:120px; height:120px; display:block; margin:0 auto 6px;
-          }
-        </style>
-      </head>
-      <body>
-        ${receiptContent}
-      </body>
-      </html>
-    `);
-    
-    printWindow.document.close();
-    printWindow.focus();
-    
-    setTimeout(() => {
-      printWindow.print();
-      
-      // إغلاق النافذة بعد الطباعة
-      setTimeout(() => {
-        printWindow.close();
-        // إعادة تعيين حالة الطباعة
-        isPrinting = false;
-        
-        // إعادة تعيين الزر
-        const printBtn = document.getElementById('printBtn');
-        if (printBtn) {
-          printBtn.disabled = false;
-          printBtn.innerHTML = '<i class="fas fa-print"></i> طباعة الفاتورة';
-        }
-        
-        showAlert('success', 'تم إرسال الفاتورة للطباعة بنجاح');
-      }, 1000);
-    }, 500);
-    
-    } catch (error) {
-      console.error('❌ خطأ في طباعة الفاتورة:', error);
-      showAlert('danger', 'حدث خطأ في طباعة الفاتورة: ' + error.message);
-      
-      // إعادة تعيين حالة الطباعة
-      isPrinting = false;
-      
-      // إعادة تعيين الزر
-      const printBtn = document.getElementById('printBtn');
-      if (printBtn) {
-        printBtn.disabled = false;
-        printBtn.innerHTML = '<i class="fas fa-print"></i> طباعة الفاتورة';
+      // 3) لو النافذة فتحت، اطبع عبرها
+      if (willUsePopup) {
+        popup.document.write(`
+          <!DOCTYPE html>
+          <html dir="rtl" lang="ar">
+          <head>
+            <meta charset="UTF-8">
+            <title>فاتورة مبيعات</title>
+            <style>
+              body{margin:0;padding:0;font-family:Arial,Tahoma,sans-serif;font-size:22px;line-height:1.4;color:#000;background:#fff;direction:rtl;text-align:right;-webkit-print-color-adjust:exact;color-adjust:exact;}
+              @media print{ @page{ size:80mm auto; margin:0; } }
+              .receipt-container{ width:58mm !important; max-width:58mm !important; margin:0 0 0 15mm !important; padding:0 !important; box-sizing:border-box; }
+              .receipt-header{ text-align:center; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:10px; }
+              .company-info h1{ font-size:32px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+              .company-info p{ margin:2px 0; font-size:20px; text-align:center; }
+              .sale-info h2{ font-size:29px; margin:12px 0 8px 0; font-weight:bold; text-align:center; }
+              .sale-info p{ margin:2px 0; font-size:20px; text-align:center; }
+              .customer-info h3{ font-size:25px; margin:12px 0 6px 0; font-weight:bold; text-align:right; }
+              .customer-info p{ margin:1px 0; font-size:20px; text-align:right; }
+              .receipt-items{ margin:15px 0; }
+              .receipt-items h3{ font-size:25px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+              .items-table{ width:100%; border-collapse:collapse; font-size:14px; table-layout:fixed; }
+              .items-table th{ border-bottom:1px solid #000; padding:3px 1px; text-align:center; font-weight:bold; font-size:14px; }
+              .items-table td{ padding:2px 1px; text-align:center; border-bottom:1px dotted #ccc; font-size:14px; }
+              .items-table th,.items-table td{ word-break:break-word; overflow-wrap:break-word; }
+              .items-table th:nth-child(1),.items-table td:nth-child(1){ width:10%; }
+              .items-table th:nth-child(2),.items-table td:nth-child(2){ width:35%; }
+              .items-table th:nth-child(3),.items-table td:nth-child(3){ width:25%; }
+              .items-table th:nth-child(4),.items-table td:nth-child(4){ width:15%; }
+              .items-table th:nth-child(5),.items-table td:nth-child(5){ width:15%; }
+              .receipt-summary{ margin:15px 0; border-top:1px solid #000; padding-top:10px; }
+              .summary-row{ display:flex; justify-content:space-between; margin:6px 0; font-size:20px; }
+              .summary-row.total{ font-weight:bold; font-size:25px; border-top:1px solid #000; padding-top:8px; margin-top:15px; }
+              .seller-info{ margin:10px 0; text-align:right; font-size:20px; }
+              .seller-info p{ margin:2px 0; }
+              .receipt-footer{ text-align:center; margin-top:20px; border-top:1px solid #000; padding-top:10px; }
+              .receipt-footer h4{ font-size:22px; margin:0 0 8px 0; font-weight:bold; }
+              .receipt-footer p{ margin:3px 0; font-size:18px; }
+              .qr-block{ text-align:center; margin:10px 0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+              #tax-qr, #tax-qr img, #tax-qr canvas{ width:120px; height:120px; display:block; margin:0 auto 6px; }
+            </style>
+          </head>
+          <body>${receiptHTML}</body>
+          </html>
+        `);
+        popup.document.close();
+        popup.focus();
+        setTimeout(() => {
+          popup.print();
+          setTimeout(() => { try { popup.close(); } catch(_){} }, 800);
+          donePrinting();
+        }, 400);
+        return;
       }
+
+      // 4) بديل في حال window.open رجعت null (iOS/PWA): اطبع عبر iframe مخفي
+      const iframe = document.createElement('iframe');
+      iframe.style.visibility = 'hidden';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(`
+        <!DOCTYPE html>
+        <html dir="rtl" lang="ar">
+        <head><meta charset="UTF-8"><title>فاتورة</title>
+        <style>
+          @media print{ @page{ size:80mm auto; margin:0; } }
+          body{ margin:0; background:#fff; }
+        </style>
+        </head>
+        <body>${receiptHTML}</body></html>
+      `);
+      doc.close();
+
+      setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        setTimeout(() => { document.body.removeChild(iframe); donePrinting(); }, 800);
+      }, 300);
+
+    } catch (error) {
+      console.error('❌ خطأ الطباعة:', error);
+      showAlert('danger', 'حدث خطأ في الطباعة: ' + (error?.message || error));
+      donePrinting(true);
+    }
+
+    function donePrinting(failed){
+      isPrinting = false;
+      const btn = document.getElementById('printBtn');
+      if (btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-print"></i> طباعة الفاتورة'; }
+      if (!failed) showAlert('success','تم إرسال الفاتورة للطباعة');
     }
   }
 
@@ -1207,124 +1065,35 @@
   // Generate the QR into #tax-qr using available QR library
   function generateTaxQR() {
     const container = document.getElementById('tax-qr');
-
-    if (!container) {
-      return;
-    }
-
-    // reset
+    if (!container || typeof QRCode === 'undefined' || !QRCode.toCanvas) return;
+    
     container.innerHTML = '';
-
-    // Try different QR libraries
-    if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
-      // Use qrcode library (preferred)
-      generateQRWithQRCodeLibrary(container);
-    } else if (typeof QRCode !== 'undefined' && QRCode.prototype) {
-      // Use QRCode.js library (fallback)
-      generateQRWithQRCodeJS(container);
-    }
-  }
-
-  function generateQRWithQRCodeLibrary(container) {
-    try {
-      // Create canvas element
-      const canvas = document.createElement('canvas');
-      container.appendChild(canvas);
-
-      // Generate QR code using the qrcode library
-      QRCode.toCanvas(canvas, TAX_NUMBER, {
-        width: 120,
-        height: 120,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#ffffff'
-        }
-      }, function (error) {
-        if (!error) {
-          // Convert canvas to image for better print compatibility
-          const png = canvas.toDataURL('image/png');
-          const imgEl = document.createElement('img');
-          imgEl.src = png;
-          imgEl.alt = 'Tax QR';
-          imgEl.width = 120;
-          imgEl.height = 120;
-          container.innerHTML = '';
-          container.appendChild(imgEl);
-        }
-      });
-    } catch (err) {
-      // QR generation failed silently
-    }
-  }
-
-  function generateQRWithQRCodeJS(container) {
-    try {
-      // Use QRCode.js library
-      const qr = new QRCode(container, {
-        text: TAX_NUMBER,
-        width: 120,
-        height: 120,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-      });
-
-      // Wait for QR to be generated, then convert to image
-      setTimeout(() => {
-        try {
-          const canvas = container.querySelector('canvas');
-          const img = container.querySelector('img');
-
-          if (img) {
-            return;
-          }
-          if (canvas) {
-            const png = canvas.toDataURL('image/png');
-            const imgEl = document.createElement('img');
-            imgEl.src = png;
-            imgEl.alt = 'Tax QR';
-            imgEl.width = 120;
-            imgEl.height = 120;
-            container.innerHTML = '';
-            container.appendChild(imgEl);
-          }
-        } catch (innerErr) {
-          // QR conversion failed silently
-        }
-      }, 200);
-    } catch (err) {
-      // QR generation failed silently
-    }
+    const canvas = document.createElement('canvas');
+    QRCode.toCanvas(canvas, "310105614500003", { width: 120, height: 120, margin: 2 }, (err) => {
+      if (!err) {
+        const img = new Image();
+        img.width = 120; img.height = 120; img.alt = 'Tax QR';
+        img.src = canvas.toDataURL('image/png');
+        container.innerHTML = ''; container.appendChild(img);
+      }
+    });
   }
 
 
-  // Ensure we have an <img> in the QR container before we clone HTML into the print window
+
   function ensureQrReadyForPrint() {
     const container = document.getElementById('tax-qr');
     if (!container) return;
-
     const img = container.querySelector('img');
     const canvas = container.querySelector('canvas');
-    if (img) return; // good to go
-
-    try {
-      if (canvas) {
-        const png = canvas.toDataURL('image/png');
-        const imgEl = document.createElement('img');
-        imgEl.src = png;
-        imgEl.alt = 'Tax QR';
-        imgEl.width = 120; imgEl.height = 120;
-        container.innerHTML = '';
-        container.appendChild(imgEl);
-      } else {
-        // maybe generation didn't run yet
-        generateTaxQR();
-      }
-    } catch (err) {
-      // QR preparation failed, continue with print
-      const fallback  = document.getElementById('tax-qr-fallback');
-      if (fallback) fallback.classList.remove('d-none');
+    if (img) return;
+    if (canvas) {
+      const png = canvas.toDataURL('image/png');
+      const imgEl = document.createElement('img');
+      imgEl.src = png; imgEl.alt = 'Tax QR'; imgEl.width = 120; imgEl.height = 120;
+      container.innerHTML = ''; container.appendChild(imgEl);
+    } else {
+      generateTaxQR();
     }
   }
 
