@@ -66,7 +66,7 @@
         margin: 0 auto !important;
         padding: 5mm !important;
         font-family: 'Courier New', monospace !important;
-        font-size: 22px !important;
+        font-size: 18px !important;
         line-height: 1.2 !important;
         color: black !important;
         background: white !important;
@@ -82,7 +82,7 @@
       }
       
       .company-info h1 {
-        font-size: 32px !important;
+        font-size: 26px !important;
         margin: 0 0 10px 0 !important;
         font-weight: bold !important;
         color: black !important;
@@ -90,12 +90,12 @@
       
       .company-info p {
         margin: 3px 0 !important;
-        font-size: 20px !important;
+        font-size: 13px !important;
         color: black !important;
       }
       
       .sale-info h2 {
-        font-size: 29px !important;
+        font-size: 23px !important;
         margin: 15px 0 10px 0 !important;
         font-weight: bold !important;
         color: black !important;
@@ -103,12 +103,12 @@
       
       .sale-info p {
         margin: 3px 0 !important;
-        font-size: 20px !important;
+        font-size: 13px !important;
         color: black !important;
       }
       
       .customer-info h3 {
-        font-size: 25px !important;
+        font-size: 20px !important;
         margin: 15px 0 8px 0 !important;
         font-weight: bold !important;
         color: black !important;
@@ -116,7 +116,7 @@
       
       .customer-info p {
         margin: 2px 0 !important;
-        font-size: 20px !important;
+        font-size: 13px !important;
         color: black !important;
       }
       
@@ -125,7 +125,7 @@
       }
       
       .receipt-items h3 {
-        font-size: 25px !important;
+        font-size: 20px !important;
         margin: 0 0 10px 0 !important;
         font-weight: bold !important;
         text-align: center !important;
@@ -135,7 +135,7 @@
       .items-table {
         width: 100% !important;
         border-collapse: collapse !important;
-        font-size: 16px !important;
+        font-size: 13px !important;
         color: black !important;
         table-layout: fixed !important;
       }
@@ -172,13 +172,13 @@
         display: flex !important;
         justify-content: space-between !important;
         margin: 8px 0 !important;
-        font-size: 22px !important;
+        font-size: 18px !important;
         color: black !important;
       }
       
       .summary-row.total {
         font-weight: bold !important;
-        font-size: 25px !important;
+        font-size: 20px !important;
         border-top: 1px solid #000 !important;
         padding-top: 8px !important;
         margin-top: 15px !important;
@@ -193,7 +193,7 @@
       
       .receipt-footer p {
         margin: 5px 0 !important;
-        font-size: 20px !important;
+        font-size: 13px !important;
         color: black !important;
       }
       
@@ -872,21 +872,21 @@
             <meta charset="UTF-8">
             <title>فاتورة مبيعات</title>
             <style>
-              body{margin:0;padding:0;font-family:Arial,Tahoma,sans-serif;font-size:22px;line-height:1.4;color:#000;background:#fff;direction:rtl;text-align:right;-webkit-print-color-adjust:exact;color-adjust:exact;}
+              body{margin:0;padding:0;font-family:Arial,Tahoma,sans-serif;font-size:18px;line-height:1.4;color:#000;background:#fff;direction:rtl;text-align:right;-webkit-print-color-adjust:exact;color-adjust:exact;}
               @media print{ @page{ size:80mm auto; margin:0; } }
               .receipt-container{ width:58mm !important; max-width:58mm !important; margin:0 0 0 15mm !important; padding:0 !important; box-sizing:border-box; }
               .receipt-header{ text-align:center; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:10px; }
-              .company-info h1{ font-size:32px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
-              .company-info p{ margin:2px 0; font-size:20px; text-align:center; }
-              .sale-info h2{ font-size:29px; margin:12px 0 8px 0; font-weight:bold; text-align:center; }
-              .sale-info p{ margin:2px 0; font-size:20px; text-align:center; }
-              .customer-info h3{ font-size:25px; margin:12px 0 6px 0; font-weight:bold; text-align:right; }
-              .customer-info p{ margin:1px 0; font-size:20px; text-align:right; }
+              .company-info h1{ font-size:26px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+              .company-info p{ margin:2px 0; font-size:16px; text-align:center; }
+              .sale-info h2{ font-size:23px; margin:12px 0 8px 0; font-weight:bold; text-align:center; }
+              .sale-info p{ margin:2px 0; font-size:16px; text-align:center; }
+              .customer-info h3{ font-size:20px; margin:12px 0 6px 0; font-weight:bold; text-align:right; }
+              .customer-info p{ margin:1px 0; font-size:16px; text-align:right; }
               .receipt-items{ margin:15px 0; }
-              .receipt-items h3{ font-size:25px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
-              .items-table{ width:100%; border-collapse:collapse; font-size:14px; table-layout:fixed; }
-              .items-table th{ border-bottom:1px solid #000; padding:3px 1px; text-align:center; font-weight:bold; font-size:14px; }
-              .items-table td{ padding:2px 1px; text-align:center; border-bottom:1px dotted #ccc; font-size:14px; }
+              .receipt-items h3{ font-size:20px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+              .items-table{ width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; }
+              .items-table th{ border-bottom:1px solid #000; padding:3px 1px; text-align:center; font-weight:bold; font-size:11px; }
+              .items-table td{ padding:2px 1px; text-align:center; border-bottom:1px dotted #ccc; font-size:11px; }
               .items-table th,.items-table td{ word-break:break-word; overflow-wrap:break-word; }
               .items-table th:nth-child(1),.items-table td:nth-child(1){ width:10%; }
               .items-table th:nth-child(2),.items-table td:nth-child(2){ width:35%; }
@@ -894,13 +894,13 @@
               .items-table th:nth-child(4),.items-table td:nth-child(4){ width:15%; }
               .items-table th:nth-child(5),.items-table td:nth-child(5){ width:15%; }
               .receipt-summary{ margin:15px 0; border-top:1px solid #000; padding-top:10px; }
-              .summary-row{ display:flex; justify-content:space-between; margin:6px 0; font-size:20px; }
-              .summary-row.total{ font-weight:bold; font-size:25px; border-top:1px solid #000; padding-top:8px; margin-top:15px; }
-              .seller-info{ margin:10px 0; text-align:right; font-size:20px; }
+              .summary-row{ display:flex; justify-content:space-between; margin:6px 0; font-size:16px; }
+              .summary-row.total{ font-weight:bold; font-size:20px; border-top:1px solid #000; padding-top:8px; margin-top:15px; }
+              .seller-info{ margin:10px 0; text-align:right; font-size:16px; }
               .seller-info p{ margin:2px 0; }
               .receipt-footer{ text-align:center; margin-top:20px; border-top:1px solid #000; padding-top:10px; }
-              .receipt-footer h4{ font-size:22px; margin:0 0 8px 0; font-weight:bold; }
-              .receipt-footer p{ margin:3px 0; font-size:18px; }
+              .receipt-footer h4{ font-size:18px; margin:0 0 8px 0; font-weight:bold; }
+              .receipt-footer p{ margin:3px 0; font-size:14px; }
               .qr-block{ text-align:center; margin:10px 0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
               #tax-qr, #tax-qr img, #tax-qr canvas{ width:120px; height:120px; display:block; margin:0 auto 6px; }
             </style>
