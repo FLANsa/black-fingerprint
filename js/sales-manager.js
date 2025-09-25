@@ -36,9 +36,13 @@ class SalesManager {
                     product_name: item.name,
                     product_description: item.description || '',
                     serial_number: item.serial_number || '',
+                    barcode: item.barcode || '',
                     unit_price: item.unitPrice,
                     quantity: item.quantity,
                     total_price: itemTotal,
+                    battery_level: item.battery_level || null,
+                    condition: item.condition || null,
+                    phone_type: item.phone_type || null,
                     notes: item.notes || ''
                 });
 
