@@ -335,8 +335,25 @@
 
     let html = '';
 
-    // Phones
+    // Phones - Sort by status: available first, then sold
     if (phones && phones.length){
+      // ترتيب الجوالات: المتاحة أولاً، ثم المباعة
+      const sortedPhones = phones.sort((a, b) => {
+        const aId = a.id || a.phone_number || a.device_number || a.serial_number;
+        const bId = b.id || b.phone_number || b.device_number || b.serial_number;
+        
+        const aSold = aId && isPhoneSold(String(aId));
+        const bSold = bId && isPhoneSold(String(bId));
+        
+        // المتاحة تأتي أولاً (false يأتي قبل true)
+        if (aSold !== bSold) {
+          return aSold ? 1 : -1;
+        }
+        
+        // إذا كانت نفس الحالة، ترتيب حسب رقم الجهاز
+        return (a.phone_number || '').localeCompare(b.phone_number || '');
+      });
+      
       html += `
         <div class="mb-4">
           <h6 class="text-primary mb-3">
@@ -357,7 +374,7 @@
                 </tr>
               </thead>
               <tbody>
-                ${phones.map(p => `
+                ${sortedPhones.map(p => `
                   <tr>
                     <td><strong>${p.phone_number || p.device_number || 'غير محدد'}</strong></td>
                     <td><span class="text-info">${p.serial_number || 'غير محدد'}</span></td>
