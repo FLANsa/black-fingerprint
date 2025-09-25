@@ -450,6 +450,9 @@
       <button class="btn btn-danger btn-lg me-3" onclick="returnCurrentSale()">
         <i class="fas fa-undo"></i> استرجاع الفاتورة
       </button>
+      <button class="btn btn-warning btn-lg me-3" onclick="testBatteryLevel()">
+        <i class="fas fa-battery-half"></i> اختبار نسبة البطارية
+      </button>
       <a href="create_sale.html" class="btn btn-primary btn-lg">
         <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
       </a>
@@ -1156,6 +1159,88 @@
     } else {
       generateTaxQR();
     }
+  }
+
+  // اختبار نسبة البطارية
+  function testBatteryLevel() {
+    if (!currentSale || !currentSale.items) {
+      showAlert('warning', 'لا توجد بيانات بيع للاختبار');
+      return;
+    }
+
+    let batteryInfo = '';
+    let phoneCount = 0;
+    let usedPhoneCount = 0;
+    let batteryCount = 0;
+
+    currentSale.items.forEach((item, index) => {
+      if (item.type === 'phone') {
+        phoneCount++;
+        
+        const isUsed = item.condition === 'used' || item.phone_type === 'used';
+        if (isUsed) {
+          usedPhoneCount++;
+        }
+        
+        if (item.battery_level) {
+          batteryCount++;
+        }
+
+        batteryInfo += `
+          <div class="mb-2 p-2 border rounded">
+            <strong>${index + 1}. ${item.name || item.product_name}</strong><br>
+            نوع المنتج: ${item.type}<br>
+            نسبة البطارية: ${item.battery_level || 'غير محدد'}<br>
+            الحالة: ${item.condition || item.phone_type || 'غير محدد'}<br>
+            مستعمل: ${isUsed ? 'نعم' : 'لا'}<br>
+            سيظهر البطارية: ${(item.type === 'phone' && item.battery_level && isUsed) ? '✅ نعم' : '❌ لا'}
+          </div>
+        `;
+      }
+    });
+
+    const summary = `
+      <div class="alert alert-info mb-3">
+        <h5>ملخص الاختبار:</h5>
+        <p>📱 إجمالي الجوالات: ${phoneCount}</p>
+        <p>📱 الجوالات المستعملة: ${usedPhoneCount}</p>
+        <p>🔋 الجوالات التي لها نسبة بطارية: ${batteryCount}</p>
+      </div>
+    `;
+
+    const modalContent = `
+      <div class="modal fade" id="batteryTestModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">🔋 اختبار نسبة البطارية</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              ${summary}
+              <h6>تفاصيل المنتجات:</h6>
+              ${batteryInfo || '<p class="text-muted">لا توجد جوالات في هذه الفاتورة</p>'}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // إزالة Modal السابق إذا كان موجوداً
+    const existingModal = document.getElementById('batteryTestModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // إضافة Modal جديد
+    document.body.insertAdjacentHTML('beforeend', modalContent);
+    
+    // عرض Modal
+    const modal = new bootstrap.Modal(document.getElementById('batteryTestModal'));
+    modal.show();
   }
 
   // عرض التنبيهات
