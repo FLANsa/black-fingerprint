@@ -126,6 +126,12 @@
   let allPhones = [];
   let allAccessories = [];
   let allSales = [];
+  
+  // ===== متغيرات الصفحات =====
+  const ITEMS_PER_PAGE = 20;
+  let currentPage = 1;
+  let totalPages = 1;
+  let currentSearchResults = { phones: [], accessories: [] };
 
   // ===== دعم الأرقام العربية =====
   function convertArabicToEnglishNumbers(str) {
@@ -305,6 +311,11 @@
       console.log('📊 نتائج البحث:', { phones: phones.length, accessories: accessories.length });
       console.log('📱 الهواتف المطابقة:', phones);
       console.log('📦 الأكسسوارات المطابقة:', accessories);
+      
+      // حفظ النتائج وإعادة تعيين الصفحة الأولى
+      currentSearchResults = { phones, accessories };
+      currentPage = 1;
+      
       renderResults(phones, accessories);
 
     } catch (error) {
@@ -313,7 +324,7 @@
     }
   }
 
-  // ===== العرض =====
+  // ===== العرض مع دعم الصفحات =====
   function renderResults(phones, accessories){
     const wrap = document.getElementById('results_wrap');
     const body = document.getElementById('results_body');
@@ -332,6 +343,17 @@
         </div>`;
       return;
     }
+
+    // حساب عدد الصفحات
+    totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+    
+    // تحديد العناصر للصفحة الحالية
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    
+    // تقسيم النتائج للصفحة الحالية
+    const currentPhones = phones.slice(startIndex, endIndex);
+    const currentAccessories = accessories.slice(startIndex, endIndex);
 
     let html = '';
 
@@ -354,10 +376,13 @@
         return (a.phone_number || '').localeCompare(b.phone_number || '');
       });
       
+      // استخدام الجوالات المفلترة للصفحة الحالية
+      const phonesForCurrentPage = sortedPhones.slice(startIndex, endIndex);
+      
       html += `
         <div class="mb-4">
           <h6 class="text-primary mb-3">
-            <i class="fas fa-mobile-alt"></i> الهواتف (${phones.length})
+            <i class="fas fa-mobile-alt"></i> الهواتف (${phones.length}) - الصفحة ${currentPage} من ${totalPages}
           </h6>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -374,7 +399,7 @@
                 </tr>
               </thead>
               <tbody>
-                ${sortedPhones.map(p => `
+                ${phonesForCurrentPage.map(p => `
                   <tr>
                     <td><strong>${p.phone_number || p.device_number || 'غير محدد'}</strong></td>
                     <td><span class="text-info">${p.serial_number || 'غير محدد'}</span></td>
@@ -424,10 +449,13 @@
 
     // Accessories
     if (accessories && accessories.length){
+      // استخدام الأكسسوارات المفلترة للصفحة الحالية
+      const accessoriesForCurrentPage = accessories.slice(startIndex, endIndex);
+      
       html += `
         <div class="mb-4">
           <h6 class="text-success mb-3">
-            <i class="fas fa-box"></i> الأكسسوارات (${accessories.length})
+            <i class="fas fa-box"></i> الأكسسوارات (${accessories.length}) - الصفحة ${currentPage} من ${totalPages}
           </h6>
           <div class="table-responsive">
             <table class="table table-striped">
@@ -443,7 +471,7 @@
                 </tr>
               </thead>
               <tbody>
-                ${accessories.map(a => `
+                ${accessoriesForCurrentPage.map(a => `
                   <tr>
                     <td><strong>${a.arabic_name || a.name || 'غير محدد'}</strong></td>
                     <td><span class="text-info">${a.serial_number || 'غير محدد'}</span></td>
@@ -472,8 +500,78 @@
         </div>`;
     }
 
+    // إضافة أزرار التنقل بين الصفحات
+    if (totalPages > 1) {
+      html += generatePaginationButtons();
+    }
+
     wrap.classList.remove('d-none');
     body.innerHTML = html;
+  }
+
+  // ===== دوال الصفحات =====
+  
+  // إنشاء أزرار التنقل بين الصفحات
+  function generatePaginationButtons() {
+    let buttons = '';
+    
+    // زر الصفحة السابقة
+    if (currentPage > 1) {
+      buttons += `<button class="btn btn-outline-primary me-2" onclick="goToPage(${currentPage - 1})">
+        <i class="fas fa-chevron-right"></i> السابق
+      </button>`;
+    }
+    
+    // أزرار الصفحات
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+      buttons += `<button class="btn btn-outline-secondary me-1" onclick="goToPage(1)">1</button>`;
+      if (startPage > 2) {
+        buttons += `<span class="me-1">...</span>`;
+      }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      const isActive = i === currentPage ? 'btn-primary' : 'btn-outline-secondary';
+      buttons += `<button class="btn ${isActive} me-1" onclick="goToPage(${i})">${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        buttons += `<span class="me-1">...</span>`;
+      }
+      buttons += `<button class="btn btn-outline-secondary me-1" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    // زر الصفحة التالية
+    if (currentPage < totalPages) {
+      buttons += `<button class="btn btn-outline-primary ms-2" onclick="goToPage(${currentPage + 1})">
+        التالي <i class="fas fa-chevron-left"></i>
+      </button>`;
+    }
+    
+    return `
+      <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="تنقل الصفحات">
+          <div class="btn-group" role="group">
+            ${buttons}
+          </div>
+        </nav>
+      </div>
+    `;
+  }
+  
+  // الانتقال لصفحة محددة
+  function goToPage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    
+    currentPage = page;
+    renderResults(currentSearchResults.phones, currentSearchResults.accessories);
+    
+    // التمرير لأعلى الصفحة
+    document.getElementById('results_wrap').scrollIntoView({ behavior: 'smooth' });
   }
 
   // ===== دوال الإجراءات =====
@@ -617,6 +715,10 @@
         console.log('🧾 المبيعات من localStorage:', allSales);
       }
 
+      // حفظ النتائج وإعادة تعيين الصفحة الأولى
+      currentSearchResults = { phones: allPhones, accessories: allAccessories };
+      currentPage = 1;
+      
       // عرض جميع البيانات (الـ isPhoneSold بتقرأ من allSales)
       renderResults(allPhones, allAccessories);
       
