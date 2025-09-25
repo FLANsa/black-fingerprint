@@ -711,7 +711,7 @@
           }
         }
         
-        // Add battery percentage for phones (only for used phones)
+        // Add battery percentage for phones (if battery level exists)
         let productName = item.name || item.product_name;
         console.log('🔍 Battery Debug (displaySaleItems):', {
           type: item.type,
@@ -721,7 +721,7 @@
           productName: productName
         });
         
-        if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
+        if (item.type === 'phone' && item.battery_level) {
           productName += ` (البطارية: ${item.battery_level}%)`;
           console.log('✅ Added battery percentage:', productName);
         } else {
@@ -1047,7 +1047,7 @@
           }
         }
         
-        // Add battery percentage for phones (only for used phones)
+        // Add battery percentage for phones (if battery level exists)
         let productName = item.name || item.product_name;
         console.log('🔍 Battery Debug (populateReceiptTemplate):', {
           type: item.type,
@@ -1057,7 +1057,7 @@
           productName: productName
         });
         
-        if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
+        if (item.type === 'phone' && item.battery_level) {
           productName += ` (البطارية: ${item.battery_level}%)`;
           console.log('✅ Added battery percentage:', productName);
         } else {
@@ -1193,7 +1193,7 @@
             نسبة البطارية: ${item.battery_level || 'غير محدد'}<br>
             الحالة: ${item.condition || item.phone_type || 'غير محدد'}<br>
             مستعمل: ${isUsed ? 'نعم' : 'لا'}<br>
-            سيظهر البطارية: ${(item.type === 'phone' && item.battery_level && isUsed) ? '✅ نعم' : '❌ لا'}
+            سيظهر البطارية: ${(item.type === 'phone' && item.battery_level) ? '✅ نعم' : '❌ لا'}
           </div>
         `;
       }
