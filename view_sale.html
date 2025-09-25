@@ -823,6 +823,9 @@
           productName += ` (البطارية: ${item.battery_level}%)`;
         }
         
+        // Debug: Show serial number in alert
+        console.log('🔍 Final serial number for', productName, ':', serialNumber);
+        
         row.innerHTML = `
           <td>${getProductTypeBadge(item.type || item.product_type)}</td>
           <td>${productName}</td>
