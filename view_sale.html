@@ -710,8 +710,19 @@
         
         // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
+        console.log('🔍 Battery Debug (displaySaleItems):', {
+          type: item.type,
+          battery_level: item.battery_level,
+          condition: item.condition,
+          phone_type: item.phone_type,
+          productName: productName
+        });
+        
         if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
           productName += ` (البطارية: ${item.battery_level}%)`;
+          console.log('✅ Added battery percentage:', productName);
+        } else {
+          console.log('❌ Battery not added - conditions not met');
         }
         
         
@@ -1035,8 +1046,19 @@
         
         // Add battery percentage for phones (only for used phones)
         let productName = item.name || item.product_name;
+        console.log('🔍 Battery Debug (populateReceiptTemplate):', {
+          type: item.type,
+          battery_level: item.battery_level,
+          condition: item.condition,
+          phone_type: item.phone_type,
+          productName: productName
+        });
+        
         if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
           productName += ` (البطارية: ${item.battery_level}%)`;
+          console.log('✅ Added battery percentage:', productName);
+        } else {
+          console.log('❌ Battery not added - conditions not met');
         }
         
         // إضافة الرقم التسلسلي تحت اسم المنتج
