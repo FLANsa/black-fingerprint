@@ -155,12 +155,11 @@
         color: black !important;
       }
       
-      /* Column widths for 5 columns */
-      .items-table th:nth-child(1), .items-table td:nth-child(1) { width: 10% !important; } /* الكمية */
-      .items-table th:nth-child(2), .items-table td:nth-child(2) { width: 35% !important; } /* المنتج */
-      .items-table th:nth-child(3), .items-table td:nth-child(3) { width: 25% !important; } /* الرقم التسلسلي */
-      .items-table th:nth-child(4), .items-table td:nth-child(4) { width: 15% !important; } /* السعر غير شامل الضريبة */
-      .items-table th:nth-child(5), .items-table td:nth-child(5) { width: 15% !important; } /* السعر شامل الضريبة */
+      /* Column widths for 4 columns */
+      .items-table th:nth-child(1), .items-table td:nth-child(1) { width: 15% !important; } /* الكمية */
+      .items-table th:nth-child(2), .items-table td:nth-child(2) { width: 50% !important; } /* المنتج */
+      .items-table th:nth-child(3), .items-table td:nth-child(3) { width: 17.5% !important; } /* السعر غير شامل الضريبة */
+      .items-table th:nth-child(4), .items-table td:nth-child(4) { width: 17.5% !important; } /* السعر شامل الضريبة */
       
       .receipt-summary {
         margin: 20px 0 !important;
@@ -490,7 +489,6 @@
           <tr>
             <th>الكمية</th>
             <th>المنتج</th>
-            <th>الرقم التسلسلي</th>
             <th>السعر غير شامل الضريبة</th>
             <th>السعر شامل الضريبة</th>
           </tr>
@@ -888,11 +886,10 @@
               .items-table th{ border-bottom:1px solid #000; padding:3px 1px; text-align:center; font-weight:bold; font-size:11px; }
               .items-table td{ padding:2px 1px; text-align:center; border-bottom:1px dotted #ccc; font-size:11px; }
               .items-table th,.items-table td{ word-break:break-word; overflow-wrap:break-word; }
-              .items-table th:nth-child(1),.items-table td:nth-child(1){ width:10%; }
-              .items-table th:nth-child(2),.items-table td:nth-child(2){ width:35%; }
-              .items-table th:nth-child(3),.items-table td:nth-child(3){ width:25%; }
-              .items-table th:nth-child(4),.items-table td:nth-child(4){ width:15%; }
-              .items-table th:nth-child(5),.items-table td:nth-child(5){ width:15%; }
+              .items-table th:nth-child(1),.items-table td:nth-child(1){ width:15%; }
+              .items-table th:nth-child(2),.items-table td:nth-child(2){ width:50%; }
+              .items-table th:nth-child(3),.items-table td:nth-child(3){ width:17.5%; }
+              .items-table th:nth-child(4),.items-table td:nth-child(4){ width:17.5%; }
               .receipt-summary{ margin:15px 0; border-top:1px solid #000; padding-top:10px; }
               .summary-row{ display:flex; justify-content:space-between; margin:6px 0; font-size:16px; }
               .summary-row.total{ font-weight:bold; font-size:20px; border-top:1px solid #000; padding-top:8px; margin-top:15px; }
@@ -1032,10 +1029,12 @@
           productName += ` (البطارية: ${item.battery_level}%)`;
         }
         
+        // إضافة الرقم التسلسلي تحت اسم المنتج
+        const productWithSerial = `${productName}<br><small style="font-size: 10px; color: #666;">الرقم التسلسلي: ${serialNumber}</small>`;
+        
         row.innerHTML = `
           <td>${item.quantity || 1}</td>
-          <td>${productName}</td>
-          <td>${serialNumber}</td>
+          <td>${productWithSerial}</td>
           <td>${unitPriceWithoutVAT.toFixed(2)}</td>
           <td>${unitPrice.toFixed(2)}</td>
         `;
