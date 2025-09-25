@@ -553,6 +553,9 @@
       <button class="btn btn-danger btn-lg me-3" onclick="returnCurrentSale()">
         <i class="fas fa-undo"></i> استرجاع الفاتورة
       </button>
+      <button class="btn btn-info btn-lg me-3" onclick="testDatabase()">
+        <i class="fas fa-database"></i> اختبار قاعدة البيانات
+      </button>
       <a href="create_sale.html" class="btn btn-primary btn-lg">
         <i class="fas fa-plus"></i> إنشاء عملية بيع جديدة
       </a>
@@ -1376,6 +1379,82 @@
       showAlert('success', 'تم استرجاع الفاتورة وإرجاع المخزون بنجاح');
     } catch (e) {
       showAlert('danger', 'حدث خطأ أثناء الاسترجاع');
+    }
+  }
+
+  // اختبار قاعدة البيانات
+  async function testDatabase() {
+    try {
+      showAlert('info', 'جاري اختبار قاعدة البيانات...');
+      
+      let phones = [];
+      let accessories = [];
+      let sales = [];
+      
+      // اختبار Firebase
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        console.log('🔥 اختبار Firebase...');
+        phones = await window.storage.getPhones();
+        accessories = await window.storage.getAccessories();
+        sales = await window.storage.getSales();
+        
+        const result = `
+✅ Firebase متاح ويعمل بشكل صحيح
+📱 عدد الهواتف: ${phones.length}
+📦 عدد الأكسسوارات: ${accessories.length}
+🧾 عدد المبيعات: ${sales.length}
+
+📋 تفاصيل آخر بيع:
+${sales.length > 0 ? JSON.stringify(sales[sales.length - 1], null, 2) : 'لا توجد مبيعات'}
+        `;
+        
+        console.log('نتائج اختبار Firebase:', result);
+        alert(result);
+        
+      } else {
+        console.log('💾 اختبار localStorage...');
+        phones = JSON.parse(localStorage.getItem('phones') || '[]');
+        accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        
+        const result = `
+⚠️ Firebase غير متاح - استخدام localStorage
+📱 عدد الهواتف: ${phones.length}
+📦 عدد الأكسسوارات: ${accessories.length}
+🧾 عدد المبيعات: ${sales.length}
+
+📋 تفاصيل آخر بيع:
+${sales.length > 0 ? JSON.stringify(sales[sales.length - 1], null, 2) : 'لا توجد مبيعات'}
+        `;
+        
+        console.log('نتائج اختبار localStorage:', result);
+        alert(result);
+      }
+      
+      // اختبار بيانات البيع الحالي
+      if (currentSale) {
+        console.log('📊 بيانات البيع الحالي:', currentSale);
+        console.log('📱 عناصر البيع:', currentSale.items);
+        
+        if (currentSale.items && currentSale.items.length > 0) {
+          currentSale.items.forEach((item, index) => {
+            console.log(`📦 عنصر ${index + 1}:`, {
+              type: item.type,
+              name: item.name,
+              serial_number: item.serial_number,
+              barcode: item.barcode,
+              battery_level: item.battery_level,
+              condition: item.condition
+            });
+          });
+        }
+      }
+      
+      showAlert('success', 'تم اختبار قاعدة البيانات بنجاح - راجع Console للتفاصيل');
+      
+    } catch (error) {
+      console.error('❌ خطأ في اختبار قاعدة البيانات:', error);
+      showAlert('danger', 'حدث خطأ في اختبار قاعدة البيانات: ' + error.message);
     }
   }
 </script>

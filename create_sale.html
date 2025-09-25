@@ -511,15 +511,17 @@
       const purchasePrice = parseFloat(opt.getAttribute('data-purchase-price') || '0') || 0;
       const profit = unitPrice - purchasePrice;
       
-      // Get battery level and condition for phones
+      // Get battery level, condition, and serial number for phones
       let batteryLevel = null;
       let phoneCondition = null;
+      let serialNumber = '';
       if (productType === 'phone') {
         const phoneId = productSelect.value;
         const phone = phones.find(p => (p.id || p.phone_number) === phoneId);
         if (phone) {
           batteryLevel = phone.battery_level || null;
           phoneCondition = phone.condition || phone.phone_type || 'new';
+          serialNumber = phone.serial_number || '';
         }
       }
   
@@ -528,6 +530,8 @@
         type: productType,
         name: opt.getAttribute('data-name') || '',
         description: opt.getAttribute('data-description') || '',
+        serial_number: serialNumber,
+        barcode: opt.getAttribute('data-barcode') || '',
         unitPrice,
         purchasePrice,
         profit,
@@ -737,6 +741,8 @@
         type: 'phone',
         name: `${manufacturer} ${model}`.trim(),
         description: ph.description || '',
+        serial_number: ph.serial_number || '',
+        barcode: ph.phone_number || ph.serial_number || '',
         unitPrice: sellingPrice,
         purchasePrice,
         profit,
