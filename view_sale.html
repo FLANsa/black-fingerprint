@@ -11,9 +11,13 @@
   
   <!-- QRCode Library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- Fallback QRCode Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(generateTaxQR, 100);
+      // محاولة إضافية بعد تأخير أطول
+      setTimeout(generateTaxQR, 1000);
     });
   </script>
 
@@ -526,7 +530,12 @@
       <p>المستخدم في حال وجود كامل الملحقات</p>
       <div class="qr-block">
         <p style="font-size: 14px; margin: 5px 0; font-weight: bold;">QR Code الضريبي</p>
-        <div id="tax-qr" aria-label="QR code for tax number"></div>
+        <div id="tax-qr" aria-label="QR code for tax number">
+          <!-- QR Code سيتم إنشاؤه هنا بواسطة JavaScript -->
+          <div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;margin:0 auto;">
+            الرقم الضريبي:<br>310105614500003
+          </div>
+        </div>
       </div>
       <p>شكرا لزيارتكم الصقري للاتصالات</p>
     </div>
@@ -1070,25 +1079,43 @@
       return;
     }
     
-    if (typeof QRCode === 'undefined' || !QRCode.toCanvas) {
-      console.log('❌ QRCode library not loaded');
-      return;
-    }
-    
-    console.log('✅ Generating QR Code...');
-    container.innerHTML = '';
-    const canvas = document.createElement('canvas');
-    QRCode.toCanvas(canvas, "310105614500003", { width: 120, height: 120, margin: 2 }, (err) => {
-      if (!err) {
-        console.log('✅ QR Code generated successfully');
-        const img = new Image();
-        img.width = 120; img.height = 120; img.alt = 'Tax QR';
-        img.src = canvas.toDataURL('image/png');
-        container.innerHTML = ''; container.appendChild(img);
-      } else {
-        console.log('❌ QR Code generation failed:', err);
+    // محاولة إنشاء QR Code بعدة طرق
+    if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
+      console.log('✅ Using QRCode.toCanvas...');
+      container.innerHTML = '';
+      const canvas = document.createElement('canvas');
+      QRCode.toCanvas(canvas, "310105614500003", { width: 120, height: 120, margin: 2 }, (err) => {
+        if (!err) {
+          console.log('✅ QR Code generated successfully');
+          const img = new Image();
+          img.width = 120; img.height = 120; img.alt = 'Tax QR';
+          img.src = canvas.toDataURL('image/png');
+          container.innerHTML = ''; container.appendChild(img);
+        } else {
+          console.log('❌ QR Code generation failed:', err);
+          // عرض النص كبديل
+          container.innerHTML = '<div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">310105614500003</div>';
+        }
+      });
+    } else if (typeof QRCode !== 'undefined' && QRCode.prototype) {
+      console.log('✅ Using QRCode constructor...');
+      container.innerHTML = '';
+      try {
+        const qr = new QRCode(container, {
+          text: "310105614500003",
+          width: 120,
+          height: 120,
+          colorDark: "#000000",
+          colorLight: "#ffffff"
+        });
+      } catch (err) {
+        console.log('❌ QRCode constructor failed:', err);
+        container.innerHTML = '<div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">310105614500003</div>';
       }
-    });
+    } else {
+      console.log('❌ QRCode library not available, showing text fallback');
+      container.innerHTML = '<div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">310105614500003</div>';
+    }
   }
 
 
