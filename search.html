@@ -23,6 +23,34 @@
     .navbar-brand, .nav-link { color: white !important; }
     .card { box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
     .table thead.table-dark th { vertical-align: middle; }
+    
+    /* تحسين مظهر أزرار التنقل */
+    .pagination-nav .btn-group .btn {
+      border-radius: 0 !important;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .pagination-nav .btn-group .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .pagination-nav .btn-group .btn:first-child {
+      border-top-left-radius: 8px !important;
+      border-bottom-left-radius: 8px !important;
+    }
+    
+    .pagination-nav .btn-group .btn:last-child {
+      border-top-right-radius: 8px !important;
+      border-bottom-right-radius: 8px !important;
+    }
+    
+    .pagination-nav .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      box-shadow: 0 2px 4px rgba(0,123,255,0.3);
+    }
   </style>
 </head>
 <body>
@@ -517,7 +545,7 @@
     
     // زر الصفحة السابقة
     if (currentPage > 1) {
-      buttons += `<button class="btn btn-outline-primary me-2" onclick="goToPage(${currentPage - 1})">
+      buttons += `<button class="btn btn-outline-primary btn-sm" onclick="goToPage(${currentPage - 1})">
         <i class="fas fa-chevron-right"></i> السابق
       </button>`;
     }
@@ -527,35 +555,35 @@
     const endPage = Math.min(totalPages, currentPage + 2);
     
     if (startPage > 1) {
-      buttons += `<button class="btn btn-outline-secondary me-1" onclick="goToPage(1)">1</button>`;
+      buttons += `<button class="btn btn-outline-secondary btn-sm" onclick="goToPage(1)">1</button>`;
       if (startPage > 2) {
-        buttons += `<span class="me-1">...</span>`;
+        buttons += `<span class="mx-2 text-muted">...</span>`;
       }
     }
     
     for (let i = startPage; i <= endPage; i++) {
       const isActive = i === currentPage ? 'btn-primary' : 'btn-outline-secondary';
-      buttons += `<button class="btn ${isActive} me-1" onclick="goToPage(${i})">${i}</button>`;
+      buttons += `<button class="btn ${isActive} btn-sm" onclick="goToPage(${i})">${i}</button>`;
     }
     
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        buttons += `<span class="me-1">...</span>`;
+        buttons += `<span class="mx-2 text-muted">...</span>`;
       }
-      buttons += `<button class="btn btn-outline-secondary me-1" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+      buttons += `<button class="btn btn-outline-secondary btn-sm" onclick="goToPage(${totalPages})">${totalPages}</button>`;
     }
     
     // زر الصفحة التالية
     if (currentPage < totalPages) {
-      buttons += `<button class="btn btn-outline-primary ms-2" onclick="goToPage(${currentPage + 1})">
+      buttons += `<button class="btn btn-outline-primary btn-sm" onclick="goToPage(${currentPage + 1})">
         التالي <i class="fas fa-chevron-left"></i>
       </button>`;
     }
     
     return `
-      <div class="d-flex justify-content-center mt-4">
-        <nav aria-label="تنقل الصفحات">
-          <div class="btn-group" role="group">
+      <div class="d-flex justify-content-center mt-4 mb-4">
+        <nav aria-label="تنقل الصفحات" class="pagination-nav">
+          <div class="btn-group shadow-sm" role="group" style="border-radius: 8px; overflow: hidden;">
             ${buttons}
           </div>
         </nav>
