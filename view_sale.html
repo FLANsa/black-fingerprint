@@ -893,6 +893,7 @@
               .receipt-items{ margin:15px 0; }
               .receipt-items h3{ font-size:20px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
               .items-table{ width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; }
+              .items-table small{ font-size: 10px !important; font-weight: bold !important; color: #333 !important; }
               .items-table th{ border-bottom:1px solid #000; padding:3px 1px; text-align:center; font-weight:bold; font-size:11px; }
               .items-table td{ padding:2px 1px; text-align:center; border-bottom:1px dotted #ccc; font-size:11px; }
               .items-table th,.items-table td{ word-break:break-word; overflow-wrap:break-word; }
@@ -1040,7 +1041,7 @@
         }
         
         // إضافة الرقم التسلسلي تحت اسم المنتج
-        const productWithSerial = `${productName}<br><small style="font-size: 10px; color: #666;">الرقم التسلسلي: ${serialNumber}</small>`;
+        const productWithSerial = `${productName}<br><small style="font-size: 11px; color: #333; font-weight: bold;">الرقم التسلسلي: ${serialNumber}</small>`;
         
         row.innerHTML = `
           <td>${item.quantity || 1}</td>
