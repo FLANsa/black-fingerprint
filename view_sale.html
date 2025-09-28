@@ -707,10 +707,18 @@
           }
         }
         
-        // Add battery percentage for phones (only for used phones)
+        // Add battery percentage and memory for phones
         let productName = item.name || item.product_name;
-        if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
-          productName += ` (البطارية: ${item.battery_level}%)`;
+        if (item.type === 'phone') {
+          // Add memory information
+          const memory = item.phone_memory || item.memory || '';
+          if (memory) {
+            productName += ` (${memory})`;
+          }
+          // Add battery percentage for used phones only
+          if (item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
+            productName += ` (البطارية: ${item.battery_level}%)`;
+          }
         }
         
         
@@ -1033,10 +1041,18 @@
           }
         }
         
-        // Add battery percentage for phones (only for used phones)
+        // Add battery percentage and memory for phones
         let productName = item.name || item.product_name;
-        if (item.type === 'phone' && item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
-          productName += ` (البطارية: ${item.battery_level}%)`;
+        if (item.type === 'phone') {
+          // Add memory information
+          const memory = item.phone_memory || item.memory || '';
+          if (memory) {
+            productName += ` (${memory})`;
+          }
+          // Add battery percentage for used phones only
+          if (item.battery_level && (item.condition === 'used' || item.phone_type === 'used')) {
+            productName += ` (البطارية: ${item.battery_level}%)`;
+          }
         }
         
         // إضافة الرقم التسلسلي تحت اسم المنتج (للجوالات فقط)
