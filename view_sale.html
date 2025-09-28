@@ -1039,8 +1039,10 @@
           productName += ` (البطارية: ${item.battery_level}%)`;
         }
         
-        // إضافة الرقم التسلسلي تحت اسم المنتج
-        const productWithSerial = `${productName}<br><span style="font-size: 15px; color: #000; font-weight: bold; background-color: #f0f0f0; padding: 1px 3px; border-radius: 2px;">الرقم التسلسلي: ${serialNumber}</span>`;
+        // إضافة الرقم التسلسلي تحت اسم المنتج (للجوالات فقط)
+        const productWithSerial = item.type === 'phone' 
+          ? `${productName}<br><span style="font-size: 15px; color: #000; font-weight: bold; background-color: #f0f0f0; padding: 1px 3px; border-radius: 2px;">الرقم التسلسلي: ${serialNumber}</span>`
+          : productName;
         
         row.innerHTML = `
           <td>${item.quantity || 1}</td>
