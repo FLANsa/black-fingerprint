@@ -517,7 +517,7 @@ class FirebaseDatabase {
       const { profit, techCommission, shopProfit } = this.computeDerived(
         jobData.partCost, 
         jobData.amountCharged, 
-        jobData.techPercent || 0.5
+        jobData.techPercent !== undefined ? jobData.techPercent : 0
       );
 
       const docRef = await addDoc(collection(this.db, 'maintenanceJobs'), {

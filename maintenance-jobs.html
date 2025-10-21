@@ -589,7 +589,7 @@
                 if (notesField) notesField.value = job.notes || '';
 
                 // Set the tech percent for editing
-                selectedTechPercent = job.techPercent || 0.5;
+                selectedTechPercent = job.techPercent !== undefined ? job.techPercent : 0;
                 console.log('💰 نسبة عمولة الفني:', selectedTechPercent);
 
                 // Show complete button only if job is not done
