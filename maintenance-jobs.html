@@ -298,6 +298,39 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="deviceType" class="form-label">نوع الجهاز *</label>
+                                <select class="form-select" id="deviceType" required>
+                                    <option value="">اختر نوع الجهاز</option>
+                                    <option value="mobile">جوال</option>
+                                    <option value="tablet">تابلت</option>
+                                    <option value="laptop">لابتوب</option>
+                                    <option value="other">أخرى</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="deviceModel" class="form-label">موديل الجهاز *</label>
+                                <input type="text" class="form-control" id="deviceModel" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="warrantyPeriod" class="form-label">فترة الضمان (أيام)</label>
+                                <select class="form-select" id="warrantyPeriod">
+                                    <option value="0">بدون ضمان</option>
+                                    <option value="7">7 أيام</option>
+                                    <option value="15" selected>15 يوم</option>
+                                    <option value="30">30 يوم (شهر)</option>
+                                    <option value="60">60 يوم (شهرين)</option>
+                                    <option value="90">90 يوم (3 شهور)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="warrantyNotes" class="form-label">ملاحظات الضمان</label>
+                                <input type="text" class="form-control" id="warrantyNotes" placeholder="ملاحظات إضافية عن الضمان">
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label for="notes" class="form-label">ملاحظات</label>
                             <textarea class="form-control" id="notes" rows="3"></textarea>
@@ -499,6 +532,9 @@
                         </span>
                     </td>
                     <td>
+                        <button class="btn btn-sm btn-info me-1" onclick="printInvoice('${job.id.replace(/'/g, "\\'")}')" title="طباعة الفاتورة">
+                            <i class="fas fa-print"></i>
+                        </button>
                         <button class="btn btn-sm btn-warning me-1" onclick="editJob('${job.id.replace(/'/g, "\\'")}')">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -591,6 +627,19 @@
                 const notesField = document.getElementById('notes');
                 if (notesField) notesField.value = job.notes || '';
 
+                // ✅ حقول الجهاز والضمان الجديدة
+                const deviceTypeField = document.getElementById('deviceType');
+                if (deviceTypeField) deviceTypeField.value = job.deviceType || '';
+                
+                const deviceModelField = document.getElementById('deviceModel');
+                if (deviceModelField) deviceModelField.value = job.deviceModel || '';
+                
+                const warrantyPeriodField = document.getElementById('warrantyPeriod');
+                if (warrantyPeriodField) warrantyPeriodField.value = job.warrantyPeriod || 15;
+                
+                const warrantyNotesField = document.getElementById('warrantyNotes');
+                if (warrantyNotesField) warrantyNotesField.value = job.warrantyNotes || '';
+
                 // Set the tech percent for editing
                 selectedTechPercent = job.techPercent !== undefined ? job.techPercent : 0;
                 console.log('💰 نسبة عمولة الفني:', selectedTechPercent);
@@ -660,7 +709,12 @@
                 techCommission,
                 shopProfit,
                 status: document.getElementById('status').value,
-                notes: document.getElementById('notes').value
+                notes: document.getElementById('notes').value,
+                // ✅ حقول الجهاز والضمان الجديدة
+                deviceType: document.getElementById('deviceType').value,
+                deviceModel: document.getElementById('deviceModel').value,
+                warrantyPeriod: parseInt(document.getElementById('warrantyPeriod').value) || 0,
+                warrantyNotes: document.getElementById('warrantyNotes').value
             };
 
             try {
@@ -792,6 +846,21 @@
             loadData();
         }
 
+
+        // Print invoice for maintenance job
+        function printInvoice(jobId) {
+            console.log('🖨️ طباعة فاتورة عمل الصيانة:', jobId);
+            
+            const job = jobsData.find(j => j.id === jobId);
+            if (!job) {
+                showAlert('error', 'لم يتم العثور على عمل الصيانة المطلوب');
+                return;
+            }
+
+            // فتح صفحة الطباعة في نافذة جديدة
+            const invoiceUrl = `maintenance-invoice.html?jobId=${encodeURIComponent(jobId)}`;
+            window.open(invoiceUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        }
 
         // ===== دعم الأرقام العربية والإنجليزية =====
         function convertArabicToEnglishNumbers(str) {
