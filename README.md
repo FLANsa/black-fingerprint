@@ -1,141 +1,167 @@
-# Phone Store Demo
+# Black Fingerprint - نظام إدارة متجر الجوالات
 
-A comprehensive web application for managing phone store inventory and sales, designed for the Saudi market.
+نظام متكامل لإدارة متجر الهواتف المحمولة الجديدة والمستعملة باللغة العربية.
 
-## Key Features
+## 🌟 المميزات الرئيسية
 
-### 📱 Inventory Management
-- Add and manage new and used phones
-- Manage accessories and add-ons
-- Advanced barcode system for products
-- Inventory tracking and alerts
+### 📱 إدارة المخزون
+- إضافة وإدارة الهواتف الجديدة والمستعملة
+- إدارة الإكسسوارات والملحقات
+- نظام باركود متقدم للمنتجات
+- تتبع المخزون والتنبيهات
 
-### 💰 Sales System
-- Create sales invoices
-- Customer and sales management
-- Detailed sales reports
-- Multiple payment options
+### 💰 نظام المبيعات
+- إنشاء فواتير المبيعات
+- إدارة العملاء والمبيعات
+- تقارير مبيعات مفصلة
+- خيارات دفع متعددة
 
-### 🔍 Search and Filter
-- Advanced product search
-- Filter by category and price
-- Detailed product display
+### 🔍 البحث والفلترة
+- بحث متقدم عن المنتجات
+- فلترة حسب الفئة والسعر
+- عرض تفصيلي للمنتجات
 
-### 📊 Reports and Statistics
-- Comprehensive dashboard
-- Daily and monthly sales reports
-- Inventory statistics
-- Performance reports
+### 📊 التقارير والإحصائيات
+- لوحة تحكم شاملة
+- تقارير مبيعات يومية وشهرية
+- إحصائيات المخزون
+- تقارير الأداء
 
-## Technologies Used
+## 🚀 النشر على Render
+
+### الطريقة الأولى: النشر التلقائي من GitHub
+
+1. **اذهب إلى [Render Dashboard](https://dashboard.render.com)**
+2. **اضغط على "New +" ثم "Static Site"**
+3. **اتصل بـ GitHub:**
+   - اختر "Build and deploy from a Git repository"
+   - اختر مستودع `black-fingerprint`
+   - اختر الفرع `main`
+
+4. **إعدادات النشر:**
+   ```
+   Name: black-fingerprint
+   Branch: main
+   Root Directory: ./
+   Build Command: (اتركه فارغ)
+   Publish Directory: ./
+   ```
+
+5. **اضغط على "Create Static Site"**
+
+### الطريقة الثانية: استخدام ملف render.yaml
+
+المشروع يحتوي على ملف `render.yaml` جاهز للنشر:
+
+```yaml
+services:
+  - type: static
+    name: black-fingerprint
+    buildCommand: ""
+    staticPublishPath: ./
+    envVars:
+      - key: NODE_ENV
+        value: production
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+```
+
+## 🔧 إعداد Firebase
+
+### 1. إنشاء مشروع Firebase
+- اذهب إلى [Firebase Console](https://console.firebase.google.com)
+- أنشئ مشروع جديد باسم `black-fingerprint`
+
+### 2. تفعيل الخدمات المطلوبة
+- **Firestore Database** - قاعدة البيانات
+- **Authentication** - المصادقة
+- **Storage** - تخزين الملفات
+- **Analytics** - التحليلات
+
+### 3. إعداد Firebase Config
+- انسخ إعدادات Firebase من Console
+- ضعها في ملف `js/firebase-config.js`
+
+## 📱 الماركات والموديلات المدعومة
+
+### Apple
+- iPhone 17 Pro Max, iPhone 17 Pro, iPhone 17 Air, iPhone 17
+- iPhone 16 Pro Max, iPhone 16 Pro, iPhone 16 Plus, iPhone 16
+- iPhone 15, iPhone 14, iPhone 13, iPhone 12, iPhone 11
+
+### Samsung
+- Galaxy S25 Ultra, Galaxy S25+, Galaxy S25
+- Galaxy S24 Ultra, Galaxy S24+, Galaxy S24
+- Galaxy A55, Galaxy A54, Galaxy A34, Galaxy A24
+
+### Xiaomi
+- 15 Ultra, 15 Pro, 15
+- 14 Ultra, 14 Pro, 14
+- Redmi Note 14 Pro+, Redmi Note 14 Pro, Redmi Note 14
+
+### Honor
+- Magic 6 Pro, Magic 6, Magic 5 Pro, Magic 5
+- Magic V3, Magic V2
+- X9b, X9a, X8b, X8a
+
+### Infinix
+- Zero 30, Zero 30 Pro
+- Note 40 Pro, Note 40, Note 30 Pro, Note 30
+- Hot 40 Pro, Hot 40, Hot 30, Hot 20
+
+### Tecno
+- Phantom X2 Pro, Phantom X2
+- Camon 30 Pro, Camon 30, Camon 20 Pro, Camon 20
+- Spark 20 Pro, Spark 20, Spark 10 Pro, Spark 10
+
+### Nothing
+- Phone 2a Plus, Phone 2a, Phone 2, Phone 1
+
+## 🛠️ التقنيات المستخدمة
 
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Backend**: Python Flask
-- **Database**: Firebase Firestore
+- **Backend**: Firebase Firestore
 - **Authentication**: Firebase Auth
 - **Storage**: Firebase Storage
 - **Analytics**: Firebase Analytics
 - **Deployment**: Render.com
 
-## Installation and Setup
+## 📋 متطلبات التشغيل
 
-### Requirements
-- Python 3.7+
-- Node.js 14+
-- Firebase account
+- Python 3.7+ (للخادم المحلي)
+- Node.js 14+ (اختياري)
+- حساب Firebase
+- متصفح حديث يدعم JavaScript ES6+
 
-### Installation Steps
+## 🚀 التشغيل المحلي
 
-1. **Clone the repository**
 ```bash
-git clone https://github.com/FLANsa/phone-store-demo.git
-cd phone-store-demo
+# استنساخ المشروع
+git clone https://github.com/FLANsa/black-fingerprint.git
+cd black-fingerprint
+
+# تشغيل الخادم المحلي
+python3 -m http.server 8000
+
+# أو باستخدام Node.js
+npx http-server -p 8000
 ```
 
-2. **Install dependencies**
-```bash
-pip install -r requirements.txt
-npm install
-```
+## 📞 الدعم
 
-3. **Setup Firebase**
-- Create a new project in Firebase Console
-- Enable Firestore Database
-- Enable Authentication
-- Enable Storage
-- Enable Analytics
-- Copy Firebase configuration to `js/firebase-config.js`
+للدعم التقني أو الاستفسارات:
+- **GitHub Issues**: [إنشاء مشكلة](https://github.com/FLANsa/black-fingerprint/issues)
+- **Email**: support@blackfingerprint.com
 
-4. **Run the project**
-```bash
-python start.py
-```
+## 📄 الترخيص
 
-## Project Structure
-
-```
-phone-store-demo/
-├── templates/          # HTML templates
-├── static/            # Static files
-│   ├── css/          # CSS files
-│   ├── js/           # JavaScript files
-│   └── images/       # Images
-├── app.py            # Main application
-├── requirements.txt  # Python dependencies
-├── package.json      # Node.js dependencies
-└── README.md        # This file
-```
-
-## Usage
-
-### Adding a New Product
-1. Navigate to "Add New Phone" page
-2. Fill in product details
-3. Upload product image
-4. Save the product
-
-### Creating a Sale
-1. Navigate to "Create Sale" page
-2. Select products
-3. Enter customer details
-4. Save the sale
-
-## Firebase Configuration
-
-The project uses Firebase v10+ with the following services:
-- **Firestore**: Database for storing products, sales, and customers
-- **Authentication**: User authentication and authorization
-- **Storage**: File storage for product images
-- **Analytics**: Usage analytics and reporting
-
-## Contributing
-
-We welcome contributions! Please follow these steps:
-
-1. Fork the project
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support, please contact us via:
-- Email: support@phonestoredemo.com
-- GitHub Issues: [Create an issue](https://github.com/FLANsa/phone-store-demo/issues)
-
-## Future Updates
-
-- [ ] Mobile application
-- [ ] Customer loyalty points system
-- [ ] Payment gateway integration
-- [ ] Advanced reporting
-- [ ] Notification system
+هذا المشروع مرخص تحت رخصة MIT - راجع ملف [LICENSE](LICENSE) للتفاصيل.
 
 ---
 
-**Phone Store Demo** - Our vision is to provide the best phone store management solutions in Saudi Arabia.
+**Black Fingerprint** - رؤيتنا هي تقديم أفضل حلول إدارة متاجر الجوالات في المملكة العربية السعودية.
