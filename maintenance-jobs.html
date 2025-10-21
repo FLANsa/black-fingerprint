@@ -16,6 +16,9 @@
     <script type="module" src="js/firebase-config-cdn.js"></script>
     <script type="module" src="js/firebase-database-cdn.js"></script>
     
+    <!-- Arabic Numbers Support -->
+    <script src="js/arabic-numbers.js"></script>
+    
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
@@ -443,8 +446,8 @@
 
         // Calculate profit
         function calculateProfit() {
-            const partCost = parseFloat(document.getElementById('partCost').value) || 0;
-            const amountCharged = parseFloat(document.getElementById('amountCharged').value) || 0;
+            const partCost = parseArabicNumber(document.getElementById('partCost').value);
+            const amountCharged = parseArabicNumber(document.getElementById('amountCharged').value);
 
             if (partCost > 0 && amountCharged > 0 && selectedTechPercent > 0) {
                 const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
@@ -622,13 +625,13 @@
 
         // Save job
         async function saveJob() {
-            const partCost = parseFloat(document.getElementById('partCost').value);
-            const amountCharged = parseFloat(document.getElementById('amountCharged').value);
+            const partCost = parseArabicNumber(document.getElementById('partCost').value);
+            const amountCharged = parseArabicNumber(document.getElementById('amountCharged').value);
             const repId = document.getElementById('repId').value;
             const techId = document.getElementById('techId').value;
 
             // تحقق أساسي
-            if (!repId || !techId || isNaN(partCost) || isNaN(amountCharged)) {
+            if (!repId || !techId || partCost <= 0 || amountCharged <= 0) {
                 showAlert('error', 'يرجى تعبئة المندوب والفني وتكاليف/مبالغ صحيحة');
                 return;
             }

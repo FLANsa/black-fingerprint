@@ -20,6 +20,9 @@
     <script type="module" src="js/firebase-config-cdn.js"></script>
     <script type="module" src="js/firebase-database-cdn.js"></script>
     
+    <!-- Arabic Numbers Support -->
+    <script src="js/arabic-numbers.js"></script>
+    
     <style>
         body { 
             font-family: 'Cairo', sans-serif; 
@@ -325,7 +328,7 @@
                 name: document.getElementById('techName').value,
                 phone: document.getElementById('techPhone').value,
                 email: document.getElementById('techEmail').value,
-                defaultCommissionPercent: parseFloat(document.getElementById('techCommission').value) / 100,
+                defaultCommissionPercent: parseArabicNumber(document.getElementById('techCommission').value) / 100,
                 active: document.getElementById('techActive').value === 'true',
                 notes: document.getElementById('techNotes').value
             };
@@ -366,7 +369,7 @@
                 name: document.getElementById('editTechName').value,
                 phone: document.getElementById('editTechPhone').value,
                 email: document.getElementById('editTechEmail').value,
-                defaultCommissionPercent: parseFloat(document.getElementById('editTechCommission').value) / 100,
+                defaultCommissionPercent: parseArabicNumber(document.getElementById('editTechCommission').value) / 100,
                 active: document.getElementById('editTechActive').value === 'true',
                 notes: document.getElementById('editTechNotes').value
             };
