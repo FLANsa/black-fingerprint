@@ -701,7 +701,7 @@ class FirebaseDatabase {
   computeDerived(partCost, amountCharged, techPercent) {
     const pc = Number(partCost) || 0;
     const ac = Number(amountCharged) || 0;
-    const tp = (typeof techPercent === 'number' && !isNaN(techPercent)) ? techPercent : 0.5; // افتراضي 50%
+    const tp = (typeof techPercent === 'number' && !isNaN(techPercent)) ? techPercent : 0; // افتراضي 0%
     const profit = ac - pc;                                // الربح الإجمالي
     const techCommission = Math.max(0, profit * tp);       // عمولة الفني
     const shopProfit = profit - techCommission;            // أرباح المحل

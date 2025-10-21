@@ -324,7 +324,7 @@
         function computeDerived(partCost, amountCharged, techPercent) {
             const pc = Number(partCost) || 0;
             const ac = Number(amountCharged) || 0;
-            const tp = (typeof techPercent === 'number' && !isNaN(techPercent)) ? techPercent : 0.5; // افتراضي 50%
+            const tp = (typeof techPercent === 'number' && !isNaN(techPercent)) ? techPercent : 0; // افتراضي 0%
             const profit = ac - pc;                                // الربح الإجمالي
             const techCommission = Math.max(0, profit * tp);       // عمولة الفني
             const shopProfit = profit - techCommission;            // أرباح المحل
@@ -336,7 +336,7 @@
         let techniciansData = [];
         let currentEditId = null;
         let currentFilters = {};
-        let selectedTechPercent = 0.5; // Default commission percentage
+        let selectedTechPercent = 0; // Default commission percentage
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -434,7 +434,7 @@
                         `نسبة العمولة: ${(selectedTechPercent * 100).toFixed(1)}%`;
                     calculateProfit();
                 } else {
-                    selectedTechPercent = 0.5; // Default
+                    selectedTechPercent = 0; // Default
                     document.getElementById('techPercentDisplay').textContent = 
                         'سيتم تحديدها تلقائياً عند اختيار الفني';
                 }
@@ -713,9 +713,12 @@
                 return;
             }
 
-            // استخدم النسبة المخزّنة إن وجدت، وإلا المختارة حالياً، وإلا 50%
+            // استخدم النسبة المخزّنة إن وجدت، وإلا المختارة حالياً، وإلا من بيانات الفني، وإلا 0%
+            const selectedTech = techniciansData.find(t => t.id === job.techId);
             const techPercent = (typeof job.techPercent === 'number') ? job.techPercent :
-                                (typeof selectedTechPercent === 'number' ? selectedTechPercent : 0.5);
+                                (typeof selectedTechPercent === 'number' ? selectedTechPercent :
+                                (selectedTech && typeof selectedTech.defaultCommissionPercent === 'number') ? 
+                                selectedTech.defaultCommissionPercent : 0);
 
             // ✅ احسب القيم المُشتقة نهائياً
             const { profit, techCommission, shopProfit } = computeDerived(job.partCost, job.amountCharged, techPercent);
