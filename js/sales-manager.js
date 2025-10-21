@@ -1,6 +1,6 @@
 /**
  * Sales Management Module
- * الصقري للاتصالات - Phone Store Management System
+ * بصمة سوداء - Phone Store Management System
  */
 
 class SalesManager {
@@ -471,7 +471,6 @@ class SalesManager {
                 <div class="receipt-header">
                     <div class="company-info">
                         <h1>${sale.company_name}</h1>
-                        <p>الرقم الضريبي: ${sale.company_vat_number}</p>
                         <p>${sale.company_address}</p>
                         <p>هاتف: ${sale.company_phone}</p>
                     </div>

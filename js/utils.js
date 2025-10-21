@@ -1,6 +1,6 @@
 /**
  * Utility Functions
- * الصقري للاتصالات - Phone Store Management System
+ * بصمة سوداء - Phone Store Management System
  */
 
 // VAT Calculation Functions

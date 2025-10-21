@@ -1,13 +1,13 @@
 /**
  * Configuration and Constants
- * الصقري للاتصالات - Phone Store Management System
+ * بصمة سوداء - Phone Store Management System
  */
 
 // VAT Configuration for Saudi Arabia
 const CONFIG = {
     VAT_RATE: 0.15, // 15% VAT rate
     COMPANY_INFO: {
-        name: "الصقري للاتصالات",
+        name: "بصمة سوداء",
         vatNumber: "1234567890",
         address: "الرياض، المملكة العربية السعودية",
         phone: "011-0000000"
@@ -46,6 +46,10 @@ const CONFIG = {
 // Default phone types data
 const DEFAULT_PHONE_TYPES = {
     "Apple": [
+        // Latest 2025 models - iPhone 17 series
+        "iPhone 17 Pro Max", "iPhone 17 Pro", "iPhone 17 Air", "iPhone 17",
+        // 2024 models - iPhone 16 series
+        "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16",
         "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
         "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14 Plus", "iPhone 14",
         "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13",
@@ -55,6 +59,8 @@ const DEFAULT_PHONE_TYPES = {
         "iPhone 8 Plus", "iPhone 8"
     ],
     "Samsung": [
+        // New 2024-2025 models
+        "Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25",
         "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24",
         "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23",
         "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22",
@@ -62,7 +68,7 @@ const DEFAULT_PHONE_TYPES = {
         "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20",
         "Galaxy Note 20 Ultra", "Galaxy Note 20",
         "Galaxy Note 10+", "Galaxy Note 10",
-        "Galaxy A54", "Galaxy A34", "Galaxy A24", "Galaxy A14"
+        "Galaxy A55", "Galaxy A54", "Galaxy A34", "Galaxy A24", "Galaxy A14"
     ],
     "Huawei": [
         "P60 Pro", "P60", "P50 Pro", "P50",
@@ -71,9 +77,11 @@ const DEFAULT_PHONE_TYPES = {
         "Nova 11", "Nova 10"
     ],
     "Xiaomi": [
+        "15 Ultra", "15 Pro", "15",
         "14 Ultra", "14 Pro", "14",
         "13 Ultra", "13 Pro", "13", "13T Pro", "13T",
         "12S Ultra", "12 Pro", "12",
+        "Redmi Note 14 Pro+", "Redmi Note 14 Pro", "Redmi Note 14",
         "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13",
         "Redmi Note 12 Pro+", "Redmi Note 12 Pro", "Redmi Note 12"
     ],
@@ -98,6 +106,28 @@ const DEFAULT_PHONE_TYPES = {
     "Realme": [
         "GT 5 Pro", "GT 5", "GT Neo 5", "GT Neo 4", "GT Neo 3",
         "Number Series", "C Series"
+    ],
+    "Honor": [
+        "Magic 6 Pro", "Magic 6", "Magic 5 Pro", "Magic 5",
+        "Magic V3", "Magic V2",
+        "X9b", "X9a", "X8b", "X8a",
+        "90 Pro", "90", "70 Pro", "70",
+        "50 Lite", "50", "Play 8T", "Play 7T"
+    ],
+    "Infinix": [
+        "Zero 30", "Zero 30 Pro",
+        "Note 40 Pro", "Note 40", "Note 30 Pro", "Note 30",
+        "Hot 40 Pro", "Hot 40", "Hot 30", "Hot 20",
+        "Smart 8", "Smart 7"
+    ],
+    "Tecno": [
+        "Phantom X2 Pro", "Phantom X2",
+        "Camon 30 Pro", "Camon 30", "Camon 20 Pro", "Camon 20",
+        "Spark 20 Pro", "Spark 20", "Spark 10 Pro", "Spark 10",
+        "Pova 6 Pro", "Pova 6", "Pova 5 Pro", "Pova 5"
+    ],
+    "Nothing": [
+        "Phone 2a Plus", "Phone 2a", "Phone 2", "Phone 1"
     ]
 };
 

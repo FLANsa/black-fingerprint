@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>البحث في المخزون — الصقري للاتصالات</title>
+  <title>البحث في المخزون — بصمة سوداء</title>
 
   <!-- نفس الخط/المكتبات -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -58,7 +58,7 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <span class="navbar-brand">الصقري للاتصالات</span>
+      <span class="navbar-brand">بصمة سوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -320,12 +320,12 @@
 
       if (type === 'all' || type === 'accessories') {
         accessories = allAccessories.filter(a => {
-          // إضافة serial_number إلى البحث للأكسسوارات أيضاً
-          const searchText = `${a.name || ''} ${a.arabic_name || ''} ${a.serial_number || ''} ${a.category || ''}`.toLowerCase();
+          // إضافة الباركود و serial_number إلى البحث للأكسسوارات
+          const searchText = `${a.name || ''} ${a.arabic_name || ''} ${a.barcode || ''} ${a.barcode_id || ''} ${a.serial_number || ''} ${a.category || ''}`.toLowerCase();
           const englishSearchText = convertArabicToEnglishNumbers(searchText);
           const arabicSearchText = convertEnglishToArabicNumbers(searchText);
           
-          console.log('🔍 البحث في الأكسسوار:', a.name || a.arabic_name, 'الرقم التسلسلي:', a.serial_number, 'النص:', searchText);
+          console.log('🔍 البحث في الأكسسوار:', a.name || a.arabic_name, 'الباركود:', a.barcode, 'الرقم التسلسلي:', a.serial_number, 'النص:', searchText);
           
           // البحث في جميع النسخ (الأصلية، الإنجليزية، العربية)
           return uniqueTerms.some(term => 
@@ -490,6 +490,7 @@
               <thead class="table-dark">
                 <tr>
                   <th>الاسم</th>
+                  <th>الباركود</th>
                   <th>الرقم التسلسلي</th>
                   <th>الفئة</th>
                   <th>الكمية</th>
@@ -502,6 +503,7 @@
                 ${accessoriesForCurrentPage.map(a => `
                   <tr>
                     <td><strong>${a.arabic_name || a.name || 'غير محدد'}</strong></td>
+                    <td><span class="text-info">${a.barcode || 'غير محدد'}</span></td>
                     <td><span class="text-info">${a.serial_number || 'غير محدد'}</span></td>
                     <td><span class="badge bg-primary">${a.category || 'غير محدد'}</span></td>
                     <td><span class="badge bg-success">${a.quantity_in_stock || a.quantity || 0}</span></td>
@@ -515,6 +517,9 @@
                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="editAccessory('${a.id}')" title="تعديل">
                           <i class="fas fa-edit"></i>
                         </button>
+                        ${a.barcode ? `<button type="button" class="btn btn-sm btn-outline-success" onclick="goPrintAccessoryBarcode('${a.barcode}')" title="طباعة الباركود">
+                          <i class="fas fa-barcode"></i>
+                        </button>` : ''}
                         <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteAccessory('${a.id}')" title="حذف">
                           <i class="fas fa-trash"></i>
                         </button>
@@ -799,6 +804,25 @@
     }
     
     // لا تُظهر النتائج افتراضياً — تُعرض فقط بعد البحث أو عند النقر على "عرض الكل"
+    
+    // البحث التلقائي بالباركود إذا تم تمريره في URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const barcode = urlParams.get('barcode');
+    const type = urlParams.get('type');
+    
+    if (barcode) {
+      console.log('🔍 بحث تلقائي بالباركود:', barcode, 'النوع:', type);
+      document.getElementById('search_term').value = barcode;
+      
+      if (type) {
+        document.getElementById('search_type').value = type === 'accessory' ? 'accessories' : 'phones';
+      }
+      
+      // تنفيذ البحث تلقائياً
+      setTimeout(() => {
+        handleSearch({ preventDefault: () => {} });
+      }, 500);
+    }
   });
 
   // ===== طباعة الباركود =====
@@ -810,6 +834,17 @@
     }
     // ✅ نوجّه بنفس الشكل المطلوب
     window.location.href = `print_barcode.html?edit=${encodeURIComponent(code)}`;
+  }
+
+  // ===== طباعة باركود الإكسسوار =====
+  function goPrintAccessoryBarcode(rawCode) {
+    const code = String(rawCode || '').trim();
+    if (!code) { 
+      showAlert('warning', 'لا يوجد رقم باركود صالح لهذا الإكسسوار'); 
+      return; 
+    }
+    // توجيه لصفحة طباعة باركود الإكسسوارات
+    window.location.href = `print_accessory_barcode.html?barcode=${encodeURIComponent(code)}`;
   }
 
   // ===== حذف الجهاز =====

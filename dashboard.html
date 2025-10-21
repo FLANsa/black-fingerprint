@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>لوحة التحكم — الصقري للاتصالات</title>
+    <title>لوحة التحكم — بصمة سوداء</title>
 
   <!-- نفس الخط/المكتبات المستخدمة في القالب -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -44,7 +44,7 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <span class="navbar-brand">الصقري للاتصالات</span>
+      <span class="navbar-brand">بصمة سوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -149,29 +149,18 @@
 
   <!-- Sales Performance Cards -->
   <div class="row mb-4">
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="card bg-light h-100">
-        <div class="card-header bg-success text-white">
-          <h5 class="mb-0"><i class="fas fa-receipt"></i> المبيعات قبل الضريبة</h5>
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-chart-line"></i> إجمالي المبيعات</h5>                                                                            
         </div>
         <div class="card-body text-center">
-          <h3 class="text-success" id="total_sales_subtotal">0.00 ريال</h3>
-          <p class="text-muted">إجمالي المبيعات قبل الضريبة</p>
+          <h3 class="text-primary" id="total_sales_amount">0.00 ريال</h3>
+          <p class="text-muted">إجمالي المبيعات</p>
         </div>
       </div>
     </div>
-    <div class="col-md-4">
-      <div class="card bg-light h-100">
-        <div class="card-header bg-danger text-white">
-          <h5 class="mb-0"><i class="fas fa-percentage"></i> إجمالي الضريبة</h5>
-        </div>
-        <div class="card-body text-center">
-          <h3 class="text-danger" id="total_vat_amount">0.00 ريال</h3>
-          <p class="text-muted">إجمالي ضريبة القيمة المضافة</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <div class="card bg-light h-100">
         <div class="card-header bg-info text-white">
           <h5 class="mb-0"><i class="fas fa-chart-pie"></i> نسبة الربح</h5>
@@ -430,41 +419,38 @@
       const effectiveSales = (sales || []).filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
       const totalSales = effectiveSales.length;
       const totalSalesAmount = effectiveSales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
-      const totalSalesSubtotal = effectiveSales.reduce((sum, sale) => sum + (sale.subtotal || 0), 0);
-      const totalVatAmount = effectiveSales.reduce((sum, sale) => sum + (sale.vat_amount || 0), 0);
 
-      // حساب الربح الفعلي: سعر البيع بعد الضريبة - سعر الشراء بعد الضريبة
+      // حساب الربح الفعلي: سعر البيع - سعر الشراء
       let totalActualProfit = 0;
-      let totalPurchaseCostAfterTax = 0;
+      let totalPurchaseCost = 0;
       
       effectiveSales.forEach(sale => {
         if (sale.items && Array.isArray(sale.items)) {
           sale.items.forEach(item => {
-            // سعر البيع بعد الضريبة (من المبيعات)
-            const sellingPriceAfterTax = item.unitPrice || item.unit_price || 0;
+            // سعر البيع (من المبيعات)
+            const sellingPrice = item.unitPrice || item.unit_price || 0;                                                                            
             const quantity = item.quantity || 1;
-            const totalSellingPriceAfterTax = sellingPriceAfterTax * quantity;
+            const totalSellingPrice = sellingPrice * quantity;                                                                              
             
-            // سعر الشراء بعد الضريبة (من قاعدة البيانات)
-            // ملاحظة: أسعار الشراء مُخزنة «مع الضريبة» بالفعل، إن وُجد purchase_price_with_vat نستخدمه كأولوية.
-            let purchasePriceAfterTax = 0;
+            // سعر الشراء (من قاعدة البيانات)
+            let purchasePrice = 0;
             if (item.type === 'phone') {
               const phone = phones.find(p => (p.id === item.id || p.phone_id === item.id || p.phone_number === item.id));
               if (phone) {
-                purchasePriceAfterTax = (phone.purchase_price_with_vat || phone.purchase_price || 0);
+                purchasePrice = (phone.purchase_price_with_vat || phone.purchase_price || 0);
               }
             } else {
               const accessory = accessories.find(a => (a.id === item.id || a.sku === item.id));
               if (accessory) {
-                purchasePriceAfterTax = (accessory.purchase_price_with_vat || accessory.purchase_price || 0);
+                purchasePrice = (accessory.purchase_price_with_vat || accessory.purchase_price || 0);
               }
             }
             
-            const totalPurchasePriceAfterTax = purchasePriceAfterTax * quantity;
-            const itemProfit = totalSellingPriceAfterTax - totalPurchasePriceAfterTax;
+            const totalPurchasePrice = purchasePrice * quantity;
+            const itemProfit = totalSellingPrice - totalPurchasePrice;
             
             totalActualProfit += itemProfit;
-            totalPurchaseCostAfterTax += totalPurchasePriceAfterTax;
+            totalPurchaseCost += totalPurchasePrice;
           });
         }
       });
@@ -505,18 +491,16 @@
       const totalRevenue = totalSalesAmount + maintenanceRevenue;
       const totalProfitRatio = totalRevenue > 0 ? (totalActualProfit / totalRevenue) * 100 : 0;
 
-      console.log('💰 إجمالي سعر البيع بعد الضريبة:', totalSalesAmount);
-      console.log('💰 إجمالي سعر الشراء بعد الضريبة:', totalPurchaseCostAfterTax);
+      console.log('💰 إجمالي سعر البيع:', totalSalesAmount);
+      console.log('💰 إجمالي سعر الشراء:', totalPurchaseCost);
       console.log('💰 ربح المبيعات فقط:', salesProfit);
       console.log('💰 إجمالي الربح الفعلي (مبيعات + صيانة):', totalActualProfit);
       console.log('💰 نسبة الربح الفعلية (الربح ÷ المبيعات):', actualProfitRatio.toFixed(2) + '%');
       console.log('💰 إجمالي الإيرادات (مبيعات + صيانة):', totalRevenue);
       console.log('💰 نسبة الربح الإجمالية:', totalProfitRatio.toFixed(2) + '%');
 
-      document.getElementById('total_sales_count').textContent = convertToLatinNumbers(totalSales);
-      document.getElementById('total_sales_amount').textContent = convertToLatinNumbers(totalSalesAmount.toFixed(0));
-      document.getElementById('total_sales_subtotal').textContent = convertToLatinNumbers(totalSalesSubtotal.toFixed(2)) + ' ريال';
-      document.getElementById('total_vat_amount').textContent = convertToLatinNumbers(totalVatAmount.toFixed(2)) + ' ريال';
+      document.getElementById('total_sales_count').textContent = convertToLatinNumbers(totalSales);                                                         
+      document.getElementById('total_sales_amount').textContent = convertToLatinNumbers(totalSalesAmount.toFixed(0));                                       
       document.getElementById('total_actual_profit').textContent = convertToLatinNumbers(totalActualProfit.toFixed(2)) + ' ريال';
 
       // حساب نسبة الربح

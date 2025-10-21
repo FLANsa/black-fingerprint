@@ -1,6 +1,6 @@
 /**
  * Local Storage Management
- * الصقري للاتصالات - Phone Store Management System
+ * بصمة سوداء - Phone Store Management System
  */
 
 class StorageManager {

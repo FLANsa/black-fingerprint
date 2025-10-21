@@ -1,4 +1,4 @@
-# JavaScript Architecture - الصقري للاتصالات
+# JavaScript Architecture - بصمة سوداء
 
 ## 📁 File Structure
 
@@ -344,5 +344,5 @@ To extend the system:
 
 ---
 
-**الصقري للاتصالات - Phone Store Management System**
+**بصمة سوداء - Phone Store Management System**
 *Modular JavaScript Architecture v1.0*

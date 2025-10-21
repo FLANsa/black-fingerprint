@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إضافة أكسسوار جديد — الصقري للاتصالات</title>
+  <title>إضافة أكسسوار جديد — بصمة سوداء</title>
 
   <!-- نفس خطوط/مكتبات التصميم التي تستخدمها -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <span class="navbar-brand">الصقري للاتصالات</span>
+      <span class="navbar-brand">بصمة سوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -118,6 +118,18 @@
                     <input type="text" class="form-control" id="supplier">
                   </div>
                 </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="barcode" class="form-label">الباركود</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control" id="barcode" placeholder="أدخل الباركود أو اضغط توليد">
+                      <button class="btn btn-outline-primary" type="button" onclick="generateBarcode()">
+                        <i class="fas fa-barcode"></i> توليد
+                      </button>
+                    </div>
+                    <small class="form-text text-muted">يمكنك إدخال باركود مخصص أو توليد باركود فريد تلقائياً</small>
+                  </div>
+                </div>
               </div>
 
               <div class="mb-3">
@@ -128,6 +140,9 @@
               <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <button type="submit" class="btn btn-success btn-lg">
                   <i class="fas fa-save"></i> حفظ الأكسسوار
+                </button>
+                <button type="button" class="btn btn-primary btn-lg" id="printBarcodeBtn" onclick="printBarcode()" style="display: none;">
+                  <i class="fas fa-print"></i> طباعة الباركود
                 </button>
               </div>
             </form>
@@ -343,14 +358,50 @@
       return true;
     }
 
-    // تسجيل الخروج
-    function logout() {
-      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        localStorage.removeItem('current_user');
-        alert('تم تسجيل الخروج بنجاح');
-        window.location.href = 'index.html';
+    // توليد باركود فريد للإكسسوار
+    function generateBarcode() {
+      // التحقق من وجود باركود مخصص أولاً
+      const currentBarcode = document.getElementById('barcode').value.trim();
+      if (currentBarcode) {
+        if (confirm(`يوجد باركود مخصص: "${currentBarcode}". هل تريد استبداله بباركود جديد؟`)) {
+          // المتابعة لتوليد باركود جديد
+        } else {
+          return; // إلغاء العملية
+        }
       }
+      
+      const today = new Date();
+      const dateStr = today.getFullYear().toString() + 
+                     (today.getMonth() + 1).toString().padStart(2, '0') + 
+                     today.getDate().toString().padStart(2, '0');
+      
+      // الحصول على آخر رقم تسلسلي لهذا التاريخ
+      let lastSerial = localStorage.getItem(`lastAccessorySerial_${dateStr}`) || '0';
+      const nextSerial = (parseInt(lastSerial) + 1).toString().padStart(4, '0');
+      
+      // حفظ الرقم التسلسلي الجديد
+      localStorage.setItem(`lastAccessorySerial_${dateStr}`, nextSerial);
+      
+      const barcode = `ACC-${dateStr}-${nextSerial}`;
+      document.getElementById('barcode').value = barcode;
+      
+      showAlert('success', `تم توليد باركود جديد: ${barcode}`);
     }
+
+    // طباعة الباركود
+    function printBarcode() {
+      const barcode = document.getElementById('barcode').value.trim();
+      if (!barcode) {
+        showAlert('warning', 'يرجى إدخال باركود أو توليد باركود أولاً');
+        return;
+      }
+      
+      // فتح صفحة طباعة الباركود
+      const printUrl = `print_accessory_barcode.html?barcode=${encodeURIComponent(barcode)}`;
+      window.open(printUrl, '_blank');
+    }
+
+    // حفظ الأكسسوار مع الباركود
 
 
     // إضافة مستمعات للأرقام العربية - طريقة محسنة
@@ -401,6 +452,8 @@
           name: document.getElementById('name').value.trim(),
           arabic_name: document.getElementById('name').value.trim(), // استخدام نفس الاسم
           category: document.getElementById('category').value,
+          barcode: document.getElementById('barcode').value.trim(),
+          barcode_id: document.getElementById('barcode').value.trim().replace(/[^a-zA-Z0-9]/g, ''), // للبحث بدون رموز
           quantity: parseInt(convertArabicToEnglishNumbers(quantityRaw)) || 0,
           quantity_in_stock: parseInt(convertArabicToEnglishNumbers(quantityRaw)) || 0, // إضافة quantity_in_stock
           purchase_price: parseArabicNumber(purchasePriceRaw),
@@ -437,6 +490,11 @@
           return false;
         }
 
+        if (!accessoryData.barcode) {
+          showAlert('warning', 'يرجى إدخال باركود للإكسسوار أو توليد باركود فريد');
+          return false;
+        }
+
         // طباعة البيانات المراد حفظها للتشخيص
         console.log('📦 بيانات الأكسسوار المراد حفظها:', accessoryData);
 
@@ -447,7 +505,12 @@
           if (accessoryId) {
             console.log('✅ تم حفظ الأكسسوار في Firebase بنجاح! ID:', accessoryId);
             console.log('📂 الفئة:', accessoryData.category);
+            console.log('🏷️ الباركود:', accessoryData.barcode);
             showAlert('success', `تم إضافة الأكسسوار "${accessoryData.name}" بنجاح!`);
+            
+            // إظهار زر طباعة الباركود
+            document.getElementById('printBarcodeBtn').style.display = 'inline-block';
+            
             return true;
           } else {
             console.log('❌ فشل في حفظ الأكسسوار في Firebase - لم يتم إرجاع ID');
@@ -462,7 +525,12 @@
           accessories.push(accessoryData);
           localStorage.setItem('accessories', JSON.stringify(accessories));
           console.log('✅ تم حفظ الأكسسوار في localStorage');
+          console.log('🏷️ الباركود:', accessoryData.barcode);
           showAlert('success', 'تم إضافة الأكسسوار بنجاح! (محلي)');
+          
+          // إظهار زر طباعة الباركود
+          document.getElementById('printBarcodeBtn').style.display = 'inline-block';
+          
           return true;
         }
       } catch (error) {
@@ -527,6 +595,9 @@
       
       // تركيز على الحقل الأول
       document.getElementById('name').focus();
+      
+      // توليد باركود تلقائياً عند تحميل الصفحة
+      generateBarcode();
     });
   </script>
 

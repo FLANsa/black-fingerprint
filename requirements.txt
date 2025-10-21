@@ -1,4 +1,4 @@
-# الصقري للاتصالات - نظام إدارة متجر الهواتف
+# بصمة سوداء - نظام إدارة متجر الهواتف
 # Requirements for Render deployment
 
 # No external dependencies required for static site

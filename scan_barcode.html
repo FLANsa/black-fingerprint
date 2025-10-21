@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>مسح الباركود — الصقري للاتصالات</title>
+  <title>مسح الباركود — بصمة سوداء</title>
 
   <!-- نفس الخط/المكتبات المستخدمة -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -31,14 +31,15 @@
               <label for="barcode_input" class="form-label">إدخال الباركود</label>
               <input type="text" class="form-control" id="barcode_input" name="barcode_input"
                      placeholder="أدخل الباركود الموجود" required autofocus />
-              <div class="form-text">أدخل الباركود الموجود على الهاتف</div>
+              <div class="form-text">أدخل الباركود الموجود على المنتج (هاتف أو إكسسوار)</div>
             </div>
 
             <div class="mb-3">
-              <label for="phone_type" class="form-label">نوع الهاتف</label>
-              <select class="form-select" id="phone_type" name="phone_type">
-                <option value="new">هاتف جديد</option>
-                <option value="used">هاتف مستعمل</option>
+              <label for="product_type" class="form-label">نوع المنتج</label>
+              <select class="form-select" id="product_type" name="product_type">
+                <option value="phone_new">هاتف جديد</option>
+                <option value="phone_used">هاتف مستعمل</option>
+                <option value="accessory">إكسسوار</option>
               </select>
             </div>
 
@@ -61,15 +62,41 @@
     document.getElementById('barcode_input').focus();
   });
 
-  // نفس سلوك إدخال Enter، لكن بدون إرسال لخادم — نحول لصفحة العرض مع بارامترات
+  // معالجة إرسال الباركود وتوجيه المستخدم للصفحة المناسبة
   function handleSubmit(e){
     e.preventDefault();
     const code = (document.getElementById('barcode_input').value || '').trim();
-    const type = document.getElementById('phone_type').value || 'new';
-    if (!code){ return; }
-    // مثال: الانتقال لصفحة عرض تفاصيل عملية بيع/هاتف مع تمرير القيم عبر Query String
-    // بدّل الرابط لاحقاً حسب مسارك الفعلي
-    const target = `view_sale.html?barcode=${encodeURIComponent(code)}&type=${encodeURIComponent(type)}`;
+    const productType = document.getElementById('product_type').value || 'phone_new';
+    
+    if (!code){ 
+      alert('يرجى إدخال الباركود');
+      return; 
+    }
+    
+    // تحديد نوع المنتج من الباركود إذا لم يتم تحديده
+    let detectedType = productType;
+    if (code.startsWith('ACC-')) {
+      detectedType = 'accessory';
+    } else if (code.startsWith('PHONE') || code.match(/^\d+$/)) {
+      detectedType = productType.includes('phone') ? productType : 'phone_new';
+    }
+    
+    // توجيه المستخدم للصفحة المناسبة
+    let target = '';
+    switch(detectedType) {
+      case 'accessory':
+        target = `search.html?barcode=${encodeURIComponent(code)}&type=accessory`;
+        break;
+      case 'phone_new':
+        target = `search.html?barcode=${encodeURIComponent(code)}&type=phone_new`;
+        break;
+      case 'phone_used':
+        target = `search.html?barcode=${encodeURIComponent(code)}&type=phone_used`;
+        break;
+      default:
+        target = `search.html?barcode=${encodeURIComponent(code)}`;
+    }
+    
     window.location.href = target;
   }
 

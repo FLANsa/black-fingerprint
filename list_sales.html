@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>قائمة المبيعات — الصقري للاتصالات</title>
+  <title>قائمة المبيعات — بصمة سوداء</title>
 
   <!-- نفس الخط/المكتبات -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <span class="navbar-brand">الصقري للاتصالات</span>
+      <span class="navbar-brand">بصمة سوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -187,27 +187,11 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-6">
       <div class="card bg-success text-white">
         <div class="card-body text-center">
           <h5 class="card-title">إجمالي المبيعات</h5>
           <h3><span id="sum_total_sales_amount">0.00</span> ريال</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card bg-info text-white">
-        <div class="card-body text-center">
-          <h5 class="card-title">المبيعات قبل الضريبة</h5>
-          <h3><span id="sum_total_sales_subtotal">0.00</span> ريال</h3>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card bg-warning text-white">
-        <div class="card-body text-center">
-          <h5 class="card-title">إجمالي الضريبة</h5>
-          <h3><span id="sum_total_vat_amount">0.00</span> ريال</h3>
         </div>
       </div>
     </div>
@@ -517,13 +501,11 @@
     // تعبئة الجدول
     const tbody = document.getElementById('sales_tbody');
     tbody.innerHTML = '';
-    // استبعاد المسترجعة من المجاميع فقط (لكن تظل معروضة ومحتسبة في عدد العمليات)
-    const effectiveForTotals = (sales || []).filter(s => !(s && (s.returned === true || s.status === 'مسترجعة')));
-    let totalSubtotal = 0, totalVat = 0, totalAmount = 0;
+    // استبعاد المسترجعة من المجاميع فقط (لكن تظل معروضة ومحتسبة في عدد العمليات)                                                                           
+    const effectiveForTotals = (sales || []).filter(s => !(s && (s.returned === true || s.status === 'مسترجعة')));                                          
+    let totalAmount = 0;
 
     pageSlice.forEach(sale => {
-      totalSubtotal += sale.subtotal || 0;
-      totalVat      += sale.vat_amount || 0;
       totalAmount   += sale.total_amount || 0;
 
       const tr = document.createElement('tr');
@@ -553,13 +535,7 @@
       // المبلغ الإجمالي + تفاصيل
       const tdAmt = document.createElement('td');
       tdAmt.innerHTML = `
-        <span class="fw-bold text-success">${fmtMoney(sale.total_amount)} ريال</span>
-        <br>
-        <small class="text-muted">
-          قبل الضريبة: ${fmtMoney(sale.subtotal)} ريال
-          <br>
-          الضريبة: ${fmtMoney(sale.vat_amount)} ريال
-        </small>`;
+        <span class="fw-bold text-success">${fmtMoney(sale.total_amount)} ريال</span>`;
       tr.appendChild(tdAmt);
 
       // طريقة الدفع
@@ -600,16 +576,12 @@
     document.getElementById('sum_total_sales_count').textContent = sales.length; // يشمل المسترجعة
 
     // احسب المجاميع من غير المسترجعة فقط
-    totalSubtotal = 0; totalVat = 0; totalAmount = 0;
+    totalAmount = 0;
     effectiveForTotals.forEach(sale => {
-      totalSubtotal += sale.subtotal || 0;
-      totalVat      += sale.vat_amount || 0;
       totalAmount   += sale.total_amount || 0;
     });
 
     document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
-    document.getElementById('sum_total_sales_subtotal').textContent = fmtMoney(totalSubtotal);
-    document.getElementById('sum_total_vat_amount').textContent = fmtMoney(totalVat);
 
     // رسم عناصر التصفح بين الصفحات
     renderPagination(totalPages);

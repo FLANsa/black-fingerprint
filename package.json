@@ -1,7 +1,7 @@
 {
   "name": "تجربة-النظام-للإتصالات",
   "version": "1.0.0",
-  "description": "الصقري للاتصالات - A web application for managing phone inventory and sales",
+  "description": "بصمة سوداء - A web application for managing phone inventory and sales",
   "main": "index.html",
   "scripts": {
     "start": "python3 -m http.server 8000",
@@ -19,7 +19,7 @@
     "firebase",
     "demo"
   ],
-  "author": "الصقري للاتصالات",
+  "author": "بصمة سوداء",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -2,13 +2,13 @@
 // إعدادات Firebase للمستودع الجديد
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB_MvtG7xnY5c18GybVF_SYJfxOa8mxgc8",
-  authDomain: "alsaqri-dc3ca.firebaseapp.com",
-  projectId: "alsaqri-dc3ca",
-  storageBucket: "alsaqri-dc3ca.firebasestorage.app",
-  messagingSenderId: "325709838350",
-  appId: "1:325709838350:web:c3c5dfadc079ce825ae45f",
-  measurementId: "G-Q8E93ZR4FZ"
+  apiKey: "AIzaSyCfRGq8FpMGqddntK1smfTMDcYc7M4gUBs",
+  authDomain: "black-fingerprint-c5c1e.firebaseapp.com",
+  projectId: "black-fingerprint-c5c1e",
+  storageBucket: "black-fingerprint-c5c1e.firebasestorage.app",
+  messagingSenderId: "963825886353",
+  appId: "1:963825886353:web:eaaff5fcfdee5317570b30",
+  measurementId: "G-YX7CHPQ152"
 };
 
 // تهيئة Firebase

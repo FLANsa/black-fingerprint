@@ -1,5 +1,5 @@
 services:
   - type: static
-    name: alsaqri
+    name: black-fingerprint
     buildCommand: ""
     staticPublishPath: ./

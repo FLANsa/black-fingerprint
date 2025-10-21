@@ -3,23 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>تفاصيل عملية البيع — الصقري للاتصالات</title>
+  <title>تفاصيل عملية البيع — بصمة سوداء</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   
-  <!-- QRCode Library -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-  <!-- Fallback QRCode Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(generateTaxQR, 100);
-      // محاولة إضافية بعد تأخير أطول
-      setTimeout(generateTaxQR, 1000);
-    });
-  </script>
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -41,26 +30,11 @@
       display: none;
     }
     
-    /* QR centered (one source of truth) */
-    .qr-block{
-      text-align:center;
-      margin:8px 0 0 0;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-    }
-    #tax-qr{ width:120px; height:120px; margin:0 auto 6px; display:block; }
-    #tax-qr img, #tax-qr canvas{
-      width:120px; height:120px; display:block; margin:0 auto; max-width:100%; max-height:100%;
-    }
     
     @media print {
       .container, .btn, .d-flex, .card {
         display: none !important;
       }
-      .qr-block{ text-align:center !important; align-items:center !important; justify-content:center !important; margin:8px 0 !important; width:100% !important; }
-      #tax-qr, #tax-qr img, #tax-qr canvas{ width:120px !important; height:120px !important; display:block !important; margin:0 auto !important; }
     }
       
       .receipt-template {
@@ -160,10 +134,9 @@
       }
       
       /* Column widths for 4 columns */
-      .items-table th:nth-child(1), .items-table td:nth-child(1) { width: 15% !important; } /* الكمية */
-      .items-table th:nth-child(2), .items-table td:nth-child(2) { width: 50% !important; } /* المنتج */
-      .items-table th:nth-child(3), .items-table td:nth-child(3) { width: 17.5% !important; } /* السعر غير شامل الضريبة */
-      .items-table th:nth-child(4), .items-table td:nth-child(4) { width: 17.5% !important; } /* السعر شامل الضريبة */
+      .items-table th:nth-child(1), .items-table td:nth-child(1) { width: 20% !important; } /* الكمية */                                                    
+      .items-table th:nth-child(2), .items-table td:nth-child(2) { width: 60% !important; } /* المنتج */                                                    
+      .items-table th:nth-child(3), .items-table td:nth-child(3) { width: 20% !important; } /* السعر */
       
       .receipt-summary {
         margin: 20px 0 !important;
@@ -223,44 +196,9 @@
       }
     }
 
-    /* === Center QR (screen + print) — overrides === */
-    .qr-block{
-      text-align:center;
-      margin:8px 0 0 0;
-      display:flex;
-      flex-direction:column;
-      align-items:center;      /* center horizontally */
-      justify-content:center;  /* center vertically within the block */
-      padding-left:0;          /* remove left offset */
-    }
-    #tax-qr{
-      width:120px; height:120px;
-      margin:0 auto 6px;       /* center the box itself */
-      display:block;
-    }
-    #tax-qr img, #tax-qr canvas{
-      width:120px; height:120px;
-      display:block;
-      margin:0 auto;           /* center QR bitmap */
-      max-width:100%; max-height:100%;
-    }
 
     /* kill previous print-left overrides and center in print too */
     @media print{
-      .qr-block,
-      .receipt-template .qr-block{
-        text-align:center !important;
-        align-items:center !important;
-        justify-content:center !important;
-        padding-left:0 !important;
-        margin:8px 0 !important;
-        width:100% !important;
-      }
-      #tax-qr, #tax-qr img, #tax-qr canvas{
-        width:120px !important; height:120px !important;
-        display:block !important;
-        margin:0 auto !important;   /* center in print */
-      }
     }
   </style>
 </head>
@@ -269,7 +207,7 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <span class="navbar-brand">الصقري للاتصالات</span>
+      <span class="navbar-brand">بصمة سوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -394,22 +332,10 @@
         </div>
         <div class="card-body">
             <div class="row">
-            <div class="col-md-4 text-center">
-              <div class="border rounded p-3">
-                <h6 class="text-muted">المجموع قبل الضريبة</h6>
-                  <h4 class="text-primary" id="subtotal">0.00 ريال</h4>
-              </div>
-            </div>
-            <div class="col-md-4 text-center">
-              <div class="border rounded p-3">
-                <h6 class="text-muted">مبلغ الضريبة (15%)</h6>
-                  <h4 class="text-warning" id="vat_amount">0.00 ريال</h4>
-              </div>
-            </div>
-            <div class="col-md-4 text-center">
+            <div class="col-md-6 text-center">
               <div class="border rounded p-3">
                 <h6 class="text-muted">المبلغ الإجمالي</h6>
-                  <h4 class="text-success fw-bold" id="total_amount">0.00 ريال</h4>
+                  <h4 class="text-success fw-bold" id="total_amount">0.00 ريال</h4>                                                                         
               </div>
             </div>
           </div>
@@ -461,18 +387,17 @@
   <div class="receipt-container">
   <div class="receipt-header">
     <div class="company-info">
-        <h1>الصقري للاتصالات</h1>
-        <p>AL SAQRI TELECOM</p>
+        <h1>بصمة سوداء</h1>
+        <p>Black Fingerprint</p>
         <p>الجوال: 0505663222</p>
         <p>0594946426</p>
-        <p>الرقم الضريبي: 310105614500003</p>
         <p>السجل التجاري: 7050488852</p>
         <p>العنوان: القصيم بريده الصفراء</p>
         <p>اسواق النافوره</p>
     </div>
 
     <div class="sale-info">
-        <h2>فاتورة ضريبية مبسطة</h2>
+        <h2>فاتورة بيع</h2>
         <p>فاتورة: <span id="receipt_sale_number">-</span></p>
         <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
     </div>
@@ -481,7 +406,6 @@
       <h3>معلومات العميل</h3>
         <p id="receipt_customer_name">-</p>
         <p id="receipt_customer_phone">-</p>
-        <p>الرقم الضريبي: </p>
     </div>
   </div>
 
@@ -492,8 +416,7 @@
           <tr>
             <th>الكمية</th>
             <th>المنتج</th>
-            <th>السعر غير شامل الضريبة</th>
-            <th>السعر شامل الضريبة</th>
+            <th>السعر</th>
           </tr>
       </thead>
         <tbody id="receipt_items">
@@ -503,16 +426,8 @@
   </div>
 
   <div class="receipt-summary">
-      <div class="summary-row">
-        <span>الاجمالي غير شامل الضريبة:</span>
-        <span id="receipt_subtotal">0.00 ريال</span>
-      </div>
-      <div class="summary-row">
-        <span>ضريبة القيمة المضافة 15%:</span>
-        <span id="receipt_vat">0.00 ريال</span>
-      </div>
       <div class="summary-row total">
-        <span>الاجمالي شامل الضريبة:</span>
+        <span>المجموع الإجمالي:</span>
         <span id="receipt_total">0.00 ريال</span>
       </div>
     </div>
@@ -527,16 +442,7 @@
       <p>2) والاجهزة المستعملة تستبدل ولا تسترجع</p>
       <p>في حال وجود عطل داخلي يشمل ضمان</p>
       <p>المستخدم في حال وجود كامل الملحقات</p>
-      <div class="qr-block">
-        <p style="font-size: 14px; margin: 5px 0; font-weight: bold;">QR Code الضريبي</p>
-        <div id="tax-qr" aria-label="QR code for tax number">
-          <!-- QR Code سيتم إنشاؤه هنا بواسطة JavaScript -->
-          <div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;margin:0 auto;">
-            الرقم الضريبي:<br>310105614500003
-          </div>
-        </div>
-      </div>
-      <p>شكرا لزيارتكم الصقري للاتصالات</p>
+      <p>شكرا لزيارتكم بصمة سوداء</p>
     </div>
   </div>
 </div>
@@ -592,10 +498,6 @@
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     
-    // إنشاء QR Code للرقم الضريبي (مع تأخير للتأكد من تحميل المكتبة)
-    setTimeout(() => {
-      generateTaxQR();
-    }, 1000);
     
     const urlParams = new URLSearchParams(window.location.search);
     const saleId = urlParams.get('id');
@@ -658,12 +560,8 @@
 
     await displaySaleItems();
 
-    const subtotal = currentSale.subtotal || 0;
-    const vatAmount = currentSale.vat_amount || 0;
     const totalAmount = currentSale.total_amount || 0;
 
-    document.getElementById('subtotal').textContent = subtotal.toFixed(2) + ' ريال';
-    document.getElementById('vat_amount').textContent = vatAmount.toFixed(2) + ' ريال';
     document.getElementById('total_amount').textContent = totalAmount.toFixed(2) + ' ريال';
 
     // عرض الضمان إن وجد
@@ -875,7 +773,6 @@
 
       // 2) جهّز المحتوى (قد يأخذ وقت)
       await populateReceiptTemplate();
-      ensureQrReadyForPrint();
       const receiptHTML = document.getElementById('receipt-roll-template').innerHTML;
 
       // 3) لو النافذة فتحت، اطبع عبرها
@@ -916,8 +813,6 @@
               .receipt-footer{ text-align:center; margin-top:20px; border-top:1px solid #000; padding-top:10px; }
               .receipt-footer h4{ font-size:18px; margin:0 0 8px 0; font-weight:bold; }
               .receipt-footer p{ margin:3px 0; font-size:14px; }
-              .qr-block{ text-align:center; margin:10px 0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-              #tax-qr, #tax-qr img, #tax-qr canvas{ width:120px; height:120px; display:block; margin:0 auto 6px; }
             </style>
           </head>
           <body>${receiptHTML}</body>
@@ -1063,7 +958,6 @@
         row.innerHTML = `
           <td>${item.quantity || 1}</td>
           <td>${productWithSerial}</td>
-          <td>${unitPriceWithoutVAT.toFixed(2)}</td>
           <td>${unitPrice.toFixed(2)}</td>
         `;
         receiptItems.appendChild(row);
@@ -1071,12 +965,8 @@
     }
 
     // المجاميع
-    const subtotal = currentSale.subtotal || 0;
-    const vatAmount = currentSale.vat_amount || 0;
     const totalAmount = currentSale.total_amount || 0;
 
-    document.getElementById('receipt_subtotal').textContent = subtotal.toFixed(2) + ' ريال';
-    document.getElementById('receipt_vat').textContent = vatAmount.toFixed(2) + ' ريال';
     document.getElementById('receipt_total').textContent = totalAmount.toFixed(2) + ' ريال';
     
     } catch (error) {
@@ -1086,62 +976,6 @@
   }
 
 
-  // --- QR: constants ---
-  const TAX_NUMBER = "310105614500003";
-
-  // Generate the QR into #tax-qr using available QR library
-  function generateTaxQR() {
-    const container = document.getElementById('tax-qr');
-    if (!container) return;
-    
-    if (typeof QRCode !== 'undefined' && QRCode.toCanvas) {
-      container.innerHTML = '';
-      const canvas = document.createElement('canvas');
-      QRCode.toCanvas(canvas, "310105614500003", { width: 120, height: 120, margin: 2 }, (err) => {
-        if (!err) {
-          const img = new Image();
-          img.width = 120; img.height = 120; img.alt = 'Tax QR';
-          img.src = canvas.toDataURL('image/png');
-          container.innerHTML = ''; container.appendChild(img);
-        } else {
-          container.innerHTML = '<div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">310105614500003</div>';
-        }
-      });
-    } else if (typeof QRCode !== 'undefined' && QRCode.prototype) {
-      container.innerHTML = '';
-      try {
-        const qr = new QRCode(container, {
-          text: "310105614500003",
-          width: 120,
-          height: 120,
-          colorDark: "#000000",
-          colorLight: "#ffffff"
-        });
-      } catch (err) {
-        container.innerHTML = '<div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">310105614500003</div>';
-      }
-    } else {
-      container.innerHTML = '<div style="width:120px;height:120px;border:1px solid #000;display:flex;align-items:center;justify-content:center;font-size:10px;text-align:center;">310105614500003</div>';
-    }
-  }
-
-
-
-  function ensureQrReadyForPrint() {
-    const container = document.getElementById('tax-qr');
-    if (!container) return;
-    const img = container.querySelector('img');
-    const canvas = container.querySelector('canvas');
-    if (img) return;
-    if (canvas) {
-      const png = canvas.toDataURL('image/png');
-      const imgEl = document.createElement('img');
-      imgEl.src = png; imgEl.alt = 'Tax QR'; imgEl.width = 120; imgEl.height = 120;
-      container.innerHTML = ''; container.appendChild(imgEl);
-    } else {
-      generateTaxQR();
-    }
-  }
 
 
   // عرض التنبيهات

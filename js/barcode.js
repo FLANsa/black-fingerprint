@@ -1,6 +1,6 @@
 /**
  * Barcode Generation and Management
- * الصقري للاتصالات - Phone Store Management System
+ * بصمة سوداء - Phone Store Management System
  */
 
 class BarcodeGenerator {
@@ -324,6 +324,76 @@ const BarcodeUtils = {
     printBarcode(phone) {
         const printWindow = window.open('', '_blank');
         const printContent = this.createPrintablePage(phone);
+        
+        printWindow.document.write(printContent);
+        printWindow.document.close();
+        printWindow.focus();
+        
+        // Auto-print after content loads
+        printWindow.onload = function() {
+            printWindow.print();
+        };
+    },
+
+    /**
+     * Create printable barcode page for accessories
+     * @param {Object} accessory - Accessory object
+     * @param {Object} companyInfo - Company information
+     * @returns {string} Printable HTML
+     */
+    createAccessoryPrintablePage(accessory, companyInfo = CONFIG.COMPANY_INFO) {
+        const barcode = new BarcodeGenerator();
+        const barcodeOptions = { width: 300, height: 100 };
+        
+        const svgBarcode = barcode.generateSVGBarcode(accessory.barcode, barcodeOptions);
+
+        return `
+            <!DOCTYPE html>
+            <html dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>طباعة باركود - ${accessory.barcode}</title>
+                <style>
+                    body { font-family: 'Cairo', Arial, sans-serif; text-align: center; padding: 20px; }
+                    .barcode-container { border: 2px solid #000; padding: 15px; margin: 20px auto; width: fit-content; }
+                    .accessory-info { margin: 15px 0; }
+                    .accessory-info p { margin: 5px 0; font-size: 14px; }
+                    .barcode { margin: 10px 0; }
+                    @media print { 
+                        body { margin: 0; padding: 10px; }
+                        .no-print { display: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="barcode-container">
+                    <h3>${companyInfo.name}</h3>
+                    <div class="barcode">${svgBarcode}</div>
+                    <div class="accessory-info">
+                        <p><strong>الاسم:</strong> ${accessory.name}</p>
+                        <p><strong>الفئة:</strong> ${accessory.category}</p>
+                        <p><strong>الباركود:</strong> ${accessory.barcode}</p>
+                        <p><strong>سعر البيع:</strong> ${accessory.selling_price} ريال</p>
+                        <p><strong>الكمية:</strong> ${accessory.quantity_in_stock || accessory.quantity}</p>
+                        ${accessory.supplier ? `<p><strong>المورد:</strong> ${accessory.supplier}</p>` : ''}
+                    </div>
+                </div>
+                <div class="no-print">
+                    <button onclick="window.print()">طباعة</button>
+                    <button onclick="window.close()">إغلاق</button>
+                </div>
+            </body>
+            </html>
+        `;
+    },
+
+    /**
+     * Print barcode for accessory
+     * @param {Object} accessory - Accessory object
+     */
+    printAccessoryBarcode(accessory) {
+        const printWindow = window.open('', '_blank');
+        const printContent = this.createAccessoryPrintablePage(accessory);
         
         printWindow.document.write(printContent);
         printWindow.document.close();
