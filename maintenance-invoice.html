@@ -36,152 +36,6 @@
             overflow: hidden;
         }
         
-        .invoice-header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-        
-        .invoice-header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0 0 10px 0;
-        }
-        
-        .invoice-header h2 {
-            font-size: 1.2rem;
-            font-weight: 400;
-            margin: 0 0 20px 0;
-            opacity: 0.9;
-        }
-        
-        .company-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .company-info p {
-            margin: 5px 0;
-            font-size: 0.95rem;
-        }
-        
-        .invoice-body {
-            padding: 30px;
-        }
-        
-        .invoice-info {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-        }
-        
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-        }
-        
-        .info-value {
-            color: #212529;
-        }
-        
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin: 30px 0 20px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #2c3e50;
-        }
-        
-        .warranty-section {
-            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
-            border: 2px solid #28a745;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 30px 0;
-        }
-        
-        .warranty-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #28a745;
-            text-align: center;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .warranty-info {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .warranty-terms {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border-right: 4px solid #28a745;
-        }
-        
-        .warranty-terms ul {
-            margin: 0;
-            padding-right: 20px;
-        }
-        
-        .warranty-terms li {
-            margin-bottom: 8px;
-            color: #495057;
-        }
-        
-        .signatures {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin: 40px 0;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .signature-box {
-            text-align: center;
-        }
-        
-        .signature-line {
-            border-bottom: 2px solid #495057;
-            margin: 20px 0 10px 0;
-            height: 40px;
-        }
-        
-        .footer {
-            background: #2c3e50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-        
         .loading {
             text-align: center;
             padding: 50px;
@@ -194,40 +48,6 @@
             padding: 50px;
             color: #dc3545;
             font-size: 1.2rem;
-        }
-        
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            
-            .invoice-container {
-                box-shadow: none;
-                border-radius: 0;
-                max-width: none;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
-            
-            .invoice-body {
-                padding: 20px;
-            }
-            
-            .invoice-header {
-                padding: 20px;
-            }
-            
-            .warranty-section {
-                break-inside: avoid;
-            }
-            
-            .signatures {
-                break-inside: avoid;
-            }
         }
         
         .print-btn {
@@ -243,6 +63,210 @@
             left: 20px;
             z-index: 1000;
         }
+        
+        /* Receipt roll printer styles - نفس تصميم فاتورة المبيعات */
+        .receipt-template {
+            display: none;
+        }
+        
+        @media print {
+            .container, .btn, .d-flex, .card, .no-print {
+                display: none !important;
+            }
+            
+            .receipt-template {
+                display: block !important;
+                width: 80mm !important;
+                max-width: 80mm !important;
+                margin: 0 auto !important;
+                padding: 5mm !important;
+                font-family: 'Courier New', monospace !important;
+                font-size: 18px !important;
+                line-height: 1.2 !important;
+                color: black !important;
+                background: white !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .receipt-header {
+                text-align: center !important;
+                margin-bottom: 20px !important;
+                border-bottom: 1px dashed #000 !important;
+                padding-bottom: 15px !important;
+            }
+            
+            .company-info h1 {
+                font-size: 26px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .company-info p {
+                margin: 3px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .maintenance-info h2 {
+                font-size: 23px !important;
+                margin: 15px 0 10px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .maintenance-info p {
+                margin: 3px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .customer-info h3 {
+                font-size: 20px !important;
+                margin: 15px 0 8px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .customer-info p {
+                margin: 2px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .device-info h3 {
+                font-size: 20px !important;
+                margin: 15px 0 8px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .device-info p {
+                margin: 2px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .maintenance-details {
+                margin: 20px 0 !important;
+            }
+            
+            .maintenance-details h3 {
+                font-size: 20px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                color: black !important;
+            }
+            
+            .details-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 13px !important;
+                color: black !important;
+                table-layout: fixed !important;
+            }
+            
+            .details-table th {
+                border-bottom: 1px solid #000 !important;
+                padding: 5px 2px !important;
+                text-align: center !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .details-table td {
+                padding: 3px 2px !important;
+                text-align: center !important;
+                border-bottom: 1px dotted #ccc !important;
+                color: black !important;
+            }
+            
+            .details-table th:nth-child(1), .details-table td:nth-child(1) { width: 40% !important; }
+            .details-table th:nth-child(2), .details-table td:nth-child(2) { width: 60% !important; }
+            
+            .receipt-summary {
+                margin: 20px 0 !important;
+                border-top: 1px dashed #000 !important;
+                padding-top: 15px !important;
+            }
+            
+            .summary-row {
+                display: flex !important;
+                justify-content: space-between !important;
+                margin: 8px 0 !important;
+                font-size: 18px !important;
+                color: black !important;
+            }
+            
+            .summary-row.total {
+                font-weight: bold !important;
+                font-size: 20px !important;
+                border-top: 1px solid #000 !important;
+                padding-top: 8px !important;
+            }
+            
+            .warranty-section {
+                margin: 20px 0 !important;
+                border-top: 1px dashed #000 !important;
+                padding-top: 15px !important;
+            }
+            
+            .warranty-section h3 {
+                font-size: 20px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                color: black !important;
+            }
+            
+            .warranty-section p {
+                margin: 3px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .warranty-terms {
+                margin: 10px 0 !important;
+            }
+            
+            .warranty-terms p {
+                margin: 2px 0 !important;
+                font-size: 12px !important;
+                color: black !important;
+            }
+            
+            .receipt-footer {
+                margin: 20px 0 0 0 !important;
+                text-align: center !important;
+                border-top: 1px dashed #000 !important;
+                padding-top: 15px !important;
+            }
+            
+            .receipt-footer h4 {
+                font-size: 18px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .receipt-footer p {
+                margin: 5px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .receipt-header, .maintenance-details, .receipt-summary, .warranty-section, .receipt-footer {
+                page-break-inside: avoid !important;
+            }
+        }
+        
+        @media print {
+            @page {
+                size: 80mm auto !important;
+                margin: 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -256,155 +280,98 @@
     </button>
 
     <div class="invoice-container">
-        <!-- Invoice Header -->
-        <div class="invoice-header">
-            <h1>بصمة سوداء</h1>
-            <h2>Black Fingerprint</h2>
-            
-            <div class="company-info">
-                <p><i class="fas fa-phone"></i> الجوال: 0542141144</p>
-                <p><i class="fas fa-phone"></i> الجوال: 0507217774</p>
-                <p><i class="fas fa-building"></i> السجل التجاري: 1131278742</p>
-                <p><i class="fas fa-map-marker-alt"></i> العنوان: القصيم بريده الصفراء</p>
-                <p><i class="fas fa-store"></i> أسواق النافورة</p>
-            </div>
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات الفاتورة...
         </div>
+        
+        <div id="error" class="error" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i> حدث خطأ في تحميل بيانات الفاتورة
+        </div>
+        
+        <!-- Receipt Roll Printer Template - نفس تصميم فاتورة المبيعات -->
+        <div id="receipt-roll-template" class="receipt-template">
+            <div class="receipt-container">
+                <div class="receipt-header">
+                    <div class="company-info">
+                        <h1>بصمة سوداء</h1>
+                        <p>Black Fingerprint</p>
+                        <p>الجوال: 0542141144</p>
+                        <p>0507217774</p>
+                        <p>السجل التجاري: 1131278742</p>
+                        <p>العنوان: القصيم بريده الصفراء</p>
+                        <p>اسواق النافوره</p>
+                    </div>
 
-        <!-- Invoice Body -->
-        <div class="invoice-body">
-            <div id="loading" class="loading">
-                <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات الفاتورة...
-            </div>
-            
-            <div id="error" class="error" style="display: none;">
-                <i class="fas fa-exclamation-triangle"></i> حدث خطأ في تحميل بيانات الفاتورة
-            </div>
-            
-            <div id="invoice-content" style="display: none;">
-                <!-- Invoice Information -->
-                <div class="invoice-info">
-                    <h3 class="section-title">معلومات الفاتورة</h3>
-                    <div class="info-row">
-                        <span class="info-label">رقم الفاتورة:</span>
-                        <span class="info-value" id="invoice-number">-</span>
+                    <div class="maintenance-info">
+                        <h2>فاتورة صيانة</h2>
+                        <p>فاتورة: <span id="receipt_invoice_number">-</span></p>
+                        <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
+                        <p>حالة العملية: <span id="receipt_status">-</span></p>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">تاريخ الفاتورة:</span>
-                        <span class="info-value" id="invoice-date">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">حالة العملية:</span>
-                        <span class="info-value" id="job-status">-</span>
+
+                    <div class="customer-info" id="receipt_customer_info">
+                        <h3>معلومات العميل</h3>
+                        <p id="receipt_customer_name">-</p>
+                        <p id="receipt_customer_phone">-</p>
                     </div>
                 </div>
 
-                <!-- Customer Information -->
-                <h3 class="section-title">بيانات العميل</h3>
-                <div class="invoice-info">
-                    <div class="info-row">
-                        <span class="info-label">اسم العميل:</span>
-                        <span class="info-value" id="customer-name">-</span>
+                <div class="device-info">
+                    <h3>معلومات الجهاز</h3>
+                    <p>نوع الجهاز: <span id="receipt_device_type">-</span></p>
+                    <p>موديل الجهاز: <span id="receipt_device_model">-</span></p>
+                </div>
+
+                <div class="maintenance-details">
+                    <h3>تفاصيل الصيانة</h3>
+                    <table class="details-table">
+                        <thead>
+                            <tr>
+                                <th>البيان</th>
+                                <th>القيمة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="receipt_details">
+                            <!-- Details will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="receipt-summary">
+                    <div class="summary-row">
+                        <span>تكلفة القطعة:</span>
+                        <span id="receipt_part_cost">0.00 ريال</span>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">رقم الجوال:</span>
-                        <span class="info-value" id="customer-phone">-</span>
+                    <div class="summary-row total">
+                        <span>المبلغ المحصل:</span>
+                        <span id="receipt_total">0.00 ريال</span>
                     </div>
                 </div>
 
-                <!-- Device and Maintenance Details -->
-                <h3 class="section-title">تفاصيل الجهاز والصيانة</h3>
-                <div class="invoice-info">
-                    <div class="info-row">
-                        <span class="info-label">نوع الجهاز:</span>
-                        <span class="info-value" id="device-type">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">موديل الجهاز:</span>
-                        <span class="info-value" id="device-model">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">اسم القطعة:</span>
-                        <span class="info-value" id="part-name">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">تكلفة القطعة:</span>
-                        <span class="info-value" id="part-cost">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">المبلغ المحصل:</span>
-                        <span class="info-value" id="amount-charged">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">اسم الفني:</span>
-                        <span class="info-value" id="tech-name">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">اسم المندوب:</span>
-                        <span class="info-value" id="rep-name">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">تاريخ الزيارة:</span>
-                        <span class="info-value" id="visit-date">-</span>
-                    </div>
-                </div>
-
-                <!-- Warranty Section -->
-                <div id="warranty-section" class="warranty-section" style="display: none;">
-                    <div class="warranty-title">
-                        <i class="fas fa-shield-alt"></i>
-                        الضمان
-                    </div>
-                    
-                    <div class="warranty-info">
-                        <div class="info-row">
-                            <span class="info-label">مدة الضمان:</span>
-                            <span class="info-value" id="warranty-period">-</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">ينتهي في:</span>
-                            <span class="info-value" id="warranty-end-date">-</span>
-                        </div>
-                    </div>
+                <div class="warranty-section" id="receipt_warranty_section" style="display: none;">
+                    <h3>🛡️ الضمان</h3>
+                    <p>مدة الضمان: <span id="receipt_warranty_period">-</span></p>
+                    <p>ينتهي في: <span id="receipt_warranty_end">-</span></p>
                     
                     <div class="warranty-terms">
-                        <h5>شروط الضمان:</h5>
-                        <ul>
-                            <li>الضمان ساري فقط على القطعة المستبدلة/المصلحة</li>
-                            <li>لا يشمل الضمان الكسر أو التلف المتعمد</li>
-                            <li>يجب إحضار هذه الفاتورة عند المطالبة بالضمان</li>
-                            <li>الضمان لا يشمل الأعطال الناتجة عن سوء الاستخدام</li>
-                        </ul>
-                        <div id="warranty-notes" style="margin-top: 15px; font-weight: 600; color: #28a745;"></div>
+                        <p>شروط الضمان:</p>
+                        <p>• الضمان ساري فقط على القطعة المستبدلة</p>
+                        <p>• لا يشمل الضمان الكسر أو التلف المتعمد</p>
+                        <p>• يجب إحضار هذه الفاتورة عند المطالبة</p>
+                        <p>• الضمان لا يشمل الأعطال الناتجة عن سوء الاستخدام</p>
+                        <p id="receipt_warranty_notes"></p>
                     </div>
                 </div>
 
-                <!-- Notes Section -->
-                <div id="notes-section" style="display: none;">
-                    <h3 class="section-title">ملاحظات</h3>
-                    <div class="invoice-info">
-                        <p id="job-notes">-</p>
-                    </div>
-                </div>
-
-                <!-- Signatures -->
-                <div class="signatures">
-                    <div class="signature-box">
-                        <h5>توقيع العميل</h5>
-                        <div class="signature-line"></div>
-                        <p>التاريخ: _______________</p>
-                    </div>
-                    <div class="signature-box">
-                        <h5>توقيع الفني</h5>
-                        <div class="signature-line"></div>
-                        <p>التاريخ: _______________</p>
-                    </div>
+                <div class="receipt-footer">
+                    <h4>سياسة الصيانة</h4>
+                    <p>1) الصيانة تشمل القطعة المستبدلة فقط</p>
+                    <p>2) الضمان حسب المدة المحددة في الفاتورة</p>
+                    <p>3) يجب إحضار هذه الفاتورة عند المطالبة بالضمان</p>
+                    <p>4) الصيانة لا تشمل الأعطال الناتجة عن سوء الاستخدام</p>
+                    <p>شكرا لثقتكم بصمة سوداء</p>
                 </div>
             </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            شكراً لثقتكم - نسعد بخدمتكم
         </div>
     </div>
 
@@ -456,48 +423,61 @@
 
             // Hide loading, show content
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('invoice-content').style.display = 'block';
+            document.getElementById('receipt-roll-template').style.display = 'block';
 
             // Invoice information
-            document.getElementById('invoice-number').textContent = currentJob.id.substring(0, 8).toUpperCase();
-            document.getElementById('invoice-date').textContent = formatDate(new Date());
-            document.getElementById('job-status').textContent = getStatusText(currentJob.status);
+            document.getElementById('receipt_invoice_number').textContent = currentJob.id.substring(0, 8).toUpperCase();
+            document.getElementById('receipt_date').textContent = formatDate(new Date());
+            document.getElementById('receipt_status').textContent = getStatusText(currentJob.status);
 
             // Customer information
-            document.getElementById('customer-name').textContent = currentJob.customerName || 'غير محدد';
-            document.getElementById('customer-phone').textContent = currentJob.customerPhone || 'غير محدد';
+            document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + (currentJob.customerName || 'غير محدد');
+            document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + (currentJob.customerPhone || 'غير محدد');
 
-            // Device and maintenance details
-            document.getElementById('device-type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
-            document.getElementById('device-model').textContent = currentJob.deviceModel || 'غير محدد';
-            document.getElementById('part-name').textContent = currentJob.partName || 'غير محدد';
-            document.getElementById('part-cost').textContent = (currentJob.partCost || 0).toFixed(2) + ' ريال';
-            document.getElementById('amount-charged').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
-            document.getElementById('tech-name').textContent = currentJob.techName || 'غير محدد';
-            document.getElementById('rep-name').textContent = currentJob.repName || 'غير محدد';
-            document.getElementById('visit-date').textContent = formatDate(currentJob.visitDate);
+            // Device information
+            document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
+            document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
+
+            // Maintenance details
+            const detailsTable = document.getElementById('receipt_details');
+            detailsTable.innerHTML = `
+                <tr>
+                    <td>اسم القطعة</td>
+                    <td>${currentJob.partName || 'غير محدد'}</td>
+                </tr>
+                <tr>
+                    <td>اسم الفني</td>
+                    <td>${currentJob.techName || 'غير محدد'}</td>
+                </tr>
+                <tr>
+                    <td>اسم المندوب</td>
+                    <td>${currentJob.repName || 'غير محدد'}</td>
+                </tr>
+                <tr>
+                    <td>تاريخ الزيارة</td>
+                    <td>${formatDate(currentJob.visitDate)}</td>
+                </tr>
+            `;
+
+            // Summary
+            document.getElementById('receipt_part_cost').textContent = (currentJob.partCost || 0).toFixed(2) + ' ريال';
+            document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
 
             // Warranty section
             if (currentJob.warrantyPeriod && currentJob.warrantyPeriod > 0) {
-                document.getElementById('warranty-section').style.display = 'block';
-                document.getElementById('warranty-period').textContent = currentJob.warrantyPeriod + ' يوم';
+                document.getElementById('receipt_warranty_section').style.display = 'block';
+                document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
                 
                 // Calculate warranty end date
                 const visitDate = new Date(currentJob.visitDate.seconds * 1000);
                 const warrantyEndDate = new Date(visitDate);
                 warrantyEndDate.setDate(warrantyEndDate.getDate() + currentJob.warrantyPeriod);
-                document.getElementById('warranty-end-date').textContent = formatDate(warrantyEndDate);
+                document.getElementById('receipt_warranty_end').textContent = formatDate(warrantyEndDate);
                 
                 // Warranty notes
                 if (currentJob.warrantyNotes) {
-                    document.getElementById('warranty-notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
+                    document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
                 }
-            }
-
-            // Notes section
-            if (currentJob.notes) {
-                document.getElementById('notes-section').style.display = 'block';
-                document.getElementById('job-notes').textContent = currentJob.notes;
             }
         }
 
