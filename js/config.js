@@ -8,7 +8,7 @@ const CONFIG = {
     VAT_RATE: 0.15, // 15% VAT rate
     COMPANY_INFO: {
         name: "بصمة سوداء",
-        vatNumber: "1234567890",
+        vatNumber: "1131278742",
         address: "الرياض، المملكة العربية السعودية",
         phone: "011-0000000"
     },
