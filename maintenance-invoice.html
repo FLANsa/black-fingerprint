@@ -327,20 +327,20 @@
                     </div>
                 </div>
 
+                <div class="maintenance-details">
+                    <h3>تفاصيل الصيانة</h3>
+                    <p style="text-align: center; margin: 10px 0;">القطعة: <strong id="receipt_part_name">-</strong></p>
+                </div>
+
                 <div class="device-info">
                     <h3>معلومات الجهاز</h3>
                     <p>نوع الجهاز: <span id="receipt_device_type">-</span></p>
                     <p>موديل الجهاز: <span id="receipt_device_model">-</span></p>
                 </div>
 
-                <div class="maintenance-details">
-                    <h3>تفاصيل الصيانة</h3>
-                    <p style="text-align: center; margin: 10px 0;">القطعة: <strong id="receipt_part_name">-</strong></p>
-                </div>
-
                 <div class="receipt-summary">
                     <div class="summary-row total">
-                        <span>المبلغ المحصل:</span>
+                        <span>المبلغ الإجمالي:</span>
                         <span id="receipt_total">0.00 ريال</span>
                     </div>
                 </div>
@@ -431,12 +431,12 @@
             document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + (currentJob.customerName || 'غير محدد');
             document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + (currentJob.customerPhone || 'غير محدد');
 
+            // Maintenance details - اسم القطعة فقط
+            document.getElementById('receipt_part_name').textContent = currentJob.partName || 'غير محدد';
+
             // Device information
             document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
             document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
-
-            // Maintenance details - اسم القطعة فقط
-            document.getElementById('receipt_part_name').textContent = currentJob.partName || 'غير محدد';
 
             // Summary
             document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
@@ -672,12 +672,12 @@
                 document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + (currentJob.customerName || 'غير محدد');
                 document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + (currentJob.customerPhone || 'غير محدد');
 
+                // تفاصيل الصيانة - اسم القطعة فقط
+                document.getElementById('receipt_part_name').textContent = currentJob.partName || 'غير محدد';
+
                 // معلومات الجهاز
                 document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
                 document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
-
-                // تفاصيل الصيانة - اسم القطعة فقط
-                document.getElementById('receipt_part_name').textContent = currentJob.partName || 'غير محدد';
 
                 // الملخص
                 document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
