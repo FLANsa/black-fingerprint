@@ -431,10 +431,10 @@
             // Summary
             document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
 
-            // Warranty section
+            // Warranty section - always show
+            document.getElementById('receipt_warranty_section').style.display = 'block';
+            
             if (currentJob.warrantyPeriod) {
-                document.getElementById('receipt_warranty_section').style.display = 'block';
-                
                 // التحقق من نوع الضمان (رقم أم نص)
                 if (typeof currentJob.warrantyPeriod === 'number' && currentJob.warrantyPeriod > 0) {
                     // ضمان رقمي
@@ -442,12 +442,18 @@
                 } else if (typeof currentJob.warrantyPeriod === 'string' && currentJob.warrantyPeriod.trim()) {
                     // ضمان نصي مخصص
                     document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod;
+                } else {
+                    // بدون ضمان
+                    document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
                 }
-                
-                // Warranty notes
-                if (currentJob.warrantyNotes) {
-                    document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
-                }
+            } else {
+                // بدون ضمان
+                document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
+            }
+            
+            // Warranty notes
+            if (currentJob.warrantyNotes) {
+                document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
             }
         }
 
@@ -674,10 +680,10 @@
                 // الملخص
                 document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
 
-                // قسم الضمان
+                // قسم الضمان - دائماً يظهر
+                document.getElementById('receipt_warranty_section').style.display = 'block';
+                
                 if (currentJob.warrantyPeriod) {
-                    document.getElementById('receipt_warranty_section').style.display = 'block';
-                    
                     // التحقق من نوع الضمان (رقم أم نص)
                     if (typeof currentJob.warrantyPeriod === 'number' && currentJob.warrantyPeriod > 0) {
                         // ضمان رقمي
@@ -685,14 +691,18 @@
                     } else if (typeof currentJob.warrantyPeriod === 'string' && currentJob.warrantyPeriod.trim()) {
                         // ضمان نصي مخصص
                         document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod;
-                    }
-                    
-                    // ملاحظات الضمان
-                    if (currentJob.warrantyNotes) {
-                        document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
+                    } else {
+                        // بدون ضمان
+                        document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
                     }
                 } else {
-                    document.getElementById('receipt_warranty_section').style.display = 'none';
+                    // بدون ضمان
+                    document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
+                }
+                
+                // ملاحظات الضمان
+                if (currentJob.warrantyNotes) {
+                    document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
                 }
 
             } catch (error) {
