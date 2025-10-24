@@ -146,7 +146,7 @@
                                 <label for="filterStatus" class="form-label">الحالة</label>
                                 <select class="form-select" id="filterStatus">
                                     <option value="">جميع الحالات</option>
-                                    <option value="pending">في الانتظار</option>
+                                    <option value="pending">قيد الصيانة</option>
                                     <option value="done">مكتملة</option>
                                     <option value="canceled">ملغية</option>
                                 </select>
@@ -292,7 +292,7 @@
                             <div class="col-md-6 mb-3">
                                 <label for="status" class="form-label">الحالة</label>
                                 <select class="form-select" id="status">
-                                    <option value="pending">في الانتظار</option>
+                                    <option value="pending">قيد الصيانة</option>
                                     <option value="done">مكتملة</option>
                                     <option value="canceled">ملغية</option>
                                 </select>
@@ -594,7 +594,7 @@
         // Get status text
         function getStatusText(status) {
             const statusMap = {
-                'pending': 'في الانتظار',
+                'pending': 'قيد الصيانة',
                 'done': 'مكتملة',
                 'canceled': 'ملغية'
             };
