@@ -533,6 +533,8 @@
 
         // طباعة الفاتورة
         async function printInvoice() {
+            console.log('🖨️ بدء عملية الطباعة...');
+            
             if (isPrinting) { 
                 alert('جاري الطباعة...'); 
                 return; 
@@ -550,13 +552,20 @@
             }
 
             try {
-                // 1) افتح النافذة فورًا (ضمن حدث الضغط) قبل أي await
-                const popup = window.open('', 'printWindow', 'width=420,height=800');
-                const willUsePopup = !!popup;
-
-                // 2) جهّز المحتوى (قد يأخذ وقت)
+                console.log('📋 تعبئة قالب الفاتورة...');
+                // 1) جهّز المحتوى أولاً
                 await populateInvoiceTemplate();
                 const receiptHTML = document.getElementById('receipt-roll-template').innerHTML;
+                
+                if (!receiptHTML) {
+                    throw new Error('لم يتم العثور على محتوى الفاتورة');
+                }
+                
+                console.log('✅ تم تحضير محتوى الفاتورة');
+
+                // 2) افتح النافذة
+                const popup = window.open('', 'printWindow', 'width=420,height=800');
+                const willUsePopup = !!popup;
 
                 // 3) لو النافذة فتحت، اطبع عبرها
                 if (willUsePopup) {
