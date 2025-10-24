@@ -317,16 +317,23 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="warrantyPeriod" class="form-label">فترة الضمان (أيام)</label>
-                                <select class="form-select" id="warrantyPeriod">
+                                <select class="form-select" id="warrantyPeriod" onchange="toggleCustomWarranty()">
                                     <option value="0">بدون ضمان</option>
                                     <option value="7">7 أيام</option>
                                     <option value="15" selected>15 يوم</option>
                                     <option value="30">30 يوم (شهر)</option>
                                     <option value="60">60 يوم (شهرين)</option>
                                     <option value="90">90 يوم (3 شهور)</option>
+                                    <option value="custom">مخصص</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label for="customWarrantyDays" class="form-label" id="customWarrantyLabel" style="display: none;">عدد الأيام المخصص</label>
+                                <input type="number" class="form-control" id="customWarrantyDays" placeholder="أدخل عدد الأيام" min="1" max="365" style="display: none;">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
                                 <label for="warrantyNotes" class="form-label">ملاحظات الضمان</label>
                                 <input type="text" class="form-control" id="warrantyNotes" placeholder="ملاحظات إضافية عن الضمان">
                             </div>
@@ -356,6 +363,41 @@
     <script src="js/navigation.js"></script>
     
     <script>
+        // دالة إظهار/إخفاء حقل الضمان المخصص
+        function toggleCustomWarranty() {
+            const warrantySelect = document.getElementById('warrantyPeriod');
+            const customWarrantyLabel = document.getElementById('customWarrantyLabel');
+            const customWarrantyDays = document.getElementById('customWarrantyDays');
+            
+            if (warrantySelect.value === 'custom') {
+                customWarrantyLabel.style.display = 'block';
+                customWarrantyDays.style.display = 'block';
+                customWarrantyDays.focus();
+            } else {
+                customWarrantyLabel.style.display = 'none';
+                customWarrantyDays.style.display = 'none';
+                customWarrantyDays.value = '';
+            }
+        }
+
+        // دالة الحصول على فترة الضمان المحددة
+        function getWarrantyPeriod() {
+            const warrantySelect = document.getElementById('warrantyPeriod');
+            const customWarrantyDays = document.getElementById('customWarrantyDays');
+            
+            if (warrantySelect.value === 'custom') {
+                const customDays = parseInt(customWarrantyDays.value);
+                if (customDays && customDays > 0 && customDays <= 365) {
+                    return customDays;
+                } else {
+                    showAlert('error', 'يرجى إدخال عدد صحيح للأيام (1-365)');
+                    return null;
+                }
+            } else {
+                return parseInt(warrantySelect.value) || 0;
+            }
+        }
+
         // ✅ دالة موحّدة لحساب القيم المشتقة
         function computeDerived(partCost, amountCharged, techPercent) {
             const pc = Number(partCost) || 0;
@@ -634,8 +676,26 @@
                 const deviceModelField = document.getElementById('deviceModel');
                 if (deviceModelField) deviceModelField.value = job.deviceModel || '';
                 
-                const warrantyPeriodField = document.getElementById('warrantyPeriod');
-                if (warrantyPeriodField) warrantyPeriodField.value = job.warrantyPeriod || 15;
+                // معالجة الضمان المخصص
+                const warrantyPeriod = job.warrantyPeriod || 0;
+                const warrantySelect = document.getElementById('warrantyPeriod');
+                const customWarrantyDays = document.getElementById('customWarrantyDays');
+                
+                if (warrantySelect && customWarrantyDays) {
+                    // التحقق من وجود الضمان في الخيارات المحددة مسبقاً
+                    const predefinedOptions = ['0', '7', '15', '30', '60', '90'];
+                    if (predefinedOptions.includes(warrantyPeriod.toString())) {
+                        warrantySelect.value = warrantyPeriod.toString();
+                        customWarrantyDays.style.display = 'none';
+                        document.getElementById('customWarrantyLabel').style.display = 'none';
+                    } else {
+                        // ضمان مخصص
+                        warrantySelect.value = 'custom';
+                        customWarrantyDays.value = warrantyPeriod;
+                        customWarrantyDays.style.display = 'block';
+                        document.getElementById('customWarrantyLabel').style.display = 'block';
+                    }
+                }
                 
                 const warrantyNotesField = document.getElementById('warrantyNotes');
                 if (warrantyNotesField) warrantyNotesField.value = job.warrantyNotes || '';
@@ -692,6 +752,12 @@
             // ✅ احسب القيم المشتقة
             const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
 
+            // ✅ التحقق من صحة الضمان المخصص
+            const warrantyPeriod = getWarrantyPeriod();
+            if (warrantyPeriod === null) {
+                return; // توقف إذا كان هناك خطأ في الضمان المخصص
+            }
+
             const jobData = {
                 customerName: document.getElementById('customerName').value,
                 customerPhone: document.getElementById('customerPhone').value,
@@ -713,7 +779,7 @@
                 // ✅ حقول الجهاز والضمان الجديدة
                 deviceType: document.getElementById('deviceType').value,
                 deviceModel: document.getElementById('deviceModel').value,
-                warrantyPeriod: parseInt(document.getElementById('warrantyPeriod').value) || 0,
+                warrantyPeriod: warrantyPeriod,
                 warrantyNotes: document.getElementById('warrantyNotes').value
             };
 
