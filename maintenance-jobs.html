@@ -328,8 +328,8 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="customWarrantyDays" class="form-label" id="customWarrantyLabel" style="display: none;">عدد الأيام المخصص</label>
-                                <input type="number" class="form-control" id="customWarrantyDays" placeholder="أدخل عدد الأيام" min="1" max="365" style="display: none;">
+                                <label for="customWarrantyText" class="form-label" id="customWarrantyLabel" style="display: none;">نص الضمان المخصص</label>
+                                <input type="text" class="form-control" id="customWarrantyText" placeholder="مثال: سنة، سنتين، 6 شهور" style="display: none;">
                             </div>
                         </div>
                         <div class="row">
@@ -367,30 +367,30 @@
         function toggleCustomWarranty() {
             const warrantySelect = document.getElementById('warrantyPeriod');
             const customWarrantyLabel = document.getElementById('customWarrantyLabel');
-            const customWarrantyDays = document.getElementById('customWarrantyDays');
+            const customWarrantyText = document.getElementById('customWarrantyText');
             
             if (warrantySelect.value === 'custom') {
                 customWarrantyLabel.style.display = 'block';
-                customWarrantyDays.style.display = 'block';
-                customWarrantyDays.focus();
+                customWarrantyText.style.display = 'block';
+                customWarrantyText.focus();
             } else {
                 customWarrantyLabel.style.display = 'none';
-                customWarrantyDays.style.display = 'none';
-                customWarrantyDays.value = '';
+                customWarrantyText.style.display = 'none';
+                customWarrantyText.value = '';
             }
         }
 
         // دالة الحصول على فترة الضمان المحددة
         function getWarrantyPeriod() {
             const warrantySelect = document.getElementById('warrantyPeriod');
-            const customWarrantyDays = document.getElementById('customWarrantyDays');
+            const customWarrantyText = document.getElementById('customWarrantyText');
             
             if (warrantySelect.value === 'custom') {
-                const customDays = parseInt(customWarrantyDays.value);
-                if (customDays && customDays > 0 && customDays <= 365) {
-                    return customDays;
+                const customText = customWarrantyText.value.trim();
+                if (customText) {
+                    return customText; // إرجاع النص كما هو
                 } else {
-                    showAlert('error', 'يرجى إدخال عدد صحيح للأيام (1-365)');
+                    showAlert('error', 'يرجى إدخال نص الضمان المخصص');
                     return null;
                 }
             } else {
@@ -679,20 +679,20 @@
                 // معالجة الضمان المخصص
                 const warrantyPeriod = job.warrantyPeriod || 0;
                 const warrantySelect = document.getElementById('warrantyPeriod');
-                const customWarrantyDays = document.getElementById('customWarrantyDays');
+                const customWarrantyText = document.getElementById('customWarrantyText');
                 
-                if (warrantySelect && customWarrantyDays) {
+                if (warrantySelect && customWarrantyText) {
                     // التحقق من وجود الضمان في الخيارات المحددة مسبقاً
                     const predefinedOptions = ['0', '7', '15', '30', '60', '90'];
                     if (predefinedOptions.includes(warrantyPeriod.toString())) {
                         warrantySelect.value = warrantyPeriod.toString();
-                        customWarrantyDays.style.display = 'none';
+                        customWarrantyText.style.display = 'none';
                         document.getElementById('customWarrantyLabel').style.display = 'none';
                     } else {
-                        // ضمان مخصص
+                        // ضمان مخصص (نص)
                         warrantySelect.value = 'custom';
-                        customWarrantyDays.value = warrantyPeriod;
-                        customWarrantyDays.style.display = 'block';
+                        customWarrantyText.value = warrantyPeriod;
+                        customWarrantyText.style.display = 'block';
                         document.getElementById('customWarrantyLabel').style.display = 'block';
                     }
                 }

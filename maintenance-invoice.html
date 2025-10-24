@@ -335,24 +335,10 @@
 
                 <div class="maintenance-details">
                     <h3>تفاصيل الصيانة</h3>
-                    <table class="details-table">
-                        <thead>
-                            <tr>
-                                <th>البيان</th>
-                                <th>القيمة</th>
-                            </tr>
-                        </thead>
-                        <tbody id="receipt_details">
-                            <!-- Details will be loaded here -->
-                        </tbody>
-                    </table>
+                    <p style="text-align: center; margin: 10px 0;">القطعة: <strong id="receipt_part_name">-</strong></p>
                 </div>
 
                 <div class="receipt-summary">
-                    <div class="summary-row">
-                        <span>تكلفة القطعة:</span>
-                        <span id="receipt_part_cost">0.00 ريال</span>
-                    </div>
                     <div class="summary-row total">
                         <span>المبلغ المحصل:</span>
                         <span id="receipt_total">0.00 ريال</span>
@@ -449,29 +435,10 @@
             document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
             document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
 
-            // Maintenance details
-            const detailsTable = document.getElementById('receipt_details');
-            detailsTable.innerHTML = `
-                <tr>
-                    <td>اسم القطعة</td>
-                    <td>${currentJob.partName || 'غير محدد'}</td>
-                </tr>
-                <tr>
-                    <td>اسم الفني</td>
-                    <td>${currentJob.techName || 'غير محدد'}</td>
-                </tr>
-                <tr>
-                    <td>اسم المندوب</td>
-                    <td>${currentJob.repName || 'غير محدد'}</td>
-                </tr>
-                <tr>
-                    <td>تاريخ الزيارة</td>
-                    <td>${formatDate(currentJob.visitDate)}</td>
-                </tr>
-            `;
+            // Maintenance details - اسم القطعة فقط
+            document.getElementById('receipt_part_name').textContent = currentJob.partName || 'غير محدد';
 
             // Summary
-            document.getElementById('receipt_part_cost').textContent = (currentJob.partCost || 0).toFixed(2) + ' ريال';
             document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
 
             // Warranty section
@@ -709,41 +676,31 @@
                 document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
                 document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
 
-                // تفاصيل الصيانة
-                const detailsTable = document.getElementById('receipt_details');
-                detailsTable.innerHTML = `
-                    <tr>
-                        <td>اسم القطعة</td>
-                        <td>${currentJob.partName || 'غير محدد'}</td>
-                    </tr>
-                    <tr>
-                        <td>اسم الفني</td>
-                        <td>${currentJob.techName || 'غير محدد'}</td>
-                    </tr>
-                    <tr>
-                        <td>اسم المندوب</td>
-                        <td>${currentJob.repName || 'غير محدد'}</td>
-                    </tr>
-                    <tr>
-                        <td>تاريخ الزيارة</td>
-                        <td>${formatDate(currentJob.visitDate)}</td>
-                    </tr>
-                `;
+                // تفاصيل الصيانة - اسم القطعة فقط
+                document.getElementById('receipt_part_name').textContent = currentJob.partName || 'غير محدد';
 
                 // الملخص
-                document.getElementById('receipt_part_cost').textContent = (currentJob.partCost || 0).toFixed(2) + ' ريال';
                 document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
 
                 // قسم الضمان
-                if (currentJob.warrantyPeriod && currentJob.warrantyPeriod > 0) {
+                if (currentJob.warrantyPeriod) {
                     document.getElementById('receipt_warranty_section').style.display = 'block';
-                    document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
                     
-                    // حساب تاريخ انتهاء الضمان
-                    const visitDate = new Date(currentJob.visitDate.seconds * 1000);
-                    const warrantyEndDate = new Date(visitDate);
-                    warrantyEndDate.setDate(warrantyEndDate.getDate() + currentJob.warrantyPeriod);
-                    document.getElementById('receipt_warranty_end').textContent = formatDate(warrantyEndDate);
+                    // التحقق من نوع الضمان (رقم أم نص)
+                    if (typeof currentJob.warrantyPeriod === 'number' && currentJob.warrantyPeriod > 0) {
+                        // ضمان رقمي
+                        document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
+                        
+                        // حساب تاريخ انتهاء الضمان
+                        const visitDate = new Date(currentJob.visitDate.seconds * 1000);
+                        const warrantyEndDate = new Date(visitDate);
+                        warrantyEndDate.setDate(warrantyEndDate.getDate() + currentJob.warrantyPeriod);
+                        document.getElementById('receipt_warranty_end').textContent = formatDate(warrantyEndDate);
+                    } else if (typeof currentJob.warrantyPeriod === 'string' && currentJob.warrantyPeriod.trim()) {
+                        // ضمان نصي مخصص
+                        document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod;
+                        document.getElementById('receipt_warranty_end').textContent = 'حسب الاتفاق';
+                    }
                     
                     // ملاحظات الضمان
                     if (currentJob.warrantyNotes) {
