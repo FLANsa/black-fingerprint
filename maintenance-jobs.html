@@ -324,6 +324,8 @@
                                     <option value="30">30 يوم (شهر)</option>
                                     <option value="60">60 يوم (شهرين)</option>
                                     <option value="90">90 يوم (3 شهور)</option>
+                                    <option value="سنة">سنة</option>
+                                    <option value="سنتين">سنتين</option>
                                     <option value="custom">مخصص</option>
                                 </select>
                             </div>
@@ -683,7 +685,7 @@
                 
                 if (warrantySelect && customWarrantyText) {
                     // التحقق من وجود الضمان في الخيارات المحددة مسبقاً
-                    const predefinedOptions = ['0', '7', '15', '30', '60', '90'];
+                    const predefinedOptions = ['0', '7', '15', '30', '60', '90', 'سنة', 'سنتين'];
                     if (predefinedOptions.includes(warrantyPeriod.toString())) {
                         warrantySelect.value = warrantyPeriod.toString();
                         customWarrantyText.style.display = 'none';
