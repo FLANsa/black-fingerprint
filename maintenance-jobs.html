@@ -396,7 +396,14 @@
                     return null;
                 }
             } else {
-                return parseInt(warrantySelect.value) || 0;
+                // التحقق إذا كانت القيمة رقم أو نص
+                const value = warrantySelect.value;
+                const numValue = parseInt(value);
+                if (!isNaN(numValue)) {
+                    return numValue; // رقم
+                } else {
+                    return value; // نص (سنة، سنتين)
+                }
             }
         }
 
