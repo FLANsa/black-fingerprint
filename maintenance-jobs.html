@@ -328,7 +328,7 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="customWarrantyText" class="form-label" id="customWarrantyLabel" style="display: none;">نص الضمان المخصص</label>
+                                <label for="customWarrantyText" class="form-label" id="customWarrantyLabel" style="display: none;"> الضمان المخصص</label>
                                 <input type="text" class="form-control" id="customWarrantyText" placeholder="مثال: سنة، سنتين، 6 شهور" style="display: none;">
                             </div>
                         </div>
@@ -390,7 +390,7 @@
                 if (customText) {
                     return customText; // إرجاع النص كما هو
                 } else {
-                    showAlert('error', 'يرجى إدخال نص الضمان المخصص');
+                    showAlert('error', 'يرجى إدخال  الضمان المخصص');
                     return null;
                 }
             } else {
