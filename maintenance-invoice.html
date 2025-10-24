@@ -344,7 +344,6 @@
                 <div class="warranty-section" id="receipt_warranty_section" style="display: none;">
                     <h3>🛡️ الضمان</h3>
                     <p>مدة الضمان: <span id="receipt_warranty_period">-</span></p>
-                    <p>ينتهي في: <span id="receipt_warranty_end">-</span></p>
                     
                     <div class="warranty-terms">
                         <p>شروط الضمان:</p>
@@ -436,12 +435,6 @@
             if (currentJob.warrantyPeriod && currentJob.warrantyPeriod > 0) {
                 document.getElementById('receipt_warranty_section').style.display = 'block';
                 document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
-                
-                // Calculate warranty end date
-                const visitDate = new Date(currentJob.visitDate.seconds * 1000);
-                const warrantyEndDate = new Date(visitDate);
-                warrantyEndDate.setDate(warrantyEndDate.getDate() + currentJob.warrantyPeriod);
-                document.getElementById('receipt_warranty_end').textContent = formatDate(warrantyEndDate);
                 
                 // Warranty notes
                 if (currentJob.warrantyNotes) {
@@ -681,16 +674,9 @@
                     if (typeof currentJob.warrantyPeriod === 'number' && currentJob.warrantyPeriod > 0) {
                         // ضمان رقمي
                         document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
-                        
-                        // حساب تاريخ انتهاء الضمان
-                        const visitDate = new Date(currentJob.visitDate.seconds * 1000);
-                        const warrantyEndDate = new Date(visitDate);
-                        warrantyEndDate.setDate(warrantyEndDate.getDate() + currentJob.warrantyPeriod);
-                        document.getElementById('receipt_warranty_end').textContent = formatDate(warrantyEndDate);
                     } else if (typeof currentJob.warrantyPeriod === 'string' && currentJob.warrantyPeriod.trim()) {
                         // ضمان نصي مخصص
                         document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod;
-                        document.getElementById('receipt_warranty_end').textContent = 'حسب الاتفاق';
                     }
                     
                     // ملاحظات الضمان
