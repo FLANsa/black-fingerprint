@@ -163,6 +163,7 @@
               <th>اسم العميل</th>
               <th>عدد المنتجات</th>
               <th>المبلغ الإجمالي</th>
+              <th>الربح</th>
               <th>طريقة الدفع</th>
               <th>الحالة</th>
               <th>الإجراءات</th>
@@ -187,11 +188,19 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-3">
       <div class="card bg-success text-white">
         <div class="card-body text-center">
           <h5 class="card-title">إجمالي المبيعات</h5>
           <h3><span id="sum_total_sales_amount">0.00</span> ريال</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <h5 class="card-title">إجمالي الربح</h5>
+          <h3><span id="sum_total_profit">0.00</span> ريال</h3>
         </div>
       </div>
     </div>
@@ -504,9 +513,11 @@
     // استبعاد المسترجعة من المجاميع فقط (لكن تظل معروضة ومحتسبة في عدد العمليات)                                                                           
     const effectiveForTotals = (sales || []).filter(s => !(s && (s.returned === true || s.status === 'مسترجعة')));                                          
     let totalAmount = 0;
+    let totalProfit = 0;
 
     pageSlice.forEach(sale => {
       totalAmount   += sale.total_amount || 0;
+      totalProfit   += sale.total_profit || 0;
 
       const tr = document.createElement('tr');
 
@@ -537,6 +548,14 @@
       tdAmt.innerHTML = `
         <span class="fw-bold text-success">${fmtMoney(sale.total_amount)} ريال</span>`;
       tr.appendChild(tdAmt);
+
+      // الربح
+      const tdProfit = document.createElement('td');
+      const profit = sale.total_profit || 0;
+      const profitColor = profit >= 0 ? 'text-success' : 'text-danger';
+      tdProfit.innerHTML = `
+        <span class="fw-bold ${profitColor}">${fmtMoney(profit)} ريال</span>`;
+      tr.appendChild(tdProfit);
 
       // طريقة الدفع
       const tdPay = document.createElement('td');
@@ -577,11 +596,16 @@
 
     // احسب المجاميع من غير المسترجعة فقط
     totalAmount = 0;
+    totalProfit = 0;
     effectiveForTotals.forEach(sale => {
       totalAmount   += sale.total_amount || 0;
+      totalProfit   += sale.total_profit || 0;
     });
 
     document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
+    if (document.getElementById('sum_total_profit')) {
+      document.getElementById('sum_total_profit').textContent = fmtMoney(totalProfit);
+    }
 
     // رسم عناصر التصفح بين الصفحات
     renderPagination(totalPages);

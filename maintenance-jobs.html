@@ -564,7 +564,21 @@
                 return;
             }
 
+            // حساب المجاميع
+            let totalPartCost = 0;
+            let totalAmountCharged = 0;
+            let totalProfit = 0;
+            let totalTechCommission = 0;
+            let totalShopProfit = 0;
+
             jobsData.forEach(job => {
+                // حساب المجاميع
+                totalPartCost += job.partCost || 0;
+                totalAmountCharged += job.amountCharged || 0;
+                totalProfit += job.profit || 0;
+                totalTechCommission += job.techCommission || 0;
+                totalShopProfit += job.shopProfit || 0;
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${job.visitDate ? new Date(job.visitDate.seconds * 1000).toLocaleDateString('ar-SA') : '-'}</td>
@@ -596,6 +610,22 @@
                 `;
                 tbody.appendChild(row);
             });
+
+            // إضافة صف المجاميع
+            const totalsRow = document.createElement('tr');
+            totalsRow.className = 'table-info fw-bold';
+            totalsRow.style.backgroundColor = '#d1ecf1';
+            totalsRow.innerHTML = `
+                <td colspan="5" class="text-end"><strong>المجموع:</strong></td>
+                <td><strong>${totalPartCost.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalAmountCharged.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalProfit.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalTechCommission.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalShopProfit.toFixed(2)} ريال</strong></td>
+                <td></td>
+                <td></td>
+            `;
+            tbody.appendChild(totalsRow);
         }
 
         // Get status text
