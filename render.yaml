@@ -1,0 +1,57 @@
+services:
+  - type: static
+    name: black-fingerprint
+    buildCommand: ""
+    staticPublishPath: ./
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_NAME
+        value: Black Fingerprint
+      - key: APP_VERSION
+        value: "2.0.0"
+      - key: COMPANY_NAME
+        value: بصمة سوداء
+      - key: COMPANY_NAME_EN
+        value: Black Fingerprint
+      - key: COMPANY_ADDRESS
+        value: القصيم، بريدة، الصفراء، اسواق النافوره
+      - key: COMPANY_PHONE
+        value: "0542141144,0507217774"
+      - key: COMPANY_EMAIL
+        value: support@black-fingerprint.com
+      - key: VAT_RATE
+        value: "0.15"
+      - key: VAT_RATE_PERCENTAGE
+        value: "15"
+      - key: DATABASE_TYPE
+        value: firestore
+      - key: DATABASE_COLLECTION_PHONES
+        value: phones
+      - key: DATABASE_COLLECTION_ACCESSORIES
+        value: accessories
+      - key: DATABASE_COLLECTION_SALES
+        value: sales
+      - key: DATABASE_COLLECTION_PHONE_TYPES
+        value: phone_types
+      - key: MAX_FILE_SIZE
+        value: "5242880"
+      - key: ALLOWED_FILE_TYPES
+        value: jpg,jpeg,png,gif,pdf
+      - key: LOG_LEVEL
+        value: info
+      - key: DEBUG
+        value: "false"
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-XSS-Protection
+        value: "1; mode=block"
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin

@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2c3e50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="عمر">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>تعديل بيانات الهاتف — عمر للاتصالات</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="css/mobile.css" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
+    .navbar { background-color: #2c3e50; position: fixed; top: 0; width: 100%; z-index: 1030; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .navbar-brand, .nav-link { color: white !important; }
+    .card { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-primary { background-color: #2c3e50; border-color: #2c3e50; }
+    .btn-primary:hover { background-color: #1a252f; border-color: #1a252f; }
+    .btn-success { background-color: #28a745; border-color: #28a745; }
+    .btn-success:hover { background-color: #218838; border-color: #1e7e34; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <span class="navbar-brand">عمر للاتصالات</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <!-- Navigation will be populated by navigation.js -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">
+              <i class="fas fa-edit"></i> تعديل بيانات الهاتف
+            </h2>
+          </div>
+          <div class="card-body">
+            
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">جاري التحميل...</span>
+              </div>
+              <p class="mt-2">جاري تحميل بيانات الهاتف...</p>
+            </div>
+
+            <!-- Phone Not Found -->
+            <div id="phoneNotFound" class="alert alert-warning d-none">
+              <h4><i class="fas fa-exclamation-triangle"></i> لم يتم العثور على الهاتف</h4>
+              <p>لم يتم العثور على الهاتف المطلوب. يرجى التحقق من الرابط أو العودة إلى صفحة البحث.</p>
+              <a href="search.html" class="btn btn-primary">
+                <i class="fas fa-search"></i> العودة إلى البحث
+              </a>
+            </div>
+
+            <!-- Edit Form -->
+            <form id="editPhoneForm" class="d-none">
+              
+              <!-- Basic Information -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-primary border-bottom pb-2">
+                    <i class="fas fa-info-circle"></i> المعلومات الأساسية
+                  </h5>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="phone_number" class="form-label">رقم الجهاز/الباركود</label>
+                  <input type="text" class="form-control" id="phone_number" readonly>
+                  <div class="form-text">رقم الجهاز لا يمكن تغييره</div>
+                </div>
+                <div class="col-md-4">
+                  <label for="manufacturer" class="form-label">الشركة المصنعة</label>
+                  <select class="form-select" id="manufacturer" required>
+                    <option value="">اختر الشركة المصنعة</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="model" class="form-label">الموديل</label>
+                  <select class="form-select" id="model" required>
+                    <option value="">اختر الموديل</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="phone_color" class="form-label">اللون</label>
+                  <input type="text" class="form-control" id="phone_color">
+                </div>
+                <div class="col-md-4">
+                  <label for="phone_memory" class="form-label">الذاكرة</label>
+                  <select class="form-select" id="phone_memory">
+                    <option value="">اختر الذاكرة</option>
+                    <option value="32GB">32GB</option>
+                    <option value="64GB">64GB</option>
+                    <option value="128GB">128GB</option>
+                    <option value="256GB">256GB</option>
+                    <option value="512GB">512GB</option>
+                    <option value="1TB">1TB</option>
+                    <option value="أخرى">أخرى</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="serial_number" class="form-label">الرقم التسلسلي</label>
+                  <input type="text" class="form-control" id="serial_number" required>
+                </div>
+              </div>
+
+              <!-- Pricing Information -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-success border-bottom pb-2">
+                    <i class="fas fa-dollar-sign"></i> معلومات الأسعار
+                  </h5>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="purchase_price" class="form-label">سعر الشراء</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="purchase_price" step="0.01" min="0" required>
+                    <span class="input-group-text">ريال</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="selling_price" class="form-label">سعر البيع</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="selling_price" step="0.01" min="0" required>
+                    <span class="input-group-text">ريال</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Condition and Warranty -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-info border-bottom pb-2">
+                    <i class="fas fa-cog"></i> الحالة والضمان
+                  </h5>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="condition" class="form-label">حالة الهاتف</label>
+                  <select class="form-select" id="condition" required>
+                    <option value="new">جديد</option>
+                    <option value="used">مستعمل</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="warranty" class="form-label">فترة الضمان</label>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="warranty" min="0" max="24">
+                    <span class="input-group-text">شهر</span>
+                  </div>
+                </div>
+                <div class="col-md-4" id="batteryAgeField" style="display: none;">
+                  <label for="battery_age" class="form-label">نسبة البطارية</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="battery_age" placeholder="مثال: 85% أو جديدة">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customer Information -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-warning border-bottom pb-2">
+                    <i class="fas fa-user"></i> معلومات العميل
+                  </h5>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <label for="customer_name" class="form-label">اسم العميل</label>
+                  <input type="text" class="form-control" id="customer_name">
+                </div>
+                <div class="col-md-4">
+                  <label for="customer_id" class="form-label">رقم الهوية/الإقامة</label>
+                  <input type="text" class="form-control" id="customer_id" maxlength="10" pattern="[0-9]{10}">
+                </div>
+                <div class="col-md-4">
+                  <label for="customer_phone" class="form-label">رقم هاتف العميل</label>
+                  <input type="text" class="form-control" id="customer_phone" maxlength="10" pattern="[0-9]{10}">
+                </div>
+              </div>
+
+              <!-- Additional Information -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <h5 class="text-secondary border-bottom pb-2">
+                    <i class="fas fa-info"></i> معلومات إضافية
+                  </h5>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="buyer_name" class="form-label">اسم المشتري</label>
+                  <input type="text" class="form-control" id="buyer_name">
+                </div>
+                <div class="col-md-6">
+                  <label for="description" class="form-label">الوصف</label>
+                  <textarea class="form-control" id="description" rows="3"></textarea>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="row">
+                <div class="col-12 text-center">
+                  <button type="submit" class="btn btn-success btn-lg me-3">
+                    <i class="fas fa-save"></i> حفظ التغييرات
+                  </button>
+                  <a href="search.html" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-arrow-right"></i> إلغاء والعودة
+                  </a>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase Integration -->
+  <script type="module" src="js/firebase-config-cdn.js"></script>
+  <script type="module" src="js/firebase-database-cdn.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let currentPhone = null;
+
+    // ===== تحميل بيانات الهاتف للتعديل =====
+    async function loadPhoneForEdit(phoneNumber) {
+      try {
+        console.log('🔄 تحميل بيانات الهاتف للتعديل:', phoneNumber);
+        
+        let phone = null;
+        
+        // البحث في Firebase أولاً
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const phones = await window.storage.getPhones();
+          phone = phones.find(p => p.phone_number === phoneNumber || p.id === phoneNumber);
+        }
+        
+        // البحث في localStorage كبديل
+        if (!phone) {
+          const phones = JSON.parse(localStorage.getItem('phones') || '[]');
+          phone = phones.find(p => p.phone_number === phoneNumber || p.id === phoneNumber);
+        }
+        
+        if (phone) {
+          console.log('✅ تم العثور على الهاتف:', phone);
+          currentPhone = phone;
+          
+          // إخفاء spinner وإظهار النموذج
+          document.getElementById('loadingSpinner').classList.add('d-none');
+          document.getElementById('editPhoneForm').classList.remove('d-none');
+          
+          // ملء النموذج بالبيانات
+          document.getElementById('phone_number').value = phone.phone_number || '';
+          
+          // تعيين الشركة المصنعة أولاً
+          const manufacturer = phone.manufacturer || phone.brand || '';
+          document.getElementById('manufacturer').value = manufacturer;
+          
+          // تحميل الموديلات بعد تعيين الشركة المصنعة
+          if (manufacturer) {
+            await loadModels(manufacturer);
+            // تعيين الموديل بعد تحميل القائمة
+            document.getElementById('model').value = phone.model || '';
+          }
+          
+          document.getElementById('phone_color').value = phone.phone_color || '';
+          
+          // تعيين قيمة الذاكرة مع إضافة الخيار إذا لم يكن موجوداً في القائمة
+          const memoryValue = phone.phone_memory || phone.memory || '';
+          const memorySelect = document.getElementById('phone_memory');
+          if (memoryValue) {
+            // التحقق من وجود القيمة في القائمة
+            const optionExists = Array.from(memorySelect.options).some(opt => opt.value === memoryValue);
+            if (!optionExists && memoryValue !== '') {
+              // إضافة القيمة كخيار جديد إذا لم تكن موجودة
+              const newOption = document.createElement('option');
+              newOption.value = memoryValue;
+              newOption.textContent = memoryValue;
+              memorySelect.appendChild(newOption);
+            }
+            memorySelect.value = memoryValue;
+          }
+          
+          document.getElementById('serial_number').value = phone.serial_number || '';
+          document.getElementById('purchase_price').value = phone.purchase_price || '';
+          document.getElementById('selling_price').value = phone.selling_price || phone.price || '';
+          document.getElementById('condition').value = phone.condition || phone.phone_type || 'new';
+          document.getElementById('warranty').value = phone.warranty || '';
+          document.getElementById('customer_name').value = phone.customer_name || '';
+          document.getElementById('customer_id').value = phone.customer_id || '';
+          document.getElementById('customer_phone').value = phone.customer_phone || '';
+          document.getElementById('buyer_name').value = phone.buyer_name || '';
+          document.getElementById('description').value = phone.description || '';
+          
+          // إظهار/إخفاء حقل عمر البطارية حسب حالة الهاتف
+          toggleBatteryAgeField();
+          
+          // تعيين عمر البطارية للهواتف المستعملة
+          if (phone.condition === 'used' || phone.phone_type === 'used') {
+            document.getElementById('battery_age').value = phone.age || phone.battery_level || '';
+          }
+          
+        } else {
+          console.log('❌ لم يتم العثور على الهاتف');
+          document.getElementById('loadingSpinner').classList.add('d-none');
+          document.getElementById('phoneNotFound').classList.remove('d-none');
+        }
+        
+      } catch (error) {
+        console.error('❌ خطأ في تحميل بيانات الهاتف:', error);
+        document.getElementById('loadingSpinner').classList.add('d-none');
+        showAlert('danger', 'حدث خطأ في تحميل بيانات الهاتف');
+      }
+    }
+
+    // ===== تبديل حقل عمر البطارية =====
+    function toggleBatteryAgeField() {
+      const condition = document.getElementById('condition').value;
+      const batteryAgeField = document.getElementById('batteryAgeField');
+      
+      if (condition === 'used') {
+        batteryAgeField.style.display = 'block';
+        document.getElementById('battery_age').required = true;
+      } else {
+        batteryAgeField.style.display = 'none';
+        document.getElementById('battery_age').required = false;
+        document.getElementById('battery_age').value = '';
+      }
+    }
+
+    // ===== حفظ التغييرات =====
+    async function savePhoneChanges() {
+      try {
+        if (!currentPhone) {
+          showAlert('danger', 'لا توجد بيانات هاتف للتحرير');
+          return false;
+        }
+
+        // التحقق من صحة البيانات
+        const customerId = document.getElementById('customer_id').value.trim();
+        const customerPhone = document.getElementById('customer_phone').value.trim();
+        
+        if (customerId && (customerId.length !== 10 || !/^[0-9]{10}$/.test(customerId))) {
+          showAlert('warning', 'رقم الهوية/الإقامة يجب أن يكون 10 أرقام');
+          document.getElementById('customer_id').focus();
+          return false;
+        }
+        
+        if (customerPhone && (customerPhone.length !== 10 || !/^[0-9]{10}$/.test(customerPhone))) {
+          showAlert('warning', 'رقم هاتف العميل يجب أن يكون 10 أرقام');
+          document.getElementById('customer_phone').focus();
+          return false;
+        }
+
+        const condition = document.getElementById('condition').value;
+        if (condition === 'used') {
+          const batteryValue = document.getElementById('battery_age').value.trim();
+          if (!batteryValue) {
+            showAlert('warning', 'يرجى إدخال نسبة البطارية');
+            document.getElementById('battery_age').focus();
+            return false;
+          }
+        }
+
+        // تجميع البيانات المحدثة
+        const updatedPhoneData = {
+          ...currentPhone,
+          manufacturer: document.getElementById('manufacturer').value,
+          brand: document.getElementById('manufacturer').value, // للتوافق
+          model: document.getElementById('model').value,
+          phone_color: document.getElementById('phone_color').value,
+          phone_memory: document.getElementById('phone_memory').value,
+          memory: document.getElementById('phone_memory').value, // للتوافق
+          serial_number: document.getElementById('serial_number').value,
+          purchase_price: parseFloat(document.getElementById('purchase_price').value) || 0,
+          selling_price: parseFloat(document.getElementById('selling_price').value) || 0,
+          price: parseFloat(document.getElementById('selling_price').value) || 0, // للتوافق
+          condition: condition,
+          phone_type: condition, // للتوافق
+          warranty: parseInt(document.getElementById('warranty').value) || 0,
+          customer_name: document.getElementById('customer_name').value,
+          customer_id: document.getElementById('customer_id').value,
+          customer_phone: document.getElementById('customer_phone').value,
+          buyer_name: document.getElementById('buyer_name').value,
+          description: document.getElementById('description').value,
+          updatedAt: new Date().toISOString()
+        };
+
+        // إضافة نسبة البطارية للهواتف المستعملة
+        if (condition === 'used') {
+          const batteryValue = document.getElementById('battery_age').value.trim();
+          updatedPhoneData.age = batteryValue;
+          updatedPhoneData.battery_level = batteryValue;
+        } else {
+          updatedPhoneData.age = null;
+          updatedPhoneData.battery_level = '100';
+        }
+
+        console.log('🔄 تحديث بيانات الهاتف:', updatedPhoneData);
+
+        let savedOK = false;
+        
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          // تحديث في Firebase
+          savedOK = await window.storage.updatePhone(currentPhone.id || currentPhone.phone_number, updatedPhoneData);
+        } else {
+          // تحديث في localStorage
+          const arr = JSON.parse(localStorage.getItem('phones') || '[]');
+          const index = arr.findIndex(p => p.id === currentPhone.id || p.phone_number === currentPhone.phone_number);
+          if (index !== -1) {
+            arr[index] = { ...arr[index], ...updatedPhoneData };
+            localStorage.setItem('phones', JSON.stringify(arr));
+            savedOK = true;
+          }
+        }
+        
+        if (savedOK) {
+          showAlert('success', 'تم تحديث بيانات الهاتف بنجاح!');
+          // إعادة توجيه إلى صفحة البحث بعد 2 ثانية
+          setTimeout(() => {
+            window.location.href = 'search.html';
+          }, 2000);
+          return true;
+        } else {
+          showAlert('danger', 'فشل في تحديث بيانات الهاتف');
+          return false;
+        }
+
+      } catch (error) {
+        console.error('❌ خطأ في حفظ التغييرات:', error);
+        showAlert('danger', 'حدث خطأ في حفظ التغييرات');
+        return false;
+      }
+    }
+
+    // ===== تحميل قائمة الشركات المصنعة =====
+    async function loadManufacturers() {
+      try {
+        console.log('🔄 تحميل قائمة الشركات المصنعة من Firebase...');
+        
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const phoneTypes = await window.storage.getPhoneTypes();
+          console.log('📱 أنواع الهواتف المحملة:', phoneTypes);
+          
+          // phoneTypes is now an object with brand as keys
+          const manufacturers = Object.keys(phoneTypes);
+          console.log('🏭 الشركات المصنعة:', manufacturers);
+          
+          const select = document.getElementById('manufacturer');
+          select.innerHTML = '<option value="">اختر الشركة المصنعة</option>';
+          manufacturers.forEach(manufacturer => {
+            const option = document.createElement('option');
+            option.value = manufacturer;
+            option.textContent = manufacturer;
+            select.appendChild(option);
+          });
+          
+          console.log('✅ تم تحميل الشركات المصنعة بنجاح');
+        } else {
+          console.log('⚠️ Firebase غير متاح، تحميل من localStorage...');
+          const phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '{}');
+          const manufacturers = Object.keys(phoneTypes);
+          
+          const select = document.getElementById('manufacturer');
+          select.innerHTML = '<option value="">اختر الشركة المصنعة</option>';
+          manufacturers.forEach(manufacturer => {
+            const option = document.createElement('option');
+            option.value = manufacturer;
+            option.textContent = manufacturer;
+            select.appendChild(option);
+          });
+        }
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الشركات المصنعة:', error);
+        showAlert('warning', 'فشل في تحميل قائمة الشركات المصنعة');
+      }
+    }
+
+    // ===== تحميل قائمة الموديلات حسب الشركة المصنعة =====
+    async function loadModels(manufacturer) {
+      try {
+        console.log('🔄 تحميل موديلات الشركة:', manufacturer);
+        
+        if (!manufacturer) {
+          document.getElementById('model').innerHTML = '<option value="">اختر الموديل</option>';
+          return;
+        }
+        
+        let phoneTypes = {};
+        
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          phoneTypes = await window.storage.getPhoneTypes();
+        } else {
+          phoneTypes = JSON.parse(localStorage.getItem('phone_types') || '{}');
+        }
+        
+        // phoneTypes is now an object with brand as keys and models as arrays
+        const models = phoneTypes[manufacturer] || [];
+        
+        console.log('📱 الموديلات المتاحة:', models);
+        
+        const modelSelect = document.getElementById('model');
+        const currentModel = modelSelect.value;
+        
+        // حفظ الموديل الحالي إذا كان موجوداً
+        const shouldPreserveModel = models.includes(currentModel);
+        
+        modelSelect.innerHTML = '<option value="">اختر الموديل</option>';
+        models.forEach(model => {
+          const option = document.createElement('option');
+          option.value = model;
+          option.textContent = model;
+          if (shouldPreserveModel && model === currentModel) {
+            option.selected = true;
+          }
+          modelSelect.appendChild(option);
+        });
+        
+        // إذا لم يكن الموديل الحالي في القائمة، أضفه
+        if (currentModel && !shouldPreserveModel) {
+          const option = document.createElement('option');
+          option.value = currentModel;
+          option.textContent = currentModel;
+          option.selected = true;
+          modelSelect.insertBefore(option, modelSelect.firstChild);
+        }
+        
+        console.log('✅ تم تحميل الموديلات بنجاح');
+        
+      } catch (error) {
+        console.error('❌ خطأ في تحميل الموديلات:', error);
+        showAlert('warning', 'فشل في تحميل قائمة الموديلات');
+      }
+    }
+
+    // ===== عرض التنبيهات =====
+    function showAlert(type, message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      
+      document.body.appendChild(alertDiv);
+      
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, 5000);
+    }
+
+    // ===== تحديث قائمة التنقل للمستخدم المحدود =====
+    function updateNavigationForUser() {
+      const currentUser = localStorage.getItem('current_user');
+      if (currentUser) {
+        try {
+          const userData = JSON.parse(currentUser);
+          const navbar = document.querySelector('.navbar-nav.me-auto');
+          
+          if (userData.role === 'user' && navbar) {
+            navbar.innerHTML = `
+              <li class="nav-item"><a class="nav-link" href="limited_dashboard.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+            `;
+          }
+          // Admin users keep the full navigation (default)
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
+      }
+    }
+
+    // ===== التحقق من تسجيل الدخول =====
+    function checkLogin() {
+      const currentUser = localStorage.getItem('current_user');
+      if (!currentUser) {
+        alert('يجب تسجيل الدخول أولاً');
+        window.location.href = 'login.html';
+        return false;
+      }
+      return true;
+    }
+
+    // ===== تسجيل الخروج =====
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        localStorage.removeItem('current_user');
+        alert('تم تسجيل الخروج بنجاح');
+        window.location.href = 'index.html';
+      }
+    }
+
+    // ===== تهيئة الصفحة =====
+    document.addEventListener('DOMContentLoaded', async function() {
+      // تحديث شريط التنقل حسب دور المستخدم
+      updateNavigationForUser();
+      
+      // التحقق من تسجيل الدخول أولاً
+      if (!checkLogin()) return;
+
+      // انتظار تهيئة Firebase
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        console.log('✅ Firebase متاح في صفحة تعديل الهاتف');
+      } else {
+        console.log('⚠️ Firebase غير متاح، استخدام localStorage');
+      }
+
+      // تحميل قائمة الشركات المصنعة
+      await loadManufacturers();
+
+      // التحقق من وجود معامل التعديل في URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const editPhoneNumber = urlParams.get('edit');
+      
+      if (editPhoneNumber) {
+        await loadPhoneForEdit(editPhoneNumber);
+      } else {
+        document.getElementById('loadingSpinner').classList.add('d-none');
+        document.getElementById('phoneNotFound').classList.remove('d-none');
+      }
+
+      // إضافة مستمع لتغيير حالة الهاتف
+      document.getElementById('condition').addEventListener('change', toggleBatteryAgeField);
+
+      // إضافة مستمع لتغيير الشركة المصنعة
+      document.getElementById('manufacturer').addEventListener('change', async function(e) {
+        const selectedManufacturer = e.target.value;
+        console.log('🔄 تغيير الشركة المصنعة إلى:', selectedManufacturer);
+        await loadModels(selectedManufacturer);
+      });
+
+      // إضافة مستمع للنموذج
+      document.getElementById('editPhoneForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        await savePhoneChanges();
+      });
+    });
+  </script>
+
+  <!-- Navigation Script -->
+  <script src="js/navigation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initNavigation('add_new_phone');
+    });
+  </script>
+</body>
+</html>

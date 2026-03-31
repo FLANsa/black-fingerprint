@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="بصمة سوداء">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>فاتورة الصيانة - بصمة سوداء</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="css/mobile.css" rel="stylesheet">
+    <!-- Google Fonts - Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Scripts -->
+    <script type="module" src="js/firebase-config-cdn.js"></script>
+    <script type="module" src="js/firebase-database-cdn.js"></script>
+    
+    <!-- Arabic Numbers Support -->
+    <script src="js/arabic-numbers.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #dc3545;
+            font-size: 1.2rem;
+        }
+        
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        /* Receipt roll printer styles - نفس تصميم فاتورة المبيعات */
+        .receipt-template {
+            display: none;
+        }
+        
+        @media print {
+            .container, .btn, .d-flex, .card, .no-print {
+                display: none !important;
+            }
+            
+            .receipt-template {
+                display: block !important;
+                width: 54mm !important;
+                max-width: 54mm !important;
+                margin: 0 auto !important;
+                padding: 2mm !important;
+                font-family: 'Courier New', monospace !important;
+                font-size: 18px !important;
+                line-height: 1.2 !important;
+                color: black !important;
+                background: white !important;
+                page-break-inside: avoid !important;
+            }
+            
+            .receipt-header {
+                text-align: center !important;
+                margin-bottom: 20px !important;
+                border-bottom: 1px dashed #000 !important;
+                padding-bottom: 15px !important;
+            }
+            
+            .company-info h1 {
+                font-size: 26px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .company-info p {
+                margin: 3px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .maintenance-info h2 {
+                font-size: 23px !important;
+                margin: 15px 0 10px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .maintenance-info p {
+                margin: 3px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .customer-info h3 {
+                font-size: 20px !important;
+                margin: 15px 0 8px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .customer-info p {
+                margin: 2px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .device-info h3 {
+                font-size: 20px !important;
+                margin: 15px 0 8px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .device-info p {
+                margin: 2px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .maintenance-details {
+                margin: 20px 0 !important;
+            }
+            
+            .maintenance-details h3 {
+                font-size: 20px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                color: black !important;
+            }
+            
+            .details-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                font-size: 13px !important;
+                color: black !important;
+                table-layout: fixed !important;
+            }
+            
+            .details-table th {
+                border-bottom: 1px solid #000 !important;
+                padding: 5px 2px !important;
+                text-align: center !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .details-table td {
+                padding: 3px 2px !important;
+                text-align: center !important;
+                border-bottom: 1px dotted #ccc !important;
+                color: black !important;
+            }
+            
+            .details-table th:nth-child(1), .details-table td:nth-child(1) { width: 40% !important; }
+            .details-table th:nth-child(2), .details-table td:nth-child(2) { width: 60% !important; }
+            
+            .receipt-summary {
+                margin: 20px 0 !important;
+                border-top: 1px dashed #000 !important;
+                padding-top: 15px !important;
+            }
+            
+            .summary-row {
+                display: flex !important;
+                justify-content: space-between !important;
+                margin: 8px 0 !important;
+                font-size: 18px !important;
+                color: black !important;
+            }
+            
+            .summary-row.total {
+                font-weight: bold !important;
+                font-size: 20px !important;
+                border-top: 1px solid #000 !important;
+                padding-top: 8px !important;
+            }
+            
+            .warranty-section {
+                margin: 20px 0 !important;
+                border-top: 1px dashed #000 !important;
+                padding-top: 15px !important;
+            }
+            
+            .warranty-section h3 {
+                font-size: 20px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                text-align: center !important;
+                color: black !important;
+            }
+            
+            .warranty-section p {
+                margin: 3px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .warranty-terms {
+                margin: 10px 0 !important;
+            }
+            
+            .warranty-terms p {
+                margin: 2px 0 !important;
+                font-size: 12px !important;
+                color: black !important;
+            }
+            
+            .receipt-footer {
+                margin: 20px 0 0 0 !important;
+                text-align: center !important;
+                border-top: 1px dashed #000 !important;
+                padding-top: 15px !important;
+            }
+            
+            .receipt-footer h4 {
+                font-size: 18px !important;
+                margin: 0 0 10px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+            }
+            
+            .receipt-footer p {
+                margin: 5px 0 !important;
+                font-size: 13px !important;
+                color: black !important;
+            }
+            
+            .receipt-header, .maintenance-details, .receipt-summary, .warranty-section, .receipt-footer {
+                page-break-inside: avoid !important;
+            }
+        }
+        
+        @media print {
+            html, body {
+                width: 100% !important;
+            }
+
+            body {
+                display: flex !important;
+                justify-content: center !important;
+                align-items: flex-start !important;
+                background: #fff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .receipt-template,
+            #receipt-roll-template,
+            #receipt-roll-template .receipt-container {
+                width: 54mm !important;
+                max-width: 54mm !important;
+                margin: 0 auto !important;
+                float: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Print and Back Buttons -->
+    <button class="btn btn-primary print-btn no-print" onclick="printInvoice()">
+        <i class="fas fa-print"></i> طباعة الفاتورة
+    </button>
+    
+    <button class="btn btn-secondary back-btn no-print" onclick="window.close()">
+        <i class="fas fa-arrow-right"></i> إغلاق
+    </button>
+
+    <div class="invoice-container">
+        <div id="loading" class="loading">
+            <i class="fas fa-spinner fa-spin"></i> جاري تحميل بيانات الفاتورة...
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i> حدث خطأ في تحميل بيانات الفاتورة
+        </div>
+        
+        <!-- Receipt Roll Printer Template - نفس تصميم فاتورة المبيعات -->
+        <div id="receipt-roll-template" class="receipt-template">
+            <div class="receipt-container">
+                <div class="receipt-header">
+                    <div class="company-info">
+                        <h1>بصمة سوداء</h1>
+                        <p>Black Fingerprint</p>
+                        <p>الجوال: 0542141144</p>
+                        <p>0507217774</p>
+                        <p>السجل التجاري: 1131278742</p>
+                        <p>العنوان: القصيم بريده الصفراء</p>
+                        <p>اسواق النافوره</p>
+                    </div>
+
+                    <div class="maintenance-info">
+                        <h2>فاتورة صيانة</h2>
+                        <p>فاتورة: <span id="receipt_invoice_number">-</span></p>
+                        <p>تاريخ الفاتورة: <span id="receipt_date">-</span></p>
+                        <p>حالة العملية: <span id="receipt_status">-</span></p>
+                    </div>
+
+                    <div class="customer-info" id="receipt_customer_info">
+                        <h3>معلومات العميل</h3>
+                        <p id="receipt_customer_name">-</p>
+                        <p id="receipt_customer_phone">-</p>
+                    </div>
+                </div>
+
+                <div class="maintenance-details">
+                    <h3>تفاصيل الصيانة</h3>
+                    <div id="receipt_parts_list">
+                        <!-- القطع ستُضاف هنا ديناميكياً -->
+                    </div>
+                    <p style="margin: 8px 0;">نوع الجهاز: <strong id="receipt_device_type">-</strong></p>
+                    <p style="margin: 8px 0;">موديل الجهاز: <strong id="receipt_device_model">-</strong></p>
+                </div>
+
+                <div class="receipt-summary">
+                    <div class="summary-row total">
+                        <span>المبلغ الإجمالي:</span>
+                        <span id="receipt_total">0.00 ريال</span>
+                    </div>
+                </div>
+
+                <div class="warranty-section" id="receipt_warranty_section" style="display: none;">
+                    <h3>فترة الصيانة من يوم الي ١٥ يوم</h3>
+                    <h3>سياسة الضمان</h3>
+                    
+                    <p>مدة الضمان: <span id="receipt_warranty_period">-</span></p>
+                    
+                    
+                    <div class="warranty-terms">
+                        <p>شروط الضمان:</p>
+                        <p>• الضمان ساري فقط على القطعة المستبدلة</p>
+                        <p>• لا يشمل الضمان الكسر أو التلف المتعمد</p>
+                        <p>• يجب إحضار هذه الفاتورة عند المطالبة</p>
+                        <p>• الضمان لا يشمل الأعطال الناتجة عن سوء الاستخدام</p>
+
+                        <p id="receipt_warranty_notes"></p>
+                    </div>
+                </div>
+
+                <div class="receipt-footer">
+                    <p style="margin-top: 20px;">شكراً لثقتكم بصمة سوداء</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentJob = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInvoice();
+        });
+
+        // Load invoice data
+        async function loadInvoice() {
+            try {
+                // Get job ID from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const jobId = urlParams.get('jobId');
+                
+                if (!jobId) {
+                    showError('لم يتم العثور على رقم العملية');
+                    return;
+                }
+
+                console.log('🔍 Loading invoice for job:', jobId);
+
+                // Load job data
+                currentJob = await window.firebaseDatabase.getMaintenanceJob(jobId);
+                
+                if (!currentJob) {
+                    showError('لم يتم العثور على بيانات العملية');
+                    return;
+                }
+
+                console.log('✅ Job data loaded:', currentJob);
+                
+                // Display invoice
+                displayInvoice();
+                
+            } catch (error) {
+                console.error('❌ Error loading invoice:', error);
+                showError('حدث خطأ في تحميل بيانات الفاتورة');
+            }
+        }
+
+        // Display invoice data
+        function displayInvoice() {
+            if (!currentJob) return;
+
+            // Hide loading, show content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('receipt-roll-template').style.display = 'block';
+
+            // Invoice information
+            document.getElementById('receipt_invoice_number').textContent = currentJob.id.substring(0, 8).toUpperCase();
+            document.getElementById('receipt_date').textContent = formatDate(new Date());
+            document.getElementById('receipt_status').textContent = getStatusText(currentJob.status);
+
+            // Customer information
+            document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + (currentJob.customerName || 'غير محدد');
+            document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + (currentJob.customerPhone || 'غير محدد');
+
+            // Maintenance details - عرض جميع القطع
+            const partsListEl = document.getElementById('receipt_parts_list');
+            if (partsListEl) {
+                partsListEl.innerHTML = '';
+                
+                if (currentJob.parts && Array.isArray(currentJob.parts) && currentJob.parts.length > 0) {
+                        // الهيكل الجديد: عرض جميع القطع بدون إظهار اسم المندوب أو تكلفة القطعة
+                    currentJob.parts.forEach((part, index) => {
+                        const partDiv = document.createElement('div');
+                        partDiv.style.margin = '8px 0';
+                        partDiv.innerHTML = `
+                            <p style="margin: 4px 0;">
+                                <strong>القطعة ${index + 1}:</strong> ${part.partName || 'غير محدد'}
+                            </p>
+                        `;
+                            partDiv.appendChild(document.createElement('hr'));
+                        partsListEl.appendChild(partDiv);
+                    });
+                } else if (currentJob.partName) {
+                        // الهيكل القديم: عرض القطعة الواحدة بدون إظهار اسم المندوب أو تكلفة القطعة
+                    const partDiv = document.createElement('div');
+                    partDiv.style.margin = '8px 0';
+                    partDiv.innerHTML = `
+                        <p style="margin: 4px 0;">
+                            <strong>القطعة:</strong> ${currentJob.partName || 'غير محدد'}
+                        </p>
+                    `;
+                    partsListEl.appendChild(partDiv);
+                } else {
+                    partsListEl.innerHTML = '<p style="margin: 4px 0;"><strong>القطعة:</strong> غير محدد</p>';
+                }
+            }
+
+            // Device information
+            document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
+            document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
+
+            // Summary
+            document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
+
+            // Warranty section - always show
+            document.getElementById('receipt_warranty_section').style.display = 'block';
+            
+            if (currentJob.warrantyPeriod) {
+                // التحقق من نوع الضمان (رقم أم نص)
+                if (typeof currentJob.warrantyPeriod === 'number' && currentJob.warrantyPeriod > 0) {
+                    // ضمان رقمي
+                    document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
+                } else if (typeof currentJob.warrantyPeriod === 'string' && currentJob.warrantyPeriod.trim()) {
+                    // ضمان نصي مخصص
+                    document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod;
+                } else {
+                    // بدون ضمان
+                    document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
+                }
+            } else {
+                // بدون ضمان
+                document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
+            }
+            
+            // Warranty notes
+            if (currentJob.warrantyNotes) {
+                document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
+            }
+        }
+
+        // Helper functions
+        function formatDate(date) {
+            if (!date) return 'غير محدد';
+            
+            const d = new Date(date.seconds ? date.seconds * 1000 : date);
+            return d.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': 'قيد الصيانة',
+                'done': 'مكتملة',
+                'canceled': 'ملغية'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getDeviceTypeText(deviceType) {
+            const deviceTypeMap = {
+                'mobile': 'جوال',
+                'tablet': 'تابلت',
+                'laptop': 'لابتوب',
+                'other': 'أخرى'
+            };
+            return deviceTypeMap[deviceType] || deviceType;
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + message;
+        }
+
+        // ✅ دالة تُرجع تاريخ اليوم بصيغة YYYY/MM/DD بالأرقام اللاتينية وبتوقيت الرياض
+        function todayRiyadh() {
+            try {
+                const dtf = new Intl.DateTimeFormat('en-GB', {
+                    calendar: 'gregory',
+                    numberingSystem: 'latn',
+                    timeZone: 'Asia/Riyadh',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                });
+                // نستخدم formatToParts لضمان ترتيب YYYY/MM/DD
+                const parts = dtf.formatToParts(new Date());
+                const y = parts.find(p => p.type === 'year')?.value;
+                const m = parts.find(p => p.type === 'month')?.value;
+                const d = parts.find(p => p.type === 'day')?.value;
+                if (y && m && d) return `${y}/${m}/${d}`;
+                // لو دعم المتصفح ضعيف جدًا
+                const fallback = dtf.format(new Date()); // غالباً DD/MM/YYYY
+                const mm = fallback.match(/(\d{2}).(\d{2}).(\d{4})/);
+                if (mm) return `${mm[3]}/${mm[2]}/${mm[1]}`;
+                return fallback;
+            } catch (e) {
+                // Fallback يدوي (+3 ساعات من UTC)
+                const now = new Date();
+                const riyadh = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+                const y = riyadh.getUTCFullYear();
+                const m = String(riyadh.getUTCMonth() + 1).padStart(2, '0');
+                const d = String(riyadh.getUTCDate()).padStart(2, '0');
+                return `${y}/${m}/${d}`;
+            }
+        }
+
+        let isPrinting = false;
+
+        // طباعة الفاتورة
+        async function printInvoice() {
+            console.log('🖨️ بدء عملية الطباعة...');
+            
+            if (isPrinting) { 
+                alert('جاري الطباعة...'); 
+                return; 
+            }
+            if (!currentJob) { 
+                alert('لا توجد بيانات للطباعة'); 
+                return; 
+            }
+
+            isPrinting = true;
+            const printBtn = document.querySelector('.print-btn');
+            if (printBtn) { 
+                printBtn.disabled = true; 
+                printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطباعة...'; 
+            }
+
+            try {
+                console.log('📋 تعبئة قالب الفاتورة...');
+                // 1) جهّز المحتوى أولاً
+                await populateInvoiceTemplate();
+                const receiptHTML = document.getElementById('receipt-roll-template').innerHTML;
+                
+                if (!receiptHTML) {
+                    throw new Error('لم يتم العثور على محتوى الفاتورة');
+                }
+                
+                console.log('✅ تم تحضير محتوى الفاتورة');
+
+                // 2) افتح النافذة
+                const popup = window.open('', 'printWindow', 'width=420,height=800');
+                const willUsePopup = !!popup;
+
+                // 3) لو النافذة فتحت، اطبع عبرها
+                if (willUsePopup) {
+                    popup.document.write(`
+                        <html dir="rtl" lang="ar">
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>فاتورة صيانة</title>
+                            <style>
+                                body{margin:0;padding:0;font-family:Arial,Tahoma,sans-serif;font-size:18px;line-height:1.4;color:#000;background:#fff;direction:rtl;text-align:right;-webkit-print-color-adjust:exact;color-adjust:exact;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;}
+                                .receipt-container{ width:54mm !important; max-width:54mm !important; margin:0 auto !important; padding:2mm !important; box-sizing:border-box; display:block; }
+                                .receipt-header{ text-align:center; margin-bottom:15px; border-bottom:1px solid #000; padding-bottom:10px; }
+                                .company-info h1{ font-size:26px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+                                .company-info p{ margin:2px 0; font-size:16px; text-align:center; }
+                                .maintenance-info h2{ font-size:23px; margin:12px 0 8px 0; font-weight:bold; text-align:center; }
+                                .maintenance-info p{ margin:2px 0; font-size:16px; text-align:center; }
+                                .customer-info h3{ font-size:20px; margin:12px 0 6px 0; font-weight:bold; text-align:right; }
+                                .customer-info p{ margin:1px 0; font-size:16px; text-align:right; }
+                                .device-info h3{ font-size:20px; margin:12px 0 6px 0; font-weight:bold; text-align:right; }
+                                .device-info p{ margin:1px 0; font-size:16px; text-align:right; }
+                                .maintenance-details{ margin:15px 0; }
+                                .maintenance-details h3{ font-size:20px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+                                .details-table{ width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed; }
+                                .details-table th{ border-bottom:1px solid #000; padding:3px 1px; text-align:center; font-weight:bold; font-size:11px; }
+                                .details-table td{ padding:2px 1px; text-align:center; border-bottom:1px dotted #ccc; font-size:11px; }
+                                .details-table th:nth-child(1), .details-table td:nth-child(1) { width: 40%; }
+                                .details-table th:nth-child(2), .details-table td:nth-child(2) { width: 60%; }
+                                .receipt-summary{ margin:15px 0; border-top:1px dashed #000; padding-top:10px; }
+                                .summary-row{ display:flex; justify-content:space-between; margin:5px 0; font-size:16px; }
+                                .summary-row.total{ font-weight:bold; font-size:18px; border-top:1px solid #000; padding-top:5px; margin-top:10px; }
+                                .warranty-section{ margin:15px 0; border-top:1px dashed #000; padding-top:10px; }
+                                .warranty-section h3{ font-size:20px; margin:0 0 8px 0; font-weight:bold; text-align:center; }
+                                .warranty-section p{ margin:2px 0; font-size:16px; }
+                                .warranty-terms{ margin:8px 0; }
+                                .warranty-terms p{ margin:1px 0; font-size:14px; }
+                                .receipt-footer{ margin:15px 0 0 0; text-align:center; border-top:1px dashed #000; padding-top:10px; }
+                                .receipt-footer h4{ font-size:18px; margin:0 0 8px 0; font-weight:bold; }
+                                .receipt-footer p{ margin:3px 0; font-size:16px; }
+                                @media print{ @page{ size:58mm auto; margin:0; } body{display:flex !important; justify-content:center !important; align-items:flex-start !important;} }
+                            </style>
+                        </head>
+                        <body>${receiptHTML}</body></html>
+                    `);
+                    popup.document.close();
+                    popup.focus();
+                    popup.print();
+                    setTimeout(() => { popup.close(); donePrinting(); }, 800);
+                } else {
+                    // استخدام iframe كبديل
+                    const iframe = document.createElement('iframe');
+                    iframe.style.position = 'fixed';
+                    iframe.style.width = '0';
+                    iframe.style.height = '0';
+                    iframe.style.border = 'none';
+                    iframe.style.left = '-9999px';
+                    iframe.style.bottom = '0';
+                    document.body.appendChild(iframe);
+
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(`
+                        <!DOCTYPE html>
+                        <html dir="rtl" lang="ar">
+                        <head><meta charset="UTF-8"><title>فاتورة صيانة</title>
+                        <style>
+                            @media print{ @page{ size:58mm auto; margin:0; } }
+                            body{ margin:0; background:#fff; display:flex; justify-content:center; align-items:flex-start; min-height:100vh; }
+                            .receipt-container{ width:54mm !important; max-width:54mm !important; margin:0 auto !important; padding:2mm !important; box-sizing:border-box; }
+                        </style>
+                        </head>
+                        <body>${receiptHTML}</body></html>
+                    `);
+                    doc.close();
+
+                    setTimeout(() => {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                        setTimeout(() => { document.body.removeChild(iframe); donePrinting(); }, 800);
+                    }, 300);
+                }
+
+            } catch (error) {
+                console.error('❌ خطأ الطباعة:', error);
+                alert('حدث خطأ في الطباعة: ' + (error?.message || error));
+                donePrinting(true);
+            }
+
+            function donePrinting(failed){
+                isPrinting = false;
+                const btn = document.querySelector('.print-btn');
+                if (btn){ btn.disabled = false; btn.innerHTML = '<i class="fas fa-print"></i> طباعة الفاتورة'; }
+                if (!failed) alert('تم إرسال الفاتورة للطباعة');
+            }
+        }
+
+        // تعبئة قالب الفاتورة
+        async function populateInvoiceTemplate() {
+            if (!currentJob) return;
+            
+            try {
+                // رقم الفاتورة
+                document.getElementById('receipt_invoice_number').textContent = currentJob.id.substring(0, 8).toUpperCase();
+
+                // تاريخ الفاتورة = تاريخ اليوم فقط (لاتيني) بتوقيت الرياض
+                const receiptDateElement = document.getElementById('receipt_date');
+                if (receiptDateElement) {
+                    receiptDateElement.textContent = todayRiyadh();
+                }
+
+                // حالة العملية
+                document.getElementById('receipt_status').textContent = getStatusText(currentJob.status);
+
+                // معلومات العميل
+                document.getElementById('receipt_customer_name').textContent = 'اسم العميل: ' + (currentJob.customerName || 'غير محدد');
+                document.getElementById('receipt_customer_phone').textContent = 'رقم الجوال: ' + (currentJob.customerPhone || 'غير محدد');
+
+                // تفاصيل الصيانة - عرض جميع القطع
+                const partsListEl = document.getElementById('receipt_parts_list');
+                if (partsListEl) {
+                    partsListEl.innerHTML = '';
+                    
+                    if (currentJob.parts && Array.isArray(currentJob.parts) && currentJob.parts.length > 0) {
+                        // الهيكل الجديد: عرض جميع القطع بدون إظهار اسم المندوب أو تكلفة القطعة
+                        currentJob.parts.forEach((part, index) => {
+                            const partDiv = document.createElement('div');
+                            partDiv.style.margin = '8px 0';
+                            partDiv.innerHTML = `
+                                <p style="margin: 4px 0;">
+                                    <strong>القطعة ${index + 1}:</strong> ${part.partName || 'غير محدد'}
+                                </p>
+                            `;
+                            partsListEl.appendChild(partDiv);
+                        });
+                    } else if (currentJob.partName) {
+                        // الهيكل القديم: عرض القطعة الواحدة بدون إظهار اسم المندوب أو تكلفة القطعة
+                        const partDiv = document.createElement('div');
+                        partDiv.style.margin = '8px 0';
+                        partDiv.innerHTML = `
+                            <p style="margin: 4px 0;">
+                                <strong>القطعة:</strong> ${currentJob.partName || 'غير محدد'}
+                            </p>
+                        `;
+                        partsListEl.appendChild(partDiv);
+                    } else {
+                        partsListEl.innerHTML = '<p style="margin: 4px 0;"><strong>القطعة:</strong> غير محدد</p>';
+                    }
+                }
+
+                // معلومات الجهاز
+                document.getElementById('receipt_device_type').textContent = getDeviceTypeText(currentJob.deviceType) || 'غير محدد';
+                document.getElementById('receipt_device_model').textContent = currentJob.deviceModel || 'غير محدد';
+
+                // الملخص
+                document.getElementById('receipt_total').textContent = (currentJob.amountCharged || 0).toFixed(2) + ' ريال';
+
+                // قسم الضمان - دائماً يظهر
+                document.getElementById('receipt_warranty_section').style.display = 'block';
+                
+                if (currentJob.warrantyPeriod) {
+                    // التحقق من نوع الضمان (رقم أم نص)
+                    if (typeof currentJob.warrantyPeriod === 'number' && currentJob.warrantyPeriod > 0) {
+                        // ضمان رقمي
+                        document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod + ' يوم';
+                    } else if (typeof currentJob.warrantyPeriod === 'string' && currentJob.warrantyPeriod.trim()) {
+                        // ضمان نصي مخصص
+                        document.getElementById('receipt_warranty_period').textContent = currentJob.warrantyPeriod;
+                    } else {
+                        // بدون ضمان
+                        document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
+                    }
+                } else {
+                    // بدون ضمان
+                    document.getElementById('receipt_warranty_period').textContent = 'بدون ضمان';
+                }
+                
+                // ملاحظات الضمان
+                if (currentJob.warrantyNotes) {
+                    document.getElementById('receipt_warranty_notes').textContent = 'ملاحظات إضافية: ' + currentJob.warrantyNotes;
+                }
+
+            } catch (error) {
+                console.error('❌ خطأ في تعبئة قالب الفاتورة:', error);
+            }
+        }
+    </script>
+</body>
+</html>

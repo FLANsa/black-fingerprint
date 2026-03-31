@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2c3e50">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="عمر">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>إنشاء عملية بيع جديدة — عمر للاتصالات</title>
+
+  <!-- نفس الخط/المكتبات المستخدمة في القالب -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="css/mobile.css" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
+    .navbar { 
+      background-color: #2c3e50; 
+      position: fixed; 
+      top: 0; 
+      width: 100%; 
+      z-index: 1030; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .navbar-brand, .nav-link { color: white !important; }
+    .card { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .btn-primary { background-color: #2c3e50; border-color: #2c3e50; }
+    .btn-primary:hover { background-color: #1a252f; border-color: #1a252f; }
+  </style>
+</head>
+<body>
+
+  <!-- شريط التنقل -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <span class="navbar-brand">عمر للاتصالات</span>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <!-- Navigation will be populated by navigation.js -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- المحتوى الأصلي -->
+  <div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2><i class="fas fa-shopping-cart"></i> إنشاء عملية بيع جديدة</h2>
+      <a href="dashboard.html" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> العودة للوحة التحكم
+      </a>
+    </div>
+
+    <div class="row">
+      <!-- معلومات العميل -->
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-user"></i> معلومات العميل</h5>
+          </div>
+          <div class="card-body">
+            <form id="customerForm" action="#" onsubmit="return false;">
+              <div class="mb-3">
+                <label for="customer_name" class="form-label">اسم العميل</label>
+                <input type="text" class="form-control" id="customer_name" name="customer_name">
+              </div>
+              <div class="mb-3">
+                <label for="customer_phone" class="form-label">رقم الهاتف</label>
+                <input type="tel" class="form-control arabic-number-field" id="customer_phone" name="customer_phone">
+              </div>
+              <div class="mb-3">
+                <label for="customer_email" class="form-label">البريد الإلكتروني</label>
+                <input type="email" class="form-control" id="customer_email" name="customer_email">
+              </div>
+              <div class="mb-3">
+                <label for="customer_address" class="form-label">العنوان</label>
+                <textarea class="form-control" id="customer_address" name="customer_address" rows="2"></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="payment_method" class="form-label">طريقة الدفع</label>
+                <select class="form-select" id="payment_method" name="payment_method">
+                  <option value="نقدي">نقدي</option>
+                  <option value="بطاقة ائتمان">بطاقة ائتمان</option>
+                  <option value="تحويل بنكي">تحويل بنكي</option>
+                  <option value="شيك">شيك</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="notes" class="form-label">ملاحظات</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- اختيار المنتجات -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-box"></i> إضافة المنتجات</h5>
+          </div>
+          <div class="card-body">
+            <!-- البحث بالباركود -->
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label for="barcode_search" class="form-label">البحث بالباركود (اختياري)</label>
+                <div class="input-group">
+                  <input type="text" class="form-control arabic-number-field" id="barcode_search" placeholder="أدخل رقم الباركود للبحث السريع" onkeypress="if(event.key==='Enter') searchByBarcode()">
+                  <button class="btn btn-outline-primary" type="button" onclick="searchByBarcode()">
+                    <i class="fas fa-search"></i> بحث
+                  </button>
+                </div>
+                <div id="barcode_search_result" class="mt-2" style="display: none;"></div>
+              </div>
+            </div>
+
+            <!-- اختيار النوع والمنتج والكمية -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="product_type" class="form-label">نوع المنتج</label>
+                <select class="form-select" id="product_type" onchange="loadProducts()">
+                  <option value="">اختر نوع المنتج</option>
+                  <option value="phone">هاتف</option>
+                  <option value="accessory">إكسسوار</option>
+                  <option value="charger">شاحن</option>
+                  <option value="case">غلاف</option>
+                  <option value="screen_protector">حماية الشاشة</option>
+                  <option value="other">أخرى</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="product_select" class="form-label">المنتج</label>
+                <select class="form-select" id="product_select" onchange="updateProductInfo()">
+                  <option value="">اختر المنتج</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label for="quantity" class="form-label">الكمية</label>
+                <input type="text" class="form-control arabic-number-field" id="quantity" value="1" onchange="updateTotalPrice()">
+              </div>
+            </div>
+
+            <!-- تفاصيل المنتج -->
+            <div id="product_details" class="mb-3" style="display: none;">
+              <div class="card bg-light">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p><strong>اسم المنتج:</strong> <span id="selected_product_name">-</span></p>
+                      <p><strong>الوصف:</strong> <span id="selected_product_description">-</span></p>
+                    </div>
+                    <div class="col-md-6">
+                      <p><strong>السعر:</strong> <span id="selected_product_price">-</span> ريال</p>
+                      <p><strong>السعر الإجمالي:</strong> <span id="total_price" class="text-success fw-bold">-</span> ريال</p>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-primary" onclick="addToCart()">
+                    <i class="fas fa-plus"></i> إضافة للسلة
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- السلة -->
+            <div class="card">
+              <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-shopping-cart"></i> سلة المشتريات</h6>
+              </div>
+              <div class="card-body">
+                <div id="cart_items">
+                  <p class="text-muted text-center">لا توجد منتجات في السلة</p>
+                </div>
+
+                <!-- الملخص -->
+                <div id="cart_summary" style="display: none;">
+                  <hr>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h5>المجموع الإجمالي: <span id="cart_total" class="text-success fw-bold">0.00</span> ريال</h5>
+
+                      <!-- الضمان (اختياري) -->
+                      <div class="mt-3">
+                        <label for="warranty_input" class="form-label">الضمان (اختياري)</label>
+                        <div class="input-group">
+                          <input list="warranty_options" id="warranty_input" class="form-control" placeholder="اكتب أو اختر الضمان">
+                          <datalist id="warranty_options"></datalist>
+                          <button class="btn btn-outline-secondary" type="button" onclick="addWarrantyOption()">حفظ كخيار</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                      <button type="button" class="btn btn-success btn-lg" id="complete_sale_btn" disabled>
+                        <i class="fas fa-check"></i> إتمام عملية البيع
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- /الملخص -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- /اختيار المنتجات -->
+    </div>
+  </div>
+
+  <!-- مكتبات JS نفسها -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Firebase Configuration -->
+  <script type="module" src="js/firebase-config-cdn.js"></script>
+  <script type="module" src="js/firebase-database-cdn.js"></script>
+  <script type="module" src="js/firebase-storage-manager.js"></script>
+  
+  <!-- Arabic Numbers Support -->
+  <script src="js/arabic-numbers.js"></script>
+
+  <!-- جافاسكربت واجهة فقط (بدل متغيرات Jinja وبدل fetch للخادم) -->
+  <script>
+    // ====== بيانات عامة ======
+    let phones = [];
+    let accessories = [];
+    let accessoryCategories = [];
+    let sales = [];
+    let cart = [];
+    let isProcessing = false; // ✅ حماية من التنفيذ المتكرر
+
+    // ملاحظة: نتوقع أن window.storage يوفّر الدوال التالية عندما تكون Firebase متاحة:
+    // getPhones(), getAccessories(), getAccessoryCategories(), getSales()
+    // إذا ما كانت متوفرة، بيصير التحميل من LocalStorage.
+  
+    // Check user role and update navigation
+    function updateNavigationForUser() {
+      const currentUser = localStorage.getItem('current_user');
+      if (currentUser) {
+        try {
+          const userData = JSON.parse(currentUser);
+          const navbar = document.querySelector('.navbar-nav.me-auto');
+          
+          if (userData.role === 'user') {
+            // Show simplified navigation for limited users
+            navbar.innerHTML = `
+              <li class="nav-item"><a class="nav-link" href="limited_dashboard.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+              <li class="nav-item"><a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
+            `;
+          }
+          // Admin users keep the full navigation (default)
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Update navigation based on user role
+      updateNavigationForUser();
+      
+      await new Promise(r => setTimeout(r, 400)); // مهلة قصيرة لضمان تهيئة window.storage
+      if (window.storage && window.storage.isFirebaseAvailable) {
+        console.log('✅ Firebase متاح في صفحة المبيعات');
+        await loadDataFromFirebase();
+      } else {
+        console.log('💾 استخدام localStorage كبديل');
+        await loadDataFromLocalStorage();
+      }
+      updateProductTypeDropdown();
+      setupArabicNumberSupport();
+      loadWarrantyOptions();
+      loadProducts(); // أول تحميل
+      
+      // ✅ إضافة event listener للزر مع حماية من التكرار
+      const completeBtn = document.getElementById('complete_sale_btn');
+      if (completeBtn) {
+        completeBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!isProcessing && cart.length > 0) {
+            completeSale();
+          }
+        });
+      }
+    });
+  
+    // ====== تحميل البيانات ======
+    async function loadDataFromFirebase() {
+      try {
+        const [p, a, c, s] = await Promise.all([
+          window.storage.getPhones?.() ?? [],
+          window.storage.getAccessories?.() ?? [],
+          window.storage.getAccessoryCategories?.() ?? [],
+          window.storage.getSales?.() ?? []
+        ]);
+        phones = Array.isArray(p) ? p : [];
+        accessories = Array.isArray(a) ? a : [];
+        accessoryCategories = Array.isArray(c) ? c : [];
+        sales = Array.isArray(s) ? s : [];
+        console.log('📥 Firebase:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length, sales: sales.length });
+      } catch (err) {
+        console.error('❌ خطأ تحميل Firebase:', err);
+        await loadDataFromLocalStorage();
+      }
+    }
+  
+    async function loadDataFromLocalStorage() {
+      try {
+        phones = JSON.parse(localStorage.getItem('phones') || '[]');
+        accessories = JSON.parse(localStorage.getItem('accessories') || '[]');
+        accessoryCategories = JSON.parse(localStorage.getItem('accessory_categories') || '[]');
+        sales = JSON.parse(localStorage.getItem('sales') || '[]');
+        console.log('📦 localStorage:', { phones: phones.length, accessories: accessories.length, categories: accessoryCategories.length, sales: sales.length });
+      } catch (err) {
+        console.error('❌ خطأ تحميل localStorage:', err);
+        phones = []; accessories = []; accessoryCategories = []; sales = [];
+      }
+    }
+  
+    // ====== بيع الهاتف مرة واحدة ======
+    function isPhoneSold(phoneId) {
+      if (!sales || sales.length === 0) return false;
+      const effectiveSales = sales.filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
+      return effectiveSales.some(sale =>
+        Array.isArray(sale.items) &&
+        sale.items.some(item => item.type === 'phone' && (item.id === phoneId || item.phone_id === phoneId))
+      );
+    }
+  
+    // ====== تعبئة قائمة نوع المنتج من Firebase ======
+    function updateProductTypeDropdown() {
+      const productTypeSelect = document.getElementById('product_type');
+      productTypeSelect.innerHTML = '';
+  
+      // خيار افتراضي
+      const base = document.createElement('option');
+      base.value = '';
+      base.textContent = 'اختر نوع المنتج';
+      productTypeSelect.appendChild(base);
+  
+      // خيار هاتف (ثابت)
+      const phoneOpt = document.createElement('option');
+      phoneOpt.value = 'phone';
+      phoneOpt.textContent = 'هاتف';
+      productTypeSelect.appendChild(phoneOpt);
+  
+      // فئات الأكسسوارات من مجموعة accessory_categories في Firebase
+      if (Array.isArray(accessoryCategories) && accessoryCategories.length > 0) {
+        accessoryCategories.forEach(cat => {
+          if (!cat?.name) return;
+          const opt = document.createElement('option');
+          opt.value = cat.name;         // القيمة هي اسم الفئة
+          opt.textContent = cat.name;   // عرض اسم الفئة
+          productTypeSelect.appendChild(opt);
+        });
+      } else {
+        const noCat = document.createElement('option');
+        noCat.value = '';
+        noCat.textContent = 'لا توجد فئات أكسسوارات — أضف فئات من صفحة الأكسسوارات';
+        noCat.disabled = true;
+        productTypeSelect.appendChild(noCat);
+      }
+  
+      console.log('✅ تم تحديث نوع المنتج:', productTypeSelect.options.length, 'خيار');
+    }
+  
+    // ====== تحميل المنتجات حسب النوع المختار ======
+    function loadProducts() {
+      const productType = document.getElementById('product_type').value;
+      const productSelect = document.getElementById('product_select');
+
+      productSelect.innerHTML = '<option value="">اختر المنتج</option>';
+      document.getElementById('product_details').style.display = 'none';
+  
+      if (!productType) return;
+
+      if (productType === 'phone') {
+        // هواتف غير مباعة
+        const availablePhones = (phones || []).filter(ph => {
+          const pid = ph.id || ph.phone_number;
+          return pid && !isPhoneSold(pid);
+        });
+  
+        if (availablePhones.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'لا توجد هواتف متاحة للبيع';
+          opt.disabled = true;
+          productSelect.appendChild(opt);
+          return;
+        }
+  
+        availablePhones.forEach(ph => {
+          const opt = document.createElement('option');
+          opt.value = ph.id || ph.phone_number; // المعرّف
+          const manufacturer = ph.manufacturer || ph.brand || '';
+          const model = ph.model || '';
+          const barcode = ph.phone_number || ph.serial_number || '';
+          const price = Number(ph.selling_price) || 0;
+          const purchase = Number(ph.purchase_price) || 0;
+  
+          opt.textContent = `${manufacturer} ${model} — باركود: ${barcode}`;
+          opt.setAttribute('data-price', String(price));
+          opt.setAttribute('data-purchase-price', String(purchase));
+          opt.setAttribute('data-name', `${manufacturer} ${model}`.trim());
+          opt.setAttribute('data-description', ph.description || '');
+          opt.setAttribute('data-barcode', barcode);
+          productSelect.appendChild(opt);
+        });
+      } else {
+        // أكسسوارات بحسب اسم الفئة (من accessories)
+        const availableAccessories = (accessories || []).filter(acc => {
+          const stock = Number(acc.quantity_in_stock ?? acc.quantity ?? 0);
+          return acc?.category === productType && stock > 0;
+        });
+  
+        if (availableAccessories.length === 0) {
+          const opt = document.createElement('option');
+          opt.value = '';
+          opt.textContent = 'لا توجد أكسسوارات متاحة في هذه الفئة';
+          opt.disabled = true;
+          productSelect.appendChild(opt);
+          return;
+        }
+  
+        availableAccessories.forEach(acc => {
+          const opt = document.createElement('option');
+          opt.value = acc.id || acc.sku || '';
+          const stock = Number(acc.quantity_in_stock ?? acc.quantity ?? 0);
+          const price = Number(acc.selling_price ?? acc.price ?? 0);
+          const purchase = Number(acc.purchase_price ?? 0);
+          const displayName = (acc.arabic_name && acc.arabic_name !== acc.name) ? acc.arabic_name : (acc.name || '');
+  
+          opt.textContent = `${displayName} (المخزون: ${stock})`;
+          opt.setAttribute('data-price', String(price));
+          opt.setAttribute('data-purchase-price', String(purchase));
+          opt.setAttribute('data-name', displayName);
+          opt.setAttribute('data-description', acc.description || '');
+          opt.setAttribute('data-stock', String(stock));
+          // لمطابقة تحديث الكمية لاحقاً
+          opt.setAttribute('data-id', opt.value);
+          productSelect.appendChild(opt);
+        });
+      }
+    }
+  
+    // ====== تفاصيل المنتج المختار ======
+    function updateProductInfo() {
+      const productSelect = document.getElementById('product_select');
+      const selectedOption = productSelect.options[productSelect.selectedIndex];
+
+      if (selectedOption && selectedOption.value) {
+        document.getElementById('selected_product_name').textContent = selectedOption.getAttribute('data-name') || '-';
+        document.getElementById('selected_product_description').textContent = selectedOption.getAttribute('data-description') || '-';
+        document.getElementById('selected_product_price').textContent = selectedOption.getAttribute('data-price') || '0';
+        updateTotalPrice();
+        document.getElementById('product_details').style.display = 'block';
+      } else {
+        document.getElementById('product_details').style.display = 'none';
+      }
+    }
+
+    function updateTotalPrice() {
+      const price = parseFloat(document.getElementById('selected_product_price').textContent) || 0;
+      const quantity = parseArabicNumber(document.getElementById('quantity').value) || 1;
+      document.getElementById('total_price').textContent = (price * quantity).toFixed(2);
+    }
+
+    // ====== دعم الأرقام العربية ======
+    function convertArabicToEnglishNumbers(str) {
+      if (!str) return '';
+      const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'};
+      return str.toString().replace(/[٠-٩]/g, m => map[m] ?? m);
+    }
+    function convertEnglishToArabicNumbers(str) {
+      if (!str) return '';
+      const map = {'0':'٠','1':'١','2':'٢','3':'٣','4':'٤','5':'٥','6':'٦','7':'٧','8':'٨','9':'٩'};
+      return str.toString().replace(/[0-9]/g, m => map[m] ?? m);
+    }
+    function parseArabicNumber(value) {
+      if (!value || value.trim() === '') return 0;
+      const converted = convertArabicToEnglishNumbers(value.toString());
+      const num = parseFloat(converted);
+      return isNaN(num) ? 0 : num;
+    }
+    function setupArabicNumberSupport() {
+      document.querySelectorAll('.arabic-number-field').forEach(field => {
+        field.addEventListener('input', function() {
+          const pos = this.selectionStart;
+          const cv = convertArabicToEnglishNumbers(this.value);
+          if (cv !== this.value) {
+            this.value = cv;
+            this.setSelectionRange(pos, pos);
+          }
+        });
+      });
+    }
+  
+    // ====== إضافة للسلة ======
+    function addToCart() {
+      const productType = document.getElementById('product_type').value;
+      const productSelect = document.getElementById('product_select');
+      const quantity = parseArabicNumber(document.getElementById('quantity').value) || 1;
+
+      if (!productType || !productSelect.value) {
+        alert('يرجى اختيار نوع المنتج والمنتج');
+        return;
+      }
+
+      const opt = productSelect.options[productSelect.selectedIndex];
+  
+      // تحقق مخزون الأكسسوارات
+      if (productType !== 'phone') {
+        const availableStock = parseInt(opt.getAttribute('data-stock')) || 0;
+        if (availableStock < quantity) {
+          alert(`الكمية المطلوبة (${quantity}) أكبر من المخزون (${availableStock})`);
+          return;
+        }
+      }
+  
+      const unitPrice = parseFloat(opt.getAttribute('data-price')) || 0;
+      const purchasePrice = parseFloat(opt.getAttribute('data-purchase-price') || '0') || 0;
+      const profit = unitPrice - purchasePrice;
+      
+      // Get battery level, condition, and serial number for phones
+      let batteryLevel = null;
+      let phoneCondition = null;
+      let serialNumber = '';
+      if (productType === 'phone') {
+        const phoneId = productSelect.value;
+        const phone = phones.find(p => (p.id || p.phone_number) === phoneId);
+        if (phone) {
+          batteryLevel = phone.battery_level || null;
+          phoneCondition = phone.condition || phone.phone_type || 'new';
+          serialNumber = phone.serial_number || '';
+        }
+      }
+  
+      const product = {
+        id: productSelect.value,
+        type: productType,
+        name: opt.getAttribute('data-name') || '',
+        description: opt.getAttribute('data-description') || '',
+        serial_number: serialNumber,
+        barcode: opt.getAttribute('data-barcode') || '',
+        unitPrice,
+        purchasePrice,
+        profit,
+        quantity,
+        totalPrice: unitPrice * quantity,
+        totalProfit: profit * quantity,
+        battery_level: batteryLevel,
+        condition: phoneCondition
+      };
+
+      cart.push(product);
+      updateCartDisplay();
+
+      // reset
+      document.getElementById('product_type').value = '';
+      document.getElementById('product_select').innerHTML = '<option value="">اختر المنتج</option>';
+      document.getElementById('quantity').value = '1';
+      document.getElementById('product_details').style.display = 'none';
+    }
+
+    // ====== عرض وتلخيص السلة ======
+    function updateCartDisplay() {
+      const cartItems = document.getElementById('cart_items');
+      const cartSummary = document.getElementById('cart_summary');
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="text-muted text-center">لا توجد منتجات في السلة</p>';
+        cartSummary.style.display = 'none';
+        return;
+      }
+
+      let html = '<div class="table-responsive"><table class="table table-sm">';
+      html += '<thead><tr><th>المنتج</th><th>سعر الشراء</th><th>سعر البيع</th><th>الكمية</th><th>المجموع</th><th>الإجراء</th></tr></thead><tbody>';
+
+      cart.forEach((item, i) => {
+        html += `
+          <tr>
+            <td>${item.name}</td>
+            <td><span class="text-muted">${(item.purchasePrice || 0).toFixed(2)} ريال</span></td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control arabic-number-field" id="price_${i}"
+                       value="${item.unitPrice.toFixed(2)}"
+                       onchange="updateItemPrice(${i})" style="width: 80px;">
+                <span class="input-group-text">ريال</span>
+              </div>
+            </td>
+            <td>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control arabic-number-field" id="quantity_${i}"
+                       value="${item.quantity}"
+                       onchange="updateItemQuantity(${i})" style="width: 60px;">
+              </div>
+            </td>
+            <td>${item.totalPrice.toFixed(2)} ريال</td>
+            <td><button class="btn btn-sm btn-danger" onclick="removeFromCart(${i})"><i class="fas fa-trash"></i></button></td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table></div>';
+      cartItems.innerHTML = html;
+
+      // إضافة دعم الأرقام العربية للحقول الديناميكية
+      setupArabicNumberSupport();
+
+      updateCartSummary();
+      cartSummary.style.display = 'block';
+    }
+
+    function updateCartSummary() {
+      const total = cart.reduce((s, it) => s + it.totalPrice, 0);
+      const totalProfit = cart.reduce((s, it) => s + (it.totalProfit || 0), 0);                                                                             
+      const totalPurchaseCost = cart.reduce((s, it) => s + ((it.purchasePrice || 0) * it.quantity), 0);                                                     
+
+      document.getElementById('cart_total').textContent = total.toFixed(2);
+  
+      // إخفاء صفوف تكلفة الشراء والربح (المنطق يبقى موجود لكن غير مرئي)
+      const cartSummary = document.getElementById('cart_summary');
+      let purchaseCostElement = document.getElementById('cart_purchase_cost');
+      let profitElement = document.getElementById('cart_profit');
+
+      // إزالة العناصر إذا كانت موجودة
+      if (purchaseCostElement) {
+        purchaseCostElement.parentElement.remove();
+      }
+      if (profitElement) {
+        profitElement.parentElement.remove();
+      }
+
+      document.getElementById('complete_sale_btn').disabled = cart.length === 0;
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCartDisplay();
+    }
+
+    function updateItemPrice(index) {
+      const newPrice = parseArabicNumber(document.getElementById(`price_${index}`).value);
+      if (newPrice < 0) {
+        alert('السعر لا يمكن أن يكون سالباً');
+        document.getElementById(`price_${index}`).value = cart[index].unitPrice.toFixed(2);
+        return;
+      }
+      cart[index].unitPrice = newPrice;
+      cart[index].profit = newPrice - (cart[index].purchasePrice || 0);
+      cart[index].totalPrice = newPrice * cart[index].quantity;
+      cart[index].totalProfit = cart[index].profit * cart[index].quantity;
+      updateCartDisplay();
+    }
+  
+    function updateItemQuantity(index) {
+      const newQty = Math.floor(parseArabicNumber(document.getElementById(`quantity_${index}`).value)) || 1;
+      if (newQty < 1) {
+        alert('الكمية يجب أن تكون 1 أو أكثر');
+        document.getElementById(`quantity_${index}`).value = cart[index].quantity;
+        return;
+      }
+      // تحقق مخزون الأكسسوارات
+      if (cart[index].type !== 'phone') {
+        const opt = document.querySelector(`option[data-id="${cart[index].id}"]`);
+        const availableStock = Math.floor(parseArabicNumber(opt?.getAttribute('data-stock') || '0'));
+        if (availableStock && newQty > availableStock) {
+          alert(`الكمية المطلوبة (${newQty}) أكبر من المخزون (${availableStock})`);
+          document.getElementById(`quantity_${index}`).value = cart[index].quantity;
+          return;
+        }
+      }
+      cart[index].quantity = newQty;
+      cart[index].totalPrice = cart[index].unitPrice * newQty;
+      cart[index].totalProfit = cart[index].profit * newQty;
+      updateCartDisplay();
+    }
+  
+    // ====== البحث بالباركود (من الهواتف والإكسسوارات) ======
+    function searchByBarcode() {
+      const barcode = document.getElementById('barcode_search').value.trim();
+      const resultDiv = document.getElementById('barcode_search_result');
+      if (!barcode) { resultDiv.style.display = 'none'; return; }
+  
+      // تحويل الأرقام العربية إلى إنجليزية للبحث
+      const englishBarcode = convertArabicToEnglishNumbers(barcode);
+      const arabicBarcode = convertEnglishToArabicNumbers(barcode);
+      
+      // البحث في كلا النسختين (عربية وإنجليزية)
+      const searchTerms = [barcode, englishBarcode, arabicBarcode];
+      const uniqueTerms = [...new Set(searchTerms)]; // إزالة التكرار
+
+      // البحث في الهواتف أولاً
+      const foundPhone = (phones || []).find(ph => {
+        const phBarcode = ph.phone_number || ph.serial_number;
+        const pid = ph.id || ph.phone_number;
+        
+        // البحث في جميع النسخ (الأصلية، الإنجليزية، العربية)
+        return phBarcode && uniqueTerms.some(term => String(phBarcode) === term) && !isPhoneSold(pid);
+      });
+
+      // البحث في الإكسسوارات إذا لم يتم العثور على هاتف
+      let foundAccessory = null;
+      if (!foundPhone) {
+        foundAccessory = (accessories || []).find(acc => {
+          const accBarcode = acc.barcode || acc.barcode_id;
+          return accBarcode && uniqueTerms.some(term => String(accBarcode) === term) && (acc.quantity_in_stock || acc.quantity || 0) > 0;
+        });
+      }
+  
+      if (foundPhone) {
+        const manufacturer = foundPhone.manufacturer || foundPhone.brand || '';
+        const model = foundPhone.model || '';
+        const price = Number(foundPhone.selling_price) || 0;
+        const purchase = Number(foundPhone.purchase_price) || 0;
+        const profit = price - purchase;
+  
+        resultDiv.innerHTML = `
+          <div class="alert alert-success">
+            <h6><i class="fas fa-mobile-alt"></i> تم العثور على الهاتف:</h6>
+            <p><strong>${manufacturer} ${model}</strong></p>
+            <p>الباركود: ${barcode} | السعر: ${price} ريال | سعر الشراء: ${purchase} ريال</p>
+            <button class="btn btn-sm btn-primary" onclick="selectPhoneByBarcode('${foundPhone.id || foundPhone.phone_number}')">
+              <i class="fas fa-plus"></i> إضافة للسلة
+            </button>
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+      } else if (foundAccessory) {
+        const name = foundAccessory.name || '';
+        const category = foundAccessory.category || '';
+        const price = Number(foundAccessory.selling_price) || 0;
+        const purchase = Number(foundAccessory.purchase_price) || 0;
+        const quantity = foundAccessory.quantity_in_stock || foundAccessory.quantity || 0;
+        const profit = price - purchase;
+  
+        resultDiv.innerHTML = `
+          <div class="alert alert-info">
+            <h6><i class="fas fa-box"></i> تم العثور على الإكسسوار:</h6>
+            <p><strong>${name}</strong> (${category})</p>
+            <p>الباركود: ${barcode} | السعر: ${price} ريال | سعر الشراء: ${purchase} ريال</p>
+            <p>الكمية المتاحة: ${quantity}</p>
+            <button class="btn btn-sm btn-primary" onclick="selectAccessoryByBarcode('${foundAccessory.id}')">
+              <i class="fas fa-plus"></i> إضافة للسلة
+            </button>
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+      } else {
+        // التحقق من وجود المنتج ولكن تم بيعه أو نفدت الكمية
+        const anyPhone = (phones || []).find(ph => {
+          const phBarcode = ph.phone_number || ph.serial_number;
+          return phBarcode && uniqueTerms.some(term => String(phBarcode) === term);
+        });
+        
+        const anyAccessory = (accessories || []).find(acc => {
+          const accBarcode = acc.barcode || acc.barcode_id;
+          return accBarcode && uniqueTerms.some(term => String(accBarcode) === term);
+        });
+
+        if (anyPhone && isPhoneSold(anyPhone.id || anyPhone.phone_number)) {
+          resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> هذا الهاتف تم بيعه مسبقاً</div>`;
+        } else if (anyAccessory && (anyAccessory.quantity_in_stock || anyAccessory.quantity || 0) <= 0) {
+          resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> نفدت كمية هذا الإكسسوار</div>`;
+        } else {
+          resultDiv.innerHTML = `<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> لم يتم العثور على منتج بالباركود: ${barcode}</div>`;
+        }
+        resultDiv.style.display = 'block';
+      }
+    }
+  
+    function selectPhoneByBarcode(phoneId) {
+      const ph = (phones || []).find(p => (p.id || p.phone_number) === phoneId);
+      if (!ph) return;
+      const manufacturer = ph.manufacturer || ph.brand || '';
+      const model = ph.model || '';
+      const barcode = ph.phone_number || ph.serial_number || '';
+      const sellingPrice = Number(ph.selling_price) || 0;
+      const purchasePrice = Number(ph.purchase_price) || 0;
+      const profit = sellingPrice - purchasePrice;
+  
+      cart.push({
+        id: phoneId,
+        type: 'phone',
+        name: `${manufacturer} ${model}`.trim(),
+        description: ph.description || '',
+        serial_number: ph.serial_number || '',
+        barcode: ph.phone_number || ph.serial_number || '',
+        unitPrice: sellingPrice,
+        purchasePrice,
+        profit,
+        quantity: 1,
+        totalPrice: sellingPrice,
+        totalProfit: profit,
+        battery_level: ph.battery_level || null,
+        condition: ph.condition || ph.phone_type || 'new'
+      });
+      updateCartDisplay();
+  
+      document.getElementById('barcode_search_result').style.display = 'none';
+      document.getElementById('barcode_search').value = '';
+      alert(`تم إضافة ${manufacturer} ${model} (باركود: ${barcode}) للسلة.\nسعر البيع: ${sellingPrice} ريال\nسعر الشراء: ${purchasePrice} ريال`);
+    }
+
+    function selectAccessoryByBarcode(accessoryId) {
+      const acc = (accessories || []).find(a => a.id === accessoryId);
+      if (!acc) return;
+      
+      const name = acc.name || '';
+      const category = acc.category || '';
+      const barcode = acc.barcode || '';
+      const sellingPrice = Number(acc.selling_price) || 0;
+      const purchasePrice = Number(acc.purchase_price) || 0;
+      const profit = sellingPrice - purchasePrice;
+      const quantity = acc.quantity_in_stock || acc.quantity || 0;
+
+      cart.push({
+        id: accessoryId,
+        type: 'accessory',
+        name: name,
+        description: acc.description || '',
+        category: category,
+        barcode: barcode,
+        unitPrice: sellingPrice,
+        purchasePrice,
+        profit,
+        quantity: 1,
+        totalPrice: sellingPrice,
+        totalProfit: profit,
+        availableQuantity: quantity
+      });
+      updateCartDisplay();
+
+      document.getElementById('barcode_search_result').style.display = 'none';
+      document.getElementById('barcode_search').value = '';
+      alert(`تم إضافة ${name} (${category}) للسلة.\nالباركود: ${barcode}\nسعر البيع: ${sellingPrice} ريال\nسعر الشراء: ${purchasePrice} ريال\nالكمية المتاحة: ${quantity}`);
+    }
+  
+    // ====== تقليل مخزون الأكسسوارات ======
+    async function updateAccessoryStock() {
+      try {
+        console.log('📦 تحديث مخزون الأكسسوارات...');
+        
+        for (const item of cart) {
+          if (item.type !== 'phone') {
+            // البحث عن الأكسسوار في قاعدة البيانات
+            const accessory = accessories.find(acc => 
+              (acc.id === item.id) || (acc.sku === item.id)
+            );
+            
+            if (accessory) {
+              const currentStock = Number(accessory.quantity_in_stock ?? accessory.quantity ?? 0);
+              const newStock = Math.max(0, currentStock - item.quantity);
+              
+              console.log(`📱 تحديث مخزون ${accessory.name}: ${currentStock} → ${newStock}`);
+              
+              // تحديث البيانات المحلية
+              accessory.quantity_in_stock = newStock;
+              accessory.quantity = newStock;
+              
+              // حفظ في Firebase أو localStorage
+              if (window.storage && window.storage.isFirebaseAvailable) {
+                await window.storage.updateAccessory?.(accessory.id, accessory);
+                console.log('✅ تم تحديث المخزون في Firebase');
+              } else {
+                // تحديث localStorage
+                const updatedAccessories = accessories.map(acc => 
+                  acc.id === accessory.id ? accessory : acc
+                );
+                localStorage.setItem('accessories', JSON.stringify(updatedAccessories));
+                console.log('✅ تم تحديث المخزون في localStorage');
+              }
+            } else {
+              console.warn(`⚠️ لم يتم العثور على الأكسسوار: ${item.name} (ID: ${item.id})`);
+            }
+          }
+        }
+        
+        // إعادة تحميل البيانات
+        await loadDataFromFirebase();
+        console.log('✅ تم تحديث مخزون الأكسسوارات بنجاح');
+      } catch (error) {
+        console.error('❌ خطأ في تحديث مخزون الأكسسوارات:', error);
+        throw error;
+      }
+    }
+
+    // ====== إتمام عملية البيع (يحفظ في Firebase إن توفرت) ======
+    async function completeSale() {
+      // ✅ حماية قوية من التنفيذ المتكرر - فحص أولي فوراً (قبل أي شيء)
+      if (isProcessing) {
+        console.log('⏳ العملية قيد التنفيذ، يرجى الانتظار...');
+        return;
+      }
+
+      // ✅ تعطيل فوراً قبل أي فحص آخر
+      isProcessing = true;
+
+      if (cart.length === 0) { 
+        isProcessing = false; // إعادة التعيين إذا كانت السلة فارغة
+        alert('السلة فارغة'); 
+        return; 
+      }
+      const completeBtn = document.getElementById('complete_sale_btn');
+      if (!completeBtn) {
+        console.error('❌ زر إتمام البيع غير موجود');
+        isProcessing = false;
+        return;
+      }
+      
+      // ✅ تعطيل الزر فوراً قبل أي عملية أخرى
+      const originalBtnText = completeBtn.innerHTML;
+      completeBtn.disabled = true;
+      completeBtn.style.pointerEvents = 'none'; // ✅ منع أي تفاعل مع الزر
+      completeBtn.style.opacity = '0.6'; // ✅ إظهار أنه معطل
+      completeBtn.style.cursor = 'not-allowed'; // ✅ تغيير شكل المؤشر
+      completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...';
+      
+      // ✅ حماية إضافية: إزالة event listener مؤقتاً
+      const tempHandler = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      };
+      completeBtn.addEventListener('click', tempHandler, true);
+      
+      // ✅ حفظ المرجع للاستخدام في catch
+      const btnRef = { completeBtn, originalBtnText, tempHandler };
+  
+      try {
+      const total = cart.reduce((s, it) => s + it.totalPrice, 0);
+      const saleNumber = 'SALE-' + Date.now().toString().slice(-6);
+      const totalProfit = cart.reduce((s, it) => s + (it.totalProfit || 0), 0);
+      const totalPurchaseCost = cart.reduce((s, it) => s + ((it.purchasePrice || 0) * it.quantity), 0);
+
+      const saleData = {
+        sale_number: saleNumber,
+        customer_name: document.getElementById('customer_name').value.trim() || 'عميل نقدي',
+        customer_phone: document.getElementById('customer_phone').value.trim() || '',
+        customer_email: document.getElementById('customer_email').value || '',
+        customer_address: document.getElementById('customer_address').value || '',
+        payment_method: document.getElementById('payment_method').value,
+        notes: document.getElementById('notes').value || '',
+        warranty: document.getElementById('warranty_input')?.value?.trim() || '',
+        items: cart,
+        total_amount: total,
+        total_purchase_cost: totalPurchaseCost,
+        total_profit: totalProfit,
+        status: 'مكتمل',
+        date_created: new Date().toISOString(),
+        date_added: new Date().toISOString()
+      };
+  
+        // تقليل مخزون الأكسسوارات المباعة
+        await updateAccessoryStock();
+
+        if (window.storage && window.storage.isFirebaseAvailable) {
+          const saleId = await window.storage.addSale?.(saleData);
+          if (!saleId) throw new Error('فشل حفظ البيع في Firebase');
+          saleData.id = saleId;
+        } else {
+          const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+          saleData.id = Date.now().toString();
+          sales.push(saleData);
+          localStorage.setItem('sales', JSON.stringify(sales));
+        }
+
+        localStorage.setItem('lastSale', JSON.stringify(saleData));
+        alert(`تم إنشاء عملية البيع!\nرقم العملية: ${saleNumber}\nالمجموع الإجمالي: ${total.toFixed(2)} ريال\nسعر الشراء: ${totalPurchaseCost.toFixed(2)} ريال`);
+  
+      cart = [];
+      updateCartDisplay();
+        document.getElementById('customerForm')?.reset?.();
+        document.getElementById('warranty_input').value = '';
+    
+        // ✅ تنظيف الحماية قبل الانتقال
+        isProcessing = false;
+        if (btnRef.completeBtn) {
+          btnRef.completeBtn.removeEventListener('click', btnRef.tempHandler, true);
+        }
+  
+        setTimeout(() => {
+          window.location.href = `view_sale.html?id=${saleData.id}`;
+        }, 800);
+      } catch (err) {
+        console.error('❌ حفظ البيع:', err);
+        alert('حدث خطأ في حفظ عملية البيع. حاول مرة أخرى.');
+        
+        // ✅ إعادة تفعيل الزر في حالة الخطأ
+        isProcessing = false;
+        if (btnRef.completeBtn) {
+          btnRef.completeBtn.disabled = false;
+          btnRef.completeBtn.style.pointerEvents = 'auto'; // ✅ إعادة تفعيل التفاعل
+          btnRef.completeBtn.style.opacity = '1'; // ✅ إعادة الشفافية
+          btnRef.completeBtn.style.cursor = 'pointer'; // ✅ إعادة شكل المؤشر
+          btnRef.completeBtn.innerHTML = btnRef.originalBtnText;
+          // ✅ إزالة الحماية المؤقتة
+          btnRef.completeBtn.removeEventListener('click', btnRef.tempHandler, true);
+        }
+      }
+    }
+
+    // ====== خيارات الضمان (قابلة للإضافة محلياً) ======
+    function loadWarrantyOptions() {
+      try {
+        const list = document.getElementById('warranty_options');
+        if (!list) return;
+        list.innerHTML = '';
+        const options = JSON.parse(localStorage.getItem('warranty_options') || '[]');
+        if (Array.isArray(options)) {
+          options.forEach(val => {
+            if (!val) return;
+            const opt = document.createElement('option');
+            opt.value = val;
+            list.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    function addWarrantyOption() {
+      const input = document.getElementById('warranty_input');
+      if (!input) return;
+      const val = (input.value || '').trim();
+      if (!val) return;
+      try {
+        const options = JSON.parse(localStorage.getItem('warranty_options') || '[]');
+        if (!options.includes(val)) {
+          options.push(val);
+          localStorage.setItem('warranty_options', JSON.stringify(options));
+          loadWarrantyOptions();
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+  
+    // ====== تسجيل الخروج ======
+    function logout() {
+      if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+        localStorage.removeItem('current_user');
+        alert('تم تسجيل الخروج بنجاح');
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+
+  <!-- Navigation Script -->
+  <script src="js/navigation.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initNavigation('create_sale');
+    });
+  </script>
+  
+</body>
+</html>
