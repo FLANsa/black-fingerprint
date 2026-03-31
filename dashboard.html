@@ -3,26 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<<<<<<< HEAD
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="البصمة السوداء">
+  <meta name="apple-mobile-web-app-title" content="عمر">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
     <title>لوحة التحكم — البصمة السوداء</title>
-=======
-    <title>لوحة التحكم — بصمة سوداء</title>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <!-- نفس الخط/المكتبات المستخدمة في القالب -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<<<<<<< HEAD
   <link href="css/mobile.css" rel="stylesheet">
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -57,13 +50,8 @@
 
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
-<<<<<<< HEAD
-  <div class="container">
-      <span class="navbar-brand">البصمة السوداء</span>
-=======
     <div class="container">
-      <span class="navbar-brand">بصمة سوداء</span>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+      <span class="navbar-brand">البصمة السوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -86,7 +74,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
   <!-- Date Range Picker -->
   <div class="row mb-4">
     <div class="col-12">
@@ -131,8 +118,6 @@
     </div>
   </div>
 
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   <!-- Inventory Overview Cards -->
   <div class="row mb-4">
     <div class="col-md-3">
@@ -160,10 +145,7 @@
           <h6 class="card-title mb-1">إجمالي المبيعات</h6>
           <h3 class="mb-0" id="total_sales_amount">0</h3>
           <small>ريال</small>
-<<<<<<< HEAD
           <small class="d-block mt-1" style="opacity: 0.8;" id="sales_period_label">للشهر الحالي</small>
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         </div>
       </div>
     </div>
@@ -174,10 +156,7 @@
           <h6 class="card-title mb-1">الربح الفعلي</h6>
           <h3 class="mb-0" id="total_actual_profit">0</h3>
           <small>ريال</small>
-<<<<<<< HEAD
           <small class="d-block mt-1" style="opacity: 0.8;" id="profit_period_label">للشهر الحالي</small>
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         </div>
       </div>
     </div>
@@ -229,13 +208,8 @@
           <h5 class="mb-0"><i class="fas fa-chart-line"></i> إجمالي المبيعات</h5>                                                                            
         </div>
         <div class="card-body text-center">
-<<<<<<< HEAD
           <h3 class="text-primary" id="total_sales_amount_period">0.00 ريال</h3>
           <p class="text-muted">إجمالي المبيعات للفترة المحددة</p>
-=======
-          <h3 class="text-primary" id="total_sales_amount">0.00 ريال</h3>
-          <p class="text-muted">إجمالي المبيعات</p>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         </div>
       </div>
     </div>
@@ -437,7 +411,6 @@
     }
   }
 
-<<<<<<< HEAD
   // الحصول على الفترة الزمنية المحددة
   function getDateRange() {
     const startDateInput = document.getElementById('start_date');
@@ -535,8 +508,6 @@
     updateDashboard();
   }
 
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   // تحديث لوحة التحكم بالبيانات الحقيقية
   async function updateDashboard() {
     try {
@@ -595,7 +566,6 @@
 
 
       // تحديث إحصائيات المبيعات (استثناء المبيعات المسترجعة)
-<<<<<<< HEAD
       let effectiveSales = (sales || []).filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
       
       // تصفية المبيعات حسب الفترة الزمنية المحددة
@@ -605,9 +575,6 @@
       // تحديث مؤشر الفترة
       updatePeriodIndicator();
       
-=======
-      const effectiveSales = (sales || []).filter(s => s && s.returned !== true && s.status !== 'مسترجعة');
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       const totalSales = effectiveSales.length;
       const totalSalesAmount = effectiveSales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
 
@@ -646,16 +613,11 @@
         }
       });
 
-<<<<<<< HEAD
       // جلب أرباح الصيانة من قاعدة البيانات وتصفيتها حسب الفترة
-=======
-      // جلب أرباح الصيانة من قاعدة البيانات
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       let maintenanceProfit = 0;
       let maintenanceJobs = [];
       try {
         console.log('🔍 جلب أرباح الصيانة...');
-<<<<<<< HEAD
         const allMaintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
         console.log('🔍 تم جلب أعمال الصيانة:', allMaintenanceJobs.length, 'عمل');
         
@@ -665,10 +627,6 @@
           if (!jobDate) return false;
           return jobDate >= startDate && jobDate <= endDate;
         });
-=======
-        maintenanceJobs = await window.firebaseDatabase.getMaintenanceJobs({ status: 'done' });
-        console.log('🔍 تم جلب أعمال الصيانة:', maintenanceJobs.length, 'عمل');
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         
         maintenanceProfit = maintenanceJobs.reduce((sum, job) => {
           const shopProfit = job.shopProfit || 0;
@@ -676,11 +634,7 @@
           return sum + shopProfit;
         }, 0);
         
-<<<<<<< HEAD
         console.log('🔧 إجمالي أرباح الصيانة للفترة:', maintenanceProfit, 'ريال');
-=======
-        console.log('🔧 إجمالي أرباح الصيانة:', maintenanceProfit, 'ريال');
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       } catch (error) {
         console.error('❌ خطأ في جلب أرباح الصيانة:', error);
         maintenanceProfit = 0;
@@ -712,7 +666,6 @@
 
       document.getElementById('total_sales_count').textContent = convertToLatinNumbers(totalSales);                                                         
       document.getElementById('total_sales_amount').textContent = convertToLatinNumbers(totalSalesAmount.toFixed(0));                                       
-<<<<<<< HEAD
       document.getElementById('total_actual_profit').textContent = convertToLatinNumbers(totalActualProfit.toFixed(2));
       
       // تحديث إجمالي المبيعات للفترة المحددة
@@ -720,9 +673,6 @@
       if (totalSalesAmountElement) {
         totalSalesAmountElement.textContent = convertToLatinNumbers(totalSalesAmount.toFixed(0)) + ' ريال';
       }
-=======
-      document.getElementById('total_actual_profit').textContent = convertToLatinNumbers(totalActualProfit.toFixed(2)) + ' ريال';
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
       // حساب نسبة الربح
       document.getElementById('profit_ratio').textContent = convertToLatinNumbers(actualProfitRatio.toFixed(1)) + '%';
@@ -736,11 +686,7 @@
       console.log('💰 نسبة الربح الفعلية (الربح ÷ المبيعات):', actualProfitRatio.toFixed(2) + '%');
       console.log('💰 نسبة الربح الإجمالية:', totalProfitRatio.toFixed(2) + '%');
 
-<<<<<<< HEAD
       // تحديث آخر المبيعات (عرض آخر 5 مبيعات من الفترة المحددة)
-=======
-      // تحديث آخر المبيعات
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       updateRecentSales(effectiveSales);
 
     } catch (error) {
@@ -854,7 +800,6 @@
     // التحقق من تسجيل الدخول أولاً
     if (!checkLogin()) return;
 
-<<<<<<< HEAD
     // تهيئة التواريخ إلى الشهر الحالي
     initializeDateRange();
 
@@ -863,18 +808,6 @@
 
     // تحديث لوحة التحكم (مرة واحدة عند تحميل الصفحة)
     await updateDashboard();
-=======
-    // انتظار تحميل Firebase
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // تحديث لوحة التحكم
-    await updateDashboard();
-
-    // تحديث البيانات كل 10 ثوانِ
-    setInterval(async () => {
-      await updateDashboard();
-    }, 10000);
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   });
 </script>
 

@@ -1,10 +1,7 @@
 /**
  * Authentication Module
-<<<<<<< HEAD
- * عمر للاتصالات - Phone Store Management System
-=======
- * بصمة سوداء - Phone Store Management System
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+ * البصمة السوداء - Phone Store Management System
  */
 
 class AuthManager {
@@ -17,11 +14,8 @@ class AuthManager {
                 password: 'admin123', // In real app, this should be hashed
                 is_admin: true,
                 full_name: 'مدير النظام',
-<<<<<<< HEAD
-                email: 'admin@omar-telecom.com',
-=======
-                email: 'admin@blackfingerprint.com',
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+                email: 'admin@black-finger-print.com',
                 created_at: new Date().toISOString()
             },
             {
@@ -30,11 +24,8 @@ class AuthManager {
                 password: 'user123',
                 is_admin: false,
                 full_name: 'موظف المبيعات',
-<<<<<<< HEAD
-                email: 'user@omar-telecom.com',
-=======
-                email: 'user@blackfingerprint.com',
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+                email: 'user@black-finger-print.com',
                 created_at: new Date().toISOString()
             }
         ];

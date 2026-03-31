@@ -3,17 +3,19 @@
 
 // Configuration constants
 const CONFIG = {
+  PROJECT_ID: 'black-finger-print',
   STORAGE_KEYS: {
     PHONES: 'phones',
     ACCESSORIES: 'accessories',
     SALES: 'sales',
     PHONE_TYPES: 'phone_types',
     ACCESSORY_CATEGORIES: 'accessory_categories',
-    CURRENT_USER: 'current_user'
+    CURRENT_USER: 'current_user',
+    DATA_PROJECT_ID: 'data_project_id'
   }
 };
 
-<<<<<<< HEAD
+
 // Default data (تُستخدم عند عدم وصول Firebase أو عندما تكون القاعدة فارغة)
 const DEFAULT_PHONE_TYPES = {
   "Apple": ["iPhone 17 Pro Max", "iPhone 17 Pro", "iPhone 17", "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16", "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15", "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14", "iPhone 13 Pro Max", "iPhone 13 Pro", "iPhone 13", "iPhone 12", "iPhone 11", "iPhone X"],
@@ -28,13 +30,6 @@ const DEFAULT_PHONE_TYPES = {
   "Infinix": ["Zero 30", "Note 40 Pro", "Note 40", "Hot 40 Pro", "Hot 40"],
   "Tecno": ["Phantom X2 Pro", "Camon 30 Pro", "Camon 30", "Spark 20 Pro", "Spark 20"],
   "Nothing": ["Phone 2a", "Phone 2", "Phone 1"]
-=======
-// Default data
-const DEFAULT_PHONE_TYPES = {
-  "Apple": ["iPhone 13", "iPhone 14", "iPhone 15"],
-  "Samsung": ["S22", "S23", "S24"],
-  "Xiaomi": ["Redmi Note 12", "Mi 11"]
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 };
 
 const DEFAULT_ACCESSORY_CATEGORIES = [
@@ -53,10 +48,32 @@ class FirebaseStorageManager {
     this.isFirebaseAvailable = !!(this.firebaseDB && this.firebaseDB.db);
     
     if (this.isFirebaseAvailable) {
-      console.log('🔥 Firebase Storage Manager initialized with Firebase');
+      console.log('🔥 Firebase Storage Manager initialized with Firebase for project:', CONFIG.PROJECT_ID);
     } else {
-      console.log('💾 Firebase not available, using LocalStorage fallback');
+      console.log('💾 Firebase not available, using LocalStorage fallback for project:', CONFIG.PROJECT_ID);
       this.initializeLocalStorage();
+    }
+  }
+
+  /**
+   * Ensure data isolation between different projects in localStorage
+   * (called implicitly via initializeLocalStorage for fallback mode)
+   */
+  ensureProjectIsolation() {
+    try {
+      const currentProjectId = localStorage.getItem(CONFIG.STORAGE_KEYS.DATA_PROJECT_ID);
+      if (currentProjectId && currentProjectId !== CONFIG.PROJECT_ID) {
+        console.warn('⚠️ Detected data from another project. Clearing local cache.');
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.PHONES);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.ACCESSORIES);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.SALES);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.PHONE_TYPES);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.ACCESSORY_CATEGORIES);
+        localStorage.removeItem(CONFIG.STORAGE_KEYS.CURRENT_USER);
+      }
+      localStorage.setItem(CONFIG.STORAGE_KEYS.DATA_PROJECT_ID, CONFIG.PROJECT_ID);
+    } catch (e) {
+      console.error('Error ensuring project isolation in localStorage:', e);
     }
   }
 
@@ -64,6 +81,9 @@ class FirebaseStorageManager {
    * Initialize localStorage fallback
    */
   initializeLocalStorage() {
+    // Ensure project isolation before initializing default data
+    this.ensureProjectIsolation();
+
     // Initialize default data if not exists
     if (!this.getPhoneTypes()) {
       this.setPhoneTypes(DEFAULT_PHONE_TYPES);
@@ -405,11 +425,8 @@ class FirebaseStorageManager {
         
         // Convert array to object format for compatibility with existing code
         const phoneTypesObj = {};
-<<<<<<< HEAD
+
         (phoneTypes || []).forEach(type => {
-=======
-        phoneTypes.forEach(type => {
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
           const manufacturer = type.manufacturer || type.brand; // Support both field names
           if (!phoneTypesObj[manufacturer]) {
             phoneTypesObj[manufacturer] = [];
@@ -417,7 +434,7 @@ class FirebaseStorageManager {
           phoneTypesObj[manufacturer].push(type.model);
         });
         console.log('🏭 Storage Manager: البيانات المحولة:', phoneTypesObj);
-<<<<<<< HEAD
+
         // عند عدم وجود بيانات (اتصال بطيء أو أوفلاين أو قاعدة فارغة) استخدم القائمة الافتراضية
         if (Object.keys(phoneTypesObj).length === 0) {
           console.log('ℹ️ Storage Manager: استخدام القائمة الافتراضية لأنواع الهواتف (Firebase فارغ أو غير متاح)');
@@ -436,16 +453,6 @@ class FirebaseStorageManager {
     const local = this.getItem(CONFIG.STORAGE_KEYS.PHONE_TYPES);
     if (local && Object.keys(local).length > 0) return local;
     return typeof DEFAULT_PHONE_TYPES !== 'undefined' ? { ...DEFAULT_PHONE_TYPES } : {};
-=======
-        return phoneTypesObj;
-      } catch (error) {
-        console.error('❌ Storage Manager: خطأ في تحميل أنواع الهواتف من Firebase:', error);
-        return this.getItem(CONFIG.STORAGE_KEYS.PHONE_TYPES);
-      }
-    }
-    console.log('💾 Storage Manager: Firebase غير متاح، تحميل من localStorage...');
-    return this.getItem(CONFIG.STORAGE_KEYS.PHONE_TYPES);
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   }
 
   async setPhoneTypes(phoneTypes) {
@@ -508,7 +515,7 @@ class FirebaseStorageManager {
   async getAccessoryCategories() {
     if (this.isFirebaseAvailable) {
       try {
-<<<<<<< HEAD
+
         const categories = await this.firebaseDB.getAccessoryCategories();
         if (categories && categories.length > 0) return categories;
         console.log('ℹ️ Storage Manager: استخدام القائمة الافتراضية لفئات الأكسسوارات');
@@ -523,15 +530,6 @@ class FirebaseStorageManager {
     const local = this.getItem(CONFIG.STORAGE_KEYS.ACCESSORY_CATEGORIES);
     if (local && local.length > 0) return local;
     return Array.isArray(DEFAULT_ACCESSORY_CATEGORIES) ? [...DEFAULT_ACCESSORY_CATEGORIES] : [];
-=======
-        return await this.firebaseDB.getAccessoryCategories();
-      } catch (error) {
-        console.error('Error getting accessory categories from Firebase:', error);
-        return this.getItem(CONFIG.STORAGE_KEYS.ACCESSORY_CATEGORIES);
-      }
-    }
-    return this.getItem(CONFIG.STORAGE_KEYS.ACCESSORY_CATEGORIES);
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   }
 
   async setAccessoryCategories(categories) {

@@ -1,6 +1,6 @@
 services:
   - type: static
-    name: black-fingerprint
+    name: black-finger-print
     buildCommand: ""
     staticPublishPath: ./
     envVars:
@@ -11,23 +11,15 @@ services:
       - key: APP_VERSION
         value: "2.0.0"
       - key: COMPANY_NAME
-        value: بصمة سوداء
+        value: البصمة السوداء
       - key: COMPANY_NAME_EN
-        value: Black Fingerprint
+        value: Black Fingerprint for Communications
       - key: COMPANY_ADDRESS
-<<<<<<< HEAD
-        value: القصيم، بريدة، الصفراء، اسواق النافوره
-      - key: COMPANY_PHONE
-        value: "0542141144,0507217774"
-      - key: COMPANY_EMAIL
-        value: support@black-fingerprint.com
-=======
         value: الرياض، المملكة العربية السعودية
       - key: COMPANY_PHONE
-        value: "011-0000000"
+        value: "0531100725"
       - key: COMPANY_EMAIL
-        value: support@blackfingerprint.com
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+        value: support@black-finger-print.com
       - key: VAT_RATE
         value: "0.15"
       - key: VAT_RATE_PERCENTAGE

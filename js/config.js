@@ -1,31 +1,16 @@
 /**
-<<<<<<< HEAD
-* Configuration and Constants
-* البصمة السوداء - Phone Store Management System
-*/
+ * Configuration and Constants
+ * البصمة السوداء - Phone Store Management System
+ */
 
 // VAT Configuration for Saudi Arabia
 const CONFIG = {
-        nameEn: "Omar for Communications",
+        nameEn: "Black Fingerprint for Communications",
     VAT_RATE: 0.15, // 15% VAT rate
     COMPANY_INFO: {
         name: "البصمة السوداء",
         address: "الرياض، المملكة العربية السعودية",
         phone: "0531100725"
-=======
- * Configuration and Constants
- * بصمة سوداء - Phone Store Management System
- */
-
-// VAT Configuration for Saudi Arabia
-const CONFIG = {
-    VAT_RATE: 0.15, // 15% VAT rate
-    COMPANY_INFO: {
-        name: "بصمة سوداء",
-        vatNumber: "1131278742",
-        address: "الرياض، المملكة العربية السعودية",
-        phone: "011-0000000"
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     },
     STORAGE_KEYS: {
         PHONES: 'phone_store_phones',
@@ -46,13 +31,9 @@ const CONFIG = {
         "نقدي",
         "بطاقة ائتمان",
         "تحويل بنكي",
-<<<<<<< HEAD
         "شيك",
         "تابي",
         "تمارا"
-=======
-        "شيك"
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     ],
     PHONE_COLORS: [
         "أسود", "أبيض", "أزرق", "أحمر", "أخضر", 

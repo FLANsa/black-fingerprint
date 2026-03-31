@@ -3,25 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="عمر">
+  <meta name="apple-mobile-web-app-title" content="البصمة السوداء">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <title>تعديل بيانات الهاتف — عمر للاتصالات</title>
-=======
-  <title>تعديل بيانات الهاتف — بصمة سوداء</title>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+  <title>تعديل بيانات الهاتف — البصمة السوداء</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<<<<<<< HEAD
   <link href="css/mobile.css" rel="stylesheet">
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -37,12 +30,8 @@
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-dark">
-    <div class="container">
-<<<<<<< HEAD
-      <span class="navbar-brand">عمر للاتصالات</span>
-=======
-      <span class="navbar-brand">بصمة سوداء</span>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+  <div class="container">
+      <span class="navbar-brand">البصمة السوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -122,7 +111,6 @@
                 </div>
                 <div class="col-md-4">
                   <label for="phone_memory" class="form-label">الذاكرة</label>
-<<<<<<< HEAD
                   <select class="form-select" id="phone_memory">
                     <option value="">اختر الذاكرة</option>
                     <option value="32GB">32GB</option>
@@ -133,9 +121,6 @@
                     <option value="1TB">1TB</option>
                     <option value="أخرى">أخرى</option>
                   </select>
-=======
-                  <input type="text" class="form-control" id="phone_memory">
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                 </div>
                 <div class="col-md-4">
                   <label for="serial_number" class="form-label">الرقم التسلسلي</label>
@@ -194,16 +179,9 @@
                   </div>
                 </div>
                 <div class="col-md-4" id="batteryAgeField" style="display: none;">
-<<<<<<< HEAD
                   <label for="battery_age" class="form-label">نسبة البطارية</label>
                   <div class="input-group">
                     <input type="text" class="form-control" id="battery_age" placeholder="مثال: 85% أو جديدة">
-=======
-                  <label for="battery_age" class="form-label">عمر البطارية</label>
-                  <div class="input-group">
-                    <input type="number" class="form-control" id="battery_age" min="0" max="100">
-                    <span class="input-group-text">%</span>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                   </div>
                 </div>
               </div>
@@ -324,7 +302,6 @@
           }
           
           document.getElementById('phone_color').value = phone.phone_color || '';
-<<<<<<< HEAD
           
           // تعيين قيمة الذاكرة مع إضافة الخيار إذا لم يكن موجوداً في القائمة
           const memoryValue = phone.phone_memory || phone.memory || '';
@@ -341,10 +318,6 @@
             }
             memorySelect.value = memoryValue;
           }
-          
-=======
-          document.getElementById('phone_memory').value = phone.phone_memory || phone.memory || '';
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
           document.getElementById('serial_number').value = phone.serial_number || '';
           document.getElementById('purchase_price').value = phone.purchase_price || '';
           document.getElementById('selling_price').value = phone.selling_price || phone.price || '';
@@ -418,15 +391,9 @@
 
         const condition = document.getElementById('condition').value;
         if (condition === 'used') {
-<<<<<<< HEAD
           const batteryValue = document.getElementById('battery_age').value.trim();
           if (!batteryValue) {
             showAlert('warning', 'يرجى إدخال نسبة البطارية');
-=======
-          const batteryAge = parseInt(document.getElementById('battery_age').value);
-          if (isNaN(batteryAge) || batteryAge < 0 || batteryAge > 100) {
-            showAlert('warning', 'عمر البطارية يجب أن يكون بين 0 و 100');
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             document.getElementById('battery_age').focus();
             return false;
           }
@@ -456,19 +423,11 @@
           updatedAt: new Date().toISOString()
         };
 
-<<<<<<< HEAD
         // إضافة نسبة البطارية للهواتف المستعملة
         if (condition === 'used') {
           const batteryValue = document.getElementById('battery_age').value.trim();
           updatedPhoneData.age = batteryValue;
           updatedPhoneData.battery_level = batteryValue;
-=======
-        // إضافة عمر البطارية للهواتف المستعملة
-        if (condition === 'used') {
-          const batteryAge = parseInt(document.getElementById('battery_age').value) || 0;
-          updatedPhoneData.age = batteryAge;
-          updatedPhoneData.battery_level = String(batteryAge);
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         } else {
           updatedPhoneData.age = null;
           updatedPhoneData.battery_level = '100';

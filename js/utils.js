@@ -1,10 +1,7 @@
 /**
  * Utility Functions
-<<<<<<< HEAD
- * عمر للاتصالات - Phone Store Management System
-=======
- * بصمة سوداء - Phone Store Management System
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+ * البصمة السوداء - Phone Store Management System
  */
 
 // VAT Calculation Functions

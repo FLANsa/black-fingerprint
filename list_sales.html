@@ -3,26 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<<<<<<< HEAD
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="عمر">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <title>قائمة المبيعات — عمر للاتصالات</title>
-=======
-  <title>قائمة المبيعات — بصمة سوداء</title>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+  <title>قائمة المبيعات — البصمة السوداء</title>
 
   <!-- نفس الخط/المكتبات -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<<<<<<< HEAD
+
   <link href="css/mobile.css" rel="stylesheet">
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -45,11 +40,8 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-<<<<<<< HEAD
-      <span class="navbar-brand">عمر للاتصالات</span>
-=======
-      <span class="navbar-brand">بصمة سوداء</span>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+      <span class="navbar-brand">البصمة السوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -181,10 +173,7 @@
               <th>اسم العميل</th>
               <th>عدد المنتجات</th>
               <th>المبلغ الإجمالي</th>
-<<<<<<< HEAD
-=======
-              <th>الربح</th>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
               <th>طريقة الدفع</th>
               <th>الحالة</th>
               <th>الإجراءات</th>
@@ -209,11 +198,8 @@
         </div>
       </div>
     </div>
-<<<<<<< HEAD
+
     <div class="col-md-6">
-=======
-    <div class="col-md-3">
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       <div class="card bg-success text-white">
         <div class="card-body text-center">
           <h5 class="card-title">إجمالي المبيعات</h5>
@@ -221,17 +207,7 @@
         </div>
       </div>
     </div>
-<<<<<<< HEAD
-=======
-    <div class="col-md-3">
-      <div class="card bg-info text-white">
-        <div class="card-body text-center">
-          <h5 class="card-title">إجمالي الربح</h5>
-          <h3><span id="sum_total_profit">0.00</span> ريال</h3>
-        </div>
-      </div>
-    </div>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
   </div>
 
   <!-- حالة عدم وجود بيانات -->
@@ -541,17 +517,10 @@
     // استبعاد المسترجعة من المجاميع فقط (لكن تظل معروضة ومحتسبة في عدد العمليات)                                                                           
     const effectiveForTotals = (sales || []).filter(s => !(s && (s.returned === true || s.status === 'مسترجعة')));                                          
     let totalAmount = 0;
-<<<<<<< HEAD
+
 
     pageSlice.forEach(sale => {
       totalAmount   += sale.total_amount || 0;
-=======
-    let totalProfit = 0;
-
-    pageSlice.forEach(sale => {
-      totalAmount   += sale.total_amount || 0;
-      totalProfit   += sale.total_profit || 0;
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
       const tr = document.createElement('tr');
 
@@ -583,17 +552,7 @@
         <span class="fw-bold text-success">${fmtMoney(sale.total_amount)} ريال</span>`;
       tr.appendChild(tdAmt);
 
-<<<<<<< HEAD
-=======
-      // الربح
-      const tdProfit = document.createElement('td');
-      const profit = sale.total_profit || 0;
-      const profitColor = profit >= 0 ? 'text-success' : 'text-danger';
-      tdProfit.innerHTML = `
-        <span class="fw-bold ${profitColor}">${fmtMoney(profit)} ريال</span>`;
-      tr.appendChild(tdProfit);
 
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       // طريقة الدفع
       const tdPay = document.createElement('td');
       tdPay.textContent = sale.payment_method || '-';
@@ -633,24 +592,12 @@
 
     // احسب المجاميع من غير المسترجعة فقط
     totalAmount = 0;
-<<<<<<< HEAD
+
     effectiveForTotals.forEach(sale => {
       totalAmount   += sale.total_amount || 0;
     });
 
     document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
-=======
-    totalProfit = 0;
-    effectiveForTotals.forEach(sale => {
-      totalAmount   += sale.total_amount || 0;
-      totalProfit   += sale.total_profit || 0;
-    });
-
-    document.getElementById('sum_total_sales_amount').textContent = fmtMoney(totalAmount);
-    if (document.getElementById('sum_total_profit')) {
-      document.getElementById('sum_total_profit').textContent = fmtMoney(totalProfit);
-    }
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
     // رسم عناصر التصفح بين الصفحات
     renderPagination(totalPages);

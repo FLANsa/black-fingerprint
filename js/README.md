@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-# JavaScript Architecture - عمر للاتصالات
-=======
-# JavaScript Architecture - بصمة سوداء
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+# JavaScript Architecture - البصمة السوداء
 
 ## 📁 File Structure
 
@@ -348,9 +345,6 @@ To extend the system:
 
 ---
 
-<<<<<<< HEAD
-**عمر للاتصالات - Phone Store Management System**
-=======
-**بصمة سوداء - Phone Store Management System**
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+**البصمة السوداء - Phone Store Management System**
 *Modular JavaScript Architecture v1.0*

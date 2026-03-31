@@ -11,12 +11,9 @@ import {
   where, 
   orderBy,
   onSnapshot,
-<<<<<<< HEAD
+
   serverTimestamp,
   runTransaction
-=======
-  serverTimestamp 
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 class FirebaseDatabase {
@@ -25,7 +22,7 @@ class FirebaseDatabase {
     this.auth = window.firebaseAuth;
   }
 
-<<<<<<< HEAD
+
   // ===== عداد رقم الباركود (فريد على مستوى المشروع) =====
   /** يُرجع الرقم التالي الفريد للهاتف (مثل "000001") من عداد في Firebase لضمان عدم التكرار. */
   async getNextPhoneNumber() {
@@ -91,13 +88,6 @@ class FirebaseDatabase {
       const docRef = await addDoc(collection(this.db, 'phones'), {
         ...phoneData,
         phone_number: phoneNumber,
-=======
-  // ===== إدارة الهواتف =====
-  async addPhone(phoneData) {
-    try {
-      const docRef = await addDoc(collection(this.db, 'phones'), {
-        ...phoneData,
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -586,7 +576,7 @@ class FirebaseDatabase {
   // ===== أعمال الصيانة =====
   async addMaintenanceJob(jobData) {
     try {
-<<<<<<< HEAD
+
       // ✅ حساب totalPartCost من البنية الجديدة أو القديمة
       let totalPartCost = 0;
       if (jobData.parts && Array.isArray(jobData.parts) && jobData.parts.length > 0) {
@@ -600,21 +590,14 @@ class FirebaseDatabase {
       // ✅ حساب الأرباح باستخدام الدالة الموحدة مع totalPartCost
       const { profit, techCommission, shopProfit } = this.computeDerived(
         totalPartCost, 
-=======
-      // ✅ حساب الأرباح باستخدام الدالة الموحدة
-      const { profit, techCommission, shopProfit } = this.computeDerived(
-        jobData.partCost, 
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         jobData.amountCharged, 
         jobData.techPercent !== undefined ? jobData.techPercent : 0
       );
 
       const docRef = await addDoc(collection(this.db, 'maintenanceJobs'), {
         ...jobData,
-<<<<<<< HEAD
+
         totalPartCost, // ✅ حفظ totalPartCost للتأكد من وجوده في المستقبل
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         profit,
         techCommission,
         shopProfit,
@@ -634,7 +617,7 @@ class FirebaseDatabase {
     try {
       let q = collection(this.db, 'maintenanceJobs');
       
-<<<<<<< HEAD
+
       // بناء الاستعلام الأساسي (بدون repId لأنه قد يكون في parts[])
           if (filters.status) {
             q = query(q, where('status', '==', filters.status));
@@ -701,44 +684,6 @@ class FirebaseDatabase {
         
         console.log('✅ Maintenance jobs loaded:', jobs.length);
         return jobs;
-=======
-      // نستخدم استعلام بسيط بدون orderBy لتجنب مشاكل الفهارس
-      if (filters.status) {
-        q = query(q, where('status', '==', filters.status));
-      }
-      
-      if (filters.repId) {
-        q = query(q, where('repId', '==', filters.repId));
-      }
-      
-      if (filters.techId) {
-        q = query(q, where('techId', '==', filters.techId));
-      }
-      
-      if (filters.dateFrom) {
-        q = query(q, where('visitDate', '>=', filters.dateFrom));
-      }
-      
-      if (filters.dateTo) {
-        q = query(q, where('visitDate', '<=', filters.dateTo));
-      }
-
-      const querySnapshot = await getDocs(q);
-      const jobs = [];
-      querySnapshot.forEach(doc => {
-        jobs.push({ id: doc.id, ...doc.data() });
-      });
-      
-      // ترتيب النتائج يدوياً دائماً
-      jobs.sort((a, b) => {
-        const dateA = a.visitDate?.seconds ? new Date(a.visitDate.seconds * 1000) : new Date(a.visitDate);
-        const dateB = b.visitDate?.seconds ? new Date(b.visitDate.seconds * 1000) : new Date(b.visitDate);
-        return dateB - dateA; // ترتيب تنازلي
-      });
-      
-      console.log('✅ Maintenance jobs loaded:', jobs.length);
-      return jobs;
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     } catch (error) {
       console.error('❌ Error getting maintenance jobs:', error);
       throw error;
@@ -747,7 +692,7 @@ class FirebaseDatabase {
 
   async updateMaintenanceJob(jobId, jobData) {
     try {
-<<<<<<< HEAD
+
       // ✅ إذا كانت القيم محسوبة مسبقاً (مثل عند completeJob)، استخدمها مباشرة
       if (jobData.profit !== undefined && jobData.techCommission !== undefined && jobData.shopProfit !== undefined) {
         // القيم محسوبة مسبقاً، لا حاجة لإعادة الحساب
@@ -787,20 +732,6 @@ class FirebaseDatabase {
           jobData.shopProfit = shopProfit;
           jobData.totalPartCost = totalPartCost; // ✅ حفظ totalPartCost للتأكد من وجوده في المستقبل
         }
-=======
-      // ✅ إعادة حساب الأرباح إذا تغيرت القيم باستخدام الدالة الموحدة
-      if (jobData.partCost !== undefined || jobData.amountCharged !== undefined || jobData.techPercent !== undefined) {
-        const currentJob = await this.getMaintenanceJob(jobId);
-        const partCost = jobData.partCost !== undefined ? jobData.partCost : currentJob.partCost;
-        const amountCharged = jobData.amountCharged !== undefined ? jobData.amountCharged : currentJob.amountCharged;
-        const techPercent = jobData.techPercent !== undefined ? jobData.techPercent : currentJob.techPercent;
-        
-        const { profit, techCommission, shopProfit } = this.computeDerived(partCost, amountCharged, techPercent);
-        
-        jobData.profit = profit;
-        jobData.techCommission = techCommission;
-        jobData.shopProfit = shopProfit;
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       }
 
       const jobRef = doc(this.db, 'maintenanceJobs', jobId);
@@ -1016,7 +947,7 @@ class FirebaseDatabase {
       console.log('📊 Found jobs for rep settlements:', jobs.length);
 
       const repTotals = {};
-<<<<<<< HEAD
+
       
       jobs.forEach(job => {
         // ✅ دعم البنية الجديدة (parts array) والقديمة (repId مباشر)
@@ -1054,14 +985,6 @@ class FirebaseDatabase {
         }
         } else if (job.repId) {
           // البنية القديمة: مندوب واحد للعمل كامل
-=======
-      jobs.forEach(job => {
-        if (!job.repId) {
-          console.warn('⚠️ Job missing repId:', job);
-          return;
-        }
-        
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         if (!repTotals[job.repId]) {
           repTotals[job.repId] = {
             repId: job.repId,
@@ -1081,12 +1004,10 @@ class FirebaseDatabase {
         repTotals[job.repId].techCommissionSum += (job.techCommission || 0);
         repTotals[job.repId].shopProfitSum += (job.shopProfit || 0);
         repTotals[job.repId].revenueSum += (job.amountCharged || 0);
-<<<<<<< HEAD
+
         } else {
           console.warn('⚠️ Job missing repId and parts:', job.id);
         }
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       });
 
       const result = Object.values(repTotals);
@@ -1116,7 +1037,7 @@ class FirebaseDatabase {
           console.warn('⚠️ Job missing techId:', job);
           return;
         }
-<<<<<<< HEAD
+
 
         // ✅ حساب totalPartCost من البنية الجديدة أو القديمة
         let totalPartCost = 0;
@@ -1128,9 +1049,6 @@ class FirebaseDatabase {
           totalPartCost = Number(job.partCost) || 0; // للتوافق مع البيانات القديمة
         }
 
-=======
-        
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         if (!techTotals[job.techId]) {
           techTotals[job.techId] = {
             techId: job.techId,
@@ -1145,11 +1063,8 @@ class FirebaseDatabase {
         }
         
         techTotals[job.techId].jobsCount++;
-<<<<<<< HEAD
+
         techTotals[job.techId].partCostSum += totalPartCost; // ✅ استخدام totalPartCost بدلاً من partCost
-=======
-        techTotals[job.techId].partCostSum += (job.partCost || 0);
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         techTotals[job.techId].profitSum += (job.profit || 0);
         techTotals[job.techId].techCommissionSum += (job.techCommission || 0);
         techTotals[job.techId].shopProfitSum += (job.shopProfit || 0);

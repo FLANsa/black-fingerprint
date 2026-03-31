@@ -3,26 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<<<<<<< HEAD
+
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="عمر">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <title>إنشاء عملية بيع جديدة — عمر للاتصالات</title>
-=======
-  <title>إنشاء عملية بيع جديدة — بصمة سوداء</title>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+  <title>إنشاء عملية بيع جديدة — البصمة السوداء</title>
 
   <!-- نفس الخط/المكتبات المستخدمة في القالب -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<<<<<<< HEAD
+
   <link href="css/mobile.css" rel="stylesheet">
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -45,11 +40,8 @@
   <!-- شريط التنقل -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-<<<<<<< HEAD
-      <span class="navbar-brand">عمر للاتصالات</span>
-=======
-      <span class="navbar-brand">بصمة سوداء</span>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+      <span class="navbar-brand">البصمة السوداء</span>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -210,11 +202,8 @@
                       </div>
                     </div>
                     <div class="col-md-6 text-end">
-<<<<<<< HEAD
+
                       <button type="button" class="btn btn-success btn-lg" id="complete_sale_btn" disabled>
-=======
-                      <button type="button" class="btn btn-success btn-lg" onclick="completeSale()" id="complete_sale_btn" disabled>
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                         <i class="fas fa-check"></i> إتمام عملية البيع
                       </button>
                     </div>
@@ -251,10 +240,8 @@
     let accessoryCategories = [];
     let sales = [];
     let cart = [];
-<<<<<<< HEAD
+
     let isProcessing = false; // ✅ حماية من التنفيذ المتكرر
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
     // ملاحظة: نتوقع أن window.storage يوفّر الدوال التالية عندما تكون Firebase متاحة:
     // getPhones(), getAccessories(), getAccessoryCategories(), getSales()
@@ -298,7 +285,7 @@
       setupArabicNumberSupport();
       loadWarrantyOptions();
       loadProducts(); // أول تحميل
-<<<<<<< HEAD
+
       
       // ✅ إضافة event listener للزر مع حماية من التكرار
       const completeBtn = document.getElementById('complete_sale_btn');
@@ -311,8 +298,6 @@
           }
         });
       }
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     });
   
     // ====== تحميل البيانات ======
@@ -920,7 +905,7 @@
 
     // ====== إتمام عملية البيع (يحفظ في Firebase إن توفرت) ======
     async function completeSale() {
-<<<<<<< HEAD
+
       // ✅ حماية قوية من التنفيذ المتكرر - فحص أولي فوراً (قبل أي شيء)
       if (isProcessing) {
         console.log('⏳ العملية قيد التنفيذ، يرجى الانتظار...');
@@ -963,10 +948,6 @@
       const btnRef = { completeBtn, originalBtnText, tempHandler };
   
       try {
-=======
-      if (cart.length === 0) { alert('السلة فارغة'); return; }
-  
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       const total = cart.reduce((s, it) => s + it.totalPrice, 0);
       const saleNumber = 'SALE-' + Date.now().toString().slice(-6);
       const totalProfit = cart.reduce((s, it) => s + (it.totalProfit || 0), 0);
@@ -990,10 +971,7 @@
         date_added: new Date().toISOString()
       };
   
-<<<<<<< HEAD
-=======
-      try {
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
         // تقليل مخزون الأكسسوارات المباعة
         await updateAccessoryStock();
 
@@ -1015,15 +993,13 @@
       updateCartDisplay();
         document.getElementById('customerForm')?.reset?.();
         document.getElementById('warranty_input').value = '';
-<<<<<<< HEAD
+
     
         // ✅ تنظيف الحماية قبل الانتقال
         isProcessing = false;
         if (btnRef.completeBtn) {
           btnRef.completeBtn.removeEventListener('click', btnRef.tempHandler, true);
         }
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   
         setTimeout(() => {
           window.location.href = `view_sale.html?id=${saleData.id}`;
@@ -1031,7 +1007,7 @@
       } catch (err) {
         console.error('❌ حفظ البيع:', err);
         alert('حدث خطأ في حفظ عملية البيع. حاول مرة أخرى.');
-<<<<<<< HEAD
+
         
         // ✅ إعادة تفعيل الزر في حالة الخطأ
         isProcessing = false;
@@ -1044,8 +1020,6 @@
           // ✅ إزالة الحماية المؤقتة
           btnRef.completeBtn.removeEventListener('click', btnRef.tempHandler, true);
         }
-=======
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       }
     }
 

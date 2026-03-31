@@ -96,7 +96,7 @@ function setNumericValue(elementId, value) {
 
 // تشغيل تلقائي عند تحميل الصفحة
 if (typeof document !== 'undefined') {
-<<<<<<< HEAD
+
     document.addEventListener('DOMContentLoaded', function() {
         setupArabicNumberSupport();
         
@@ -116,23 +116,6 @@ if (typeof document !== 'undefined') {
                 subtree: true
             });
         }
-=======
-    document.addEventListener('DOMContentLoaded', setupArabicNumberSupport);
-    
-    // إعادة تشغيل عند تحديث المحتوى الديناميكي
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                // إعادة تطبيق الدعم على العناصر الجديدة
-                setTimeout(setupArabicNumberSupport, 100);
-            }
-        });
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     });
 }
 

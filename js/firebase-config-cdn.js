@@ -1,6 +1,5 @@
-<<<<<<< HEAD
-// Firebase Configuration for Black Finger Print - CDN Version
-// إعدادات Firebase لمشروع بصمة سوداء - نسخة CDN
+// Firebase Configuration for Phone Store Demo - CDN Version
+// إعدادات Firebase للمستودع الجديد - نسخة CDN
 
 const firebaseConfig = {
   apiKey: "AIzaSyAN9fS6DGdigwDuXAiggGwwIo01vumMzTM",
@@ -10,19 +9,6 @@ const firebaseConfig = {
   messagingSenderId: "209431717379",
   appId: "1:209431717379:web:af68a4e7bc5f334e0c1036",
   measurementId: "G-41FNYQN9KW"
-=======
-// Firebase Configuration for Phone Store Demo - CDN Version
-// إعدادات Firebase للمستودع الجديد - نسخة CDN
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCfRGq8FpMGqddntK1smfTMDcYc7M4gUBs",
-  authDomain: "black-fingerprint-c5c1e.firebaseapp.com",
-  projectId: "black-fingerprint-c5c1e",
-  storageBucket: "black-fingerprint-c5c1e.firebasestorage.app",
-  messagingSenderId: "963825886353",
-  appId: "1:963825886353:web:eaaff5fcfdee5317570b30",
-  measurementId: "G-YX7CHPQ152"
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 };
 
 // تهيئة Firebase باستخدام CDN

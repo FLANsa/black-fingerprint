@@ -49,11 +49,8 @@ function addArabicTextAsImage(doc, text, x, y, fontSize = 12, width = 200, heigh
 // Function to convert Arabic text to English for PDF
 function convertArabicToEnglish(text) {
     const translations = {
-<<<<<<< HEAD
-        'عمر للاتصالات': 'Omar for Communications',
-=======
-        'بصمة سوداء': 'Black Fingerprint',
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
+
+        'البصمة السوداء': 'Black Fingerprint for Communications',
         'اختبار الخط العربي': 'Arabic Font Test',
         'رقم الجهاز': 'Device Number',
         'نسبة البطارية': 'Battery Level',
