@@ -1,15 +1,6 @@
 {
-  "name": "تجربة-النظام-للإتصالات",
+  "name": "black-fingerprint",
   "version": "1.0.0",
-<<<<<<< HEAD
-  "description": "عمر للاتصالات - A web application for managing phone inventory and sales",
-  "main": "index.html",
-  "scripts": {
-    "start": "python3 -m http.server 3005",
-    "dev": "python3 -m http.server 3005",
-    "build": "echo 'No build step required for static site'",
-    "serve": "python3 -m http.server 3005"
-=======
   "description": "بصمة سوداء - A web application for managing phone inventory and sales",
   "main": "index.html",
   "scripts": {
@@ -17,7 +8,6 @@
     "dev": "python3 -m http.server 8000",
     "build": "echo 'No build step required for static site'",
     "serve": "python3 -m http.server 8000"
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   },
   "keywords": [
     "phone-store",
@@ -29,11 +19,7 @@
     "firebase",
     "demo"
   ],
-<<<<<<< HEAD
-  "author": "عمر للاتصالات",
-=======
   "author": "بصمة سوداء",
->>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   "license": "MIT",
   "repository": {
     "type": "git",
