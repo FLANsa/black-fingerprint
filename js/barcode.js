@@ -1,6 +1,10 @@
 /**
  * Barcode Generation and Management
+<<<<<<< HEAD
  * البصمة السوداء - Phone Store Management System
+=======
+ * بصمة سوداء - Phone Store Management System
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
  */
 
 class BarcodeGenerator {
@@ -271,8 +275,12 @@ const BarcodeUtils = {
     createPrintablePage(phone, companyInfo = CONFIG.COMPANY_INFO) {
         const barcode = new BarcodeGenerator();
         const barcodeOptions = { width: 300, height: 100 };
+<<<<<<< HEAD
         const phoneName = [phone.brand, phone.model].filter(Boolean).join(' ') || '—';
 
+=======
+        
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         let svgBarcode;
         if (phone.condition === 'used' && phone.age) {
             svgBarcode = barcode.generateUsedPhoneBarcode(phone.phone_number, phone.age, barcodeOptions);
@@ -288,12 +296,18 @@ const BarcodeUtils = {
                 <title>طباعة باركود - ${phone.phone_number}</title>
                 <style>
                     body { font-family: 'Cairo', Arial, sans-serif; text-align: center; padding: 20px; }
+<<<<<<< HEAD
                     .barcode-container { border: 2px solid #000; padding: 6px 15px 12px; margin: 20px auto; width: fit-content; }
                     .shop-name { font-weight: 700; font-size: 18px; margin: 0 0 3px 0; }
                     .phone-name { font-weight: 600; font-size: 12px; color: #333; margin: 0 0 4px 0; }
                     .barcode { margin: -4px 0 0 0; }
                     .phone-info { margin: 6px 0 0 0; }
                     .phone-info p { margin: 3px 0; font-size: 14px; }
+=======
+                    .barcode-container { border: 2px solid #000; padding: 15px; margin: 20px auto; width: fit-content; }
+                    .phone-info { margin: 15px 0; }
+                    .phone-info p { margin: 5px 0; font-size: 14px; }
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                     @media print { 
                         body { margin: 0; padding: 10px; }
                         .no-print { display: none; }
@@ -302,11 +316,20 @@ const BarcodeUtils = {
             </head>
             <body>
                 <div class="barcode-container">
+<<<<<<< HEAD
                     <p class="shop-name">${companyInfo.name}</p>
                     <p class="phone-name">${phoneName}</p>
                     <div class="barcode">${svgBarcode}</div>
                     <div class="phone-info">
                         <p><strong>الرقم التسلسلي:</strong> ${phone.serial_number || '—'}</p>
+=======
+                    <h3>${companyInfo.name}</h3>
+                    <div class="barcode">${svgBarcode}</div>
+                    <div class="phone-info">
+                        <p><strong>الشركة:</strong> ${phone.brand}</p>
+                        <p><strong>الموديل:</strong> ${phone.model}</p>
+                        <p><strong>الرقم التسلسلي:</strong> ${phone.serial_number}</p>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                         ${phone.condition === 'used' && phone.age ? 
                             `<p><strong>عمر البطارية:</strong> ${phone.age} شهر</p>` : ''}
                     </div>

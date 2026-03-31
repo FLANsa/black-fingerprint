@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<<<<<<< HEAD
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,12 +11,18 @@
     <meta name="apple-mobile-web-app-title" content="عمر">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <title>إدارة أعمال الصيانة — عمر للاتصالات</title>
+=======
+    <title>إدارة أعمال الصيانة — بصمة سوداء</title>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
     <link href="css/mobile.css" rel="stylesheet">
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     <!-- Google Fonts - Cairo -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -117,7 +124,11 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
+<<<<<<< HEAD
             <span class="navbar-brand">عمر للاتصالات</span>
+=======
+            <span class="navbar-brand">بصمة سوداء</span>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -187,9 +198,12 @@
                                 <button class="btn btn-secondary me-2" onclick="clearFilters()">
                                     <i class="fas fa-times"></i> مسح الفلاتر
                                 </button>
+<<<<<<< HEAD
                                 <button class="btn btn-success me-2" onclick="printReport()">
                                     <i class="fas fa-file-pdf"></i> طباعة التقرير
                                 </button>
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                             </div>
                         </div>
                     </div>
@@ -270,12 +284,28 @@
                                 <input type="date" class="form-control" id="visitDate" required>
                             </div>
                             <div class="col-md-6 mb-3">
+<<<<<<< HEAD
+=======
+                                <label for="partName" class="form-label">اسم القطعة *</label>
+                                <input type="text" class="form-control" id="partName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="repId" class="form-label">المندوب *</label>
+                                <select class="form-select" id="repId" required>
+                                    <option value="">اختر المندوب</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                                 <label for="techId" class="form-label">الفني *</label>
                                 <select class="form-select" id="techId" required>
                                     <option value="">اختر الفني</option>
                                 </select>
                             </div>
                         </div>
+<<<<<<< HEAD
                         
                         <!-- قسم القطع المتعددة -->
                         <div class="row mb-3">
@@ -301,6 +331,14 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
+=======
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="partCost" class="form-label">تكلفة القطعة (ريال) *</label>
+                                <input type="number" class="form-control arabic-number-field" id="partCost" min="0" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                                 <label for="amountCharged" class="form-label">المبلغ المحصل (ريال) *</label>
                                 <input type="number" class="form-control arabic-number-field" id="amountCharged" min="0" step="0.01" required>
                             </div>
@@ -480,18 +518,27 @@
                 displayJobs();
             } catch (error) {
                 console.error('❌ خطأ في تحميل البيانات:', error);
+<<<<<<< HEAD
                 console.error('❌ تفاصيل الخطأ:', error.stack);
                 showAlert('error', 'حدث خطأ في تحميل البيانات: ' + (error.message || 'خطأ غير معروف'));
+=======
+                showAlert('error', 'حدث خطأ في تحميل البيانات');
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             }
         }
 
         // Populate dropdowns
         function populateDropdowns() {
+<<<<<<< HEAD
+=======
+            const repSelect = document.getElementById('repId');
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             const techSelect = document.getElementById('techId');
             const filterRepSelect = document.getElementById('filterRep');
             const filterTechSelect = document.getElementById('filterTech');
 
             // Clear existing options
+<<<<<<< HEAD
             if (techSelect) {
                 techSelect.innerHTML = '<option value="">اختر الفني</option>';
             }
@@ -536,11 +583,39 @@
                     }
                 });
             }
+=======
+            [repSelect, techSelect, filterRepSelect, filterTechSelect].forEach(select => {
+                select.innerHTML = select.id.includes('filter') ? '<option value="">جميع المندوبين</option>' : '<option value="">اختر المندوب</option>';
+            });
+
+            // Add reps
+            repsData.forEach(rep => {
+                if (rep.active) {
+                    const option = document.createElement('option');
+                    option.value = rep.id;
+                    option.textContent = rep.name;
+                    repSelect.appendChild(option.cloneNode(true));
+                    filterRepSelect.appendChild(option);
+                }
+            });
+
+            // Add technicians
+            techniciansData.forEach(tech => {
+                if (tech.active) {
+                    const option = document.createElement('option');
+                    option.value = tech.id;
+                    option.textContent = tech.name;
+                    techSelect.appendChild(option.cloneNode(true));
+                    filterTechSelect.appendChild(option);
+                }
+            });
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         }
 
         // Setup event listeners
         function setupEventListeners() {
             // Financial calculation listeners
+<<<<<<< HEAD
             const amountChargedField = document.getElementById('amountCharged');
             if (amountChargedField) {
                 amountChargedField.addEventListener('input', calculateProfit);
@@ -569,10 +644,34 @@
                     }
                 });
             }
+=======
+            ['partCost', 'amountCharged'].forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', calculateProfit);
+                }
+            });
+
+            // Tech selection listener
+            document.getElementById('techId').addEventListener('change', function() {
+                const selectedTech = techniciansData.find(tech => tech.id === this.value);
+                if (selectedTech) {
+                    selectedTechPercent = selectedTech.defaultCommissionPercent;
+                    document.getElementById('techPercentDisplay').textContent = 
+                        `نسبة العمولة: ${(selectedTechPercent * 100).toFixed(1)}%`;
+                    calculateProfit();
+                } else {
+                    selectedTechPercent = 0; // Default
+                    document.getElementById('techPercentDisplay').textContent = 
+                        'سيتم تحديدها تلقائياً عند اختيار الفني';
+                }
+            });
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         }
 
         // Calculate profit
         function calculateProfit() {
+<<<<<<< HEAD
             // حساب إجمالي تكلفة القطع
             const parts = getPartsData();
             const totalPartCost = parts.reduce((sum, part) => sum + part.partCost, 0);
@@ -581,6 +680,13 @@
 
             if (totalPartCost > 0 && amountCharged > 0 && selectedTechPercent > 0) {
                 const { profit, techCommission, shopProfit } = computeDerived(totalPartCost, amountCharged, selectedTechPercent);
+=======
+            const partCost = parseArabicNumber(document.getElementById('partCost').value);
+            const amountCharged = parseArabicNumber(document.getElementById('amountCharged').value);
+
+            if (partCost > 0 && amountCharged > 0 && selectedTechPercent > 0) {
+                const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                 
                 // تحديث القيم في النموذج إذا كانت العناصر موجودة
                 const totalProfitEl = document.getElementById('totalProfit');
@@ -610,6 +716,7 @@
                 return;
             }
 
+<<<<<<< HEAD
             jobsData.forEach(job => {
                 try {
                     // ✅ استخراج القطع والمندوبين (القطع غير إلزامية)
@@ -689,6 +796,70 @@
                     console.error('❌ Error displaying job:', error, job);
                 }
             });
+=======
+            // حساب المجاميع
+            let totalPartCost = 0;
+            let totalAmountCharged = 0;
+            let totalProfit = 0;
+            let totalTechCommission = 0;
+            let totalShopProfit = 0;
+
+            jobsData.forEach(job => {
+                // حساب المجاميع
+                totalPartCost += job.partCost || 0;
+                totalAmountCharged += job.amountCharged || 0;
+                totalProfit += job.profit || 0;
+                totalTechCommission += job.techCommission || 0;
+                totalShopProfit += job.shopProfit || 0;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${job.visitDate ? new Date(job.visitDate.seconds * 1000).toLocaleDateString('ar-SA') : '-'}</td>
+                    <td>${job.customerName}</td>
+                    <td>${job.repName || '-'}</td>
+                    <td>${job.techName || '-'}</td>
+                    <td>${job.partName}</td>
+                    <td>${job.partCost.toFixed(2)} ريال</td>
+                    <td>${job.amountCharged.toFixed(2)} ريال</td>
+                    <td>${job.profit.toFixed(2)} ريال</td>
+                    <td>${job.techCommission.toFixed(2)} ريال</td>
+                    <td>${job.shopProfit.toFixed(2)} ريال</td>
+                    <td>
+                        <span class="status-badge status-${job.status}">
+                            ${getStatusText(job.status)}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-info me-1" onclick="printInvoice('${job.id.replace(/'/g, "\\'")}')" title="طباعة الفاتورة">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning me-1" onclick="editJob('${job.id.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteJob('${job.id.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // إضافة صف المجاميع
+            const totalsRow = document.createElement('tr');
+            totalsRow.className = 'table-info fw-bold';
+            totalsRow.style.backgroundColor = '#d1ecf1';
+            totalsRow.innerHTML = `
+                <td colspan="5" class="text-end"><strong>المجموع:</strong></td>
+                <td><strong>${totalPartCost.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalAmountCharged.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalProfit.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalTechCommission.toFixed(2)} ريال</strong></td>
+                <td><strong>${totalShopProfit.toFixed(2)} ريال</strong></td>
+                <td></td>
+                <td></td>
+            `;
+            tbody.appendChild(totalsRow);
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         }
 
         // Get status text
@@ -709,11 +880,14 @@
             document.getElementById('visitDate').value = new Date().toISOString().split('T')[0];
             selectedTechPercent = 0.5; // Reset to default
             
+<<<<<<< HEAD
             // مسح القطع السابقة (القطع غير إلزامية)
             document.getElementById('partsContainer').innerHTML = '';
             partCounter = 0;
             calculateTotalPartCost(); // تحديث الإجمالي إلى 0
             
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             // Hide complete button for new jobs
             document.getElementById('completeJobBtn').style.display = 'none';
             
@@ -755,6 +929,7 @@
                     visitDateField.value = job.visitDate ? new Date(job.visitDate.seconds * 1000).toISOString().split('T')[0] : '';
                 }
                 
+<<<<<<< HEAD
                 const techIdField = document.getElementById('techId');
                 if (techIdField) techIdField.value = job.techId || '';
                 
@@ -785,6 +960,23 @@
                     calculateTotalPartCost(); // تحديث الإجمالي
                 }
                 
+=======
+                const partNameField = document.getElementById('partName');
+                if (partNameField) partNameField.value = job.partName || '';
+                
+                const repIdField = document.getElementById('repId');
+                if (repIdField) repIdField.value = job.repId || '';
+                
+                const techIdField = document.getElementById('techId');
+                if (techIdField) techIdField.value = job.techId || '';
+                
+                const partCostField = document.getElementById('partCost');
+                if (partCostField) partCostField.value = job.partCost || 0;
+                
+                const amountChargedField = document.getElementById('amountCharged');
+                if (amountChargedField) amountChargedField.value = job.amountCharged || 0;
+                
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                 const statusField = document.getElementById('status');
                 if (statusField) statusField.value = job.status || 'pending';
                 
@@ -854,6 +1046,7 @@
             }
         }
 
+<<<<<<< HEAD
         // ===== إدارة القطع المتعددة =====
         let partCounter = 0;
 
@@ -972,6 +1165,27 @@
 
             // ✅ احسب القيم المشتقة
             const { profit, techCommission, shopProfit } = computeDerived(totalPartCost, amountCharged, selectedTechPercent);
+=======
+        // Save job
+        async function saveJob() {
+            const partCost = parseArabicNumber(document.getElementById('partCost').value);
+            const amountCharged = parseArabicNumber(document.getElementById('amountCharged').value);
+            const repId = document.getElementById('repId').value;
+            const techId = document.getElementById('techId').value;
+
+            // تحقق أساسي
+            if (!repId || !techId || partCost <= 0 || amountCharged <= 0) {
+                showAlert('error', 'يرجى تعبئة المندوب والفني وتكاليف/مبالغ صحيحة');
+                return;
+            }
+
+            // أسماء المندوب/الفني
+            const rep = repsData.find(r => r.id === repId);
+            const tech = techniciansData.find(t => t.id === techId);
+
+            // ✅ احسب القيم المشتقة
+            const { profit, techCommission, shopProfit } = computeDerived(partCost, amountCharged, selectedTechPercent);
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
             // ✅ التحقق من صحة الضمان المخصص
             const warrantyPeriod = getWarrantyPeriod();
@@ -983,10 +1197,19 @@
                 customerName: document.getElementById('customerName').value,
                 customerPhone: document.getElementById('customerPhone').value,
                 visitDate: new Date(document.getElementById('visitDate').value),
+<<<<<<< HEAD
                 parts, // مصفوفة القطع
                 totalPartCost, // إجمالي تكلفة القطع
                 techId,
                 techName: tech ? tech.name : '',
+=======
+                partName: document.getElementById('partName').value,
+                repId,
+                techId,
+                repName: rep ? rep.name : '',
+                techName: tech ? tech.name : '',
+                partCost,
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                 amountCharged,
                 techPercent: selectedTechPercent,      // نخزّن النسبة لاستخدامها لاحقاً
                 // ✅ القيم المحسوبة
@@ -1049,6 +1272,7 @@
             const job = jobsData.find(j => j.id === currentEditId);
             if (!job) return;
 
+<<<<<<< HEAD
             // ✅ حساب إجمالي تكلفة القطع بشكل صحيح
             let totalPartCost = 0;
             if (job.parts && Array.isArray(job.parts) && job.parts.length > 0) {
@@ -1090,6 +1314,14 @@
                 parts: job.parts?.length || 0
             });
 
+=======
+            // تأكيد توفر البيانات الأساسية
+            if (!job.partCost || !job.amountCharged || !job.repId || !job.techId) {
+                showAlert('error', 'يرجى التأكد من ملء جميع البيانات المطلوبة قبل إتمام العملية');
+                return;
+            }
+
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             // استخدم النسبة المخزّنة إن وجدت، وإلا المختارة حالياً، وإلا من بيانات الفني، وإلا 0%
             const selectedTech = techniciansData.find(t => t.id === job.techId);
             const techPercent = (typeof job.techPercent === 'number') ? job.techPercent :
@@ -1097,6 +1329,7 @@
                                 (selectedTech && typeof selectedTech.defaultCommissionPercent === 'number') ? 
                                 selectedTech.defaultCommissionPercent : 0);
 
+<<<<<<< HEAD
             // ✅ احسب القيم المُشتقة نهائياً (profit = amountCharged - totalPartCost)
             const { profit, techCommission, shopProfit } = computeDerived(totalPartCost, amountCharged, techPercent);
             
@@ -1106,6 +1339,10 @@
                 shopProfit,
                 techPercent: techPercent * 100 + '%'
             });
+=======
+            // ✅ احسب القيم المُشتقة نهائياً
+            const { profit, techCommission, shopProfit } = computeDerived(job.partCost, job.amountCharged, techPercent);
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
             const confirmMessage = `هل أنت متأكد من إتمام هذه العملية؟
             
@@ -1121,6 +1358,7 @@
                     status: 'done',
                     completedAt: new Date(),
                     // ✅ ثبّت القيم عند الإتمام
+<<<<<<< HEAD
                     totalPartCost, // ✅ إرسال totalPartCost للتأكد من الحساب الصحيح
                     profit,
                     techCommission,
@@ -1128,6 +1366,12 @@
                     techPercent,
                     // ✅ التأكد من حفظ parts إذا كانت موجودة
                     parts: job.parts || []
+=======
+                    profit,
+                    techCommission,
+                    shopProfit,
+                    techPercent
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                 };
 
                 await window.firebaseDatabase.updateMaintenanceJob(currentEditId, jobData);
@@ -1192,6 +1436,7 @@
             window.open(invoiceUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
         }
 
+<<<<<<< HEAD
         // طباعة تقرير أعمال الصيانة
         function printReport() {
             console.log('📊 طباعة تقرير أعمال الصيانة');
@@ -1217,6 +1462,8 @@
             window.open(reportUrl, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
         }
 
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         // ===== دعم الأرقام العربية والإنجليزية =====
         function convertArabicToEnglishNumbers(str) {
             if (!str) return '';

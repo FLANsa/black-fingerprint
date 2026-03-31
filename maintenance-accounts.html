@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<<<<<<< HEAD
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,6 +12,10 @@
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <meta name="requires-role" content="admin">
     <title>حسابات الصيانة — عمر للاتصالات</title>
+=======
+    <meta name="requires-role" content="admin">
+    <title>حسابات الصيانة — بصمة سوداء</title>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     
     <!-- Page Guard -->
     <script src="js/guard.js"></script>
@@ -19,7 +24,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<<<<<<< HEAD
     <link href="css/mobile.css" rel="stylesheet">
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     <!-- Google Fonts - Cairo -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -181,7 +189,11 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
+<<<<<<< HEAD
             <span class="navbar-brand">عمر للاتصالات</span>
+=======
+            <span class="navbar-brand">بصمة سوداء</span>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -292,6 +304,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">&nbsp;</label>
+<<<<<<< HEAD
                     <div class="d-flex gap-2">
                         <button class="btn btn-primary" onclick="loadAccounts()">
                             <i class="fas fa-search"></i> بحث
@@ -299,6 +312,12 @@
                         <button class="btn btn-success" onclick="printAccountsReport()">
                             <i class="fas fa-file-pdf"></i> طباعة
                         </button>
+=======
+                    <div>
+                        <button class="btn btn-primary" onclick="loadAccounts()">
+                            <i class="fas fa-search"></i> بحث
+                        </button>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                     </div>
                 </div>
             </div>
@@ -431,8 +450,11 @@
                                 <option value="cash">نقداً</option>
                                 <option value="bank_transfer">تحويل بنكي</option>
                                 <option value="check">شيك</option>
+<<<<<<< HEAD
                                 <option value="tabby">تابي</option>
                                 <option value="tamara">تمارا</option>
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                                 <option value="other">أخرى</option>
                             </select>
                         </div>
@@ -665,11 +687,16 @@
                     </td>
                     <td><span class="status-badge status-${rep.status}">${rep.status === 'paid' ? 'مدفوع' : 'معلق'}</span></td>
                     <td>
+<<<<<<< HEAD
                         <button class="btn btn-sm btn-primary me-1" onclick="openPaymentModal('rep', '${rep.repId}', '${rep.repName}')">
                             <i class="fas fa-credit-card"></i>
                         </button>
                         <button class="btn btn-sm btn-success" onclick="printSingleReport('rep', '${rep.repId}')" title="طباعة تقرير">
                             <i class="fas fa-print"></i>
+=======
+                        <button class="btn btn-sm btn-primary" onclick="openPaymentModal('rep', '${rep.repId}', '${rep.repName}')">
+                            <i class="fas fa-credit-card"></i> دفعة
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                         </button>
                     </td>
                 `;
@@ -715,11 +742,16 @@
                     </td>
                     <td><span class="status-badge status-${tech.status}">${tech.status === 'paid' ? 'مدفوع' : 'معلق'}</span></td>
                     <td>
+<<<<<<< HEAD
                         <button class="btn btn-sm btn-primary me-1" onclick="openPaymentModal('tech', '${tech.techId}', '${tech.techName}')">
                             <i class="fas fa-credit-card"></i>
                         </button>
                         <button class="btn btn-sm btn-success" onclick="printSingleReport('tech', '${tech.techId}')" title="طباعة تقرير">
                             <i class="fas fa-print"></i>
+=======
+                        <button class="btn btn-sm btn-primary" onclick="openPaymentModal('tech', '${tech.techId}', '${tech.techName}')">
+                            <i class="fas fa-credit-card"></i> دفعة
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                         </button>
                     </td>
                 `;
@@ -755,8 +787,11 @@
                     'cash': 'نقداً',
                     'bank_transfer': 'تحويل بنكي',
                     'check': 'شيك',
+<<<<<<< HEAD
                     'tabby': 'تابي',
                     'tamara': 'تمارا',
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                     'other': 'أخرى'
                 };
                 
@@ -852,6 +887,7 @@
         }
 
 
+<<<<<<< HEAD
         // طباعة تقرير الحسابات
         function printAccountsReport() {
             const dateFrom = document.getElementById('dateFrom').value;
@@ -891,6 +927,8 @@
             window.open(reportUrl, '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
         }
 
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         // Show alert
         function showAlert(message, type) {
             const alertDiv = document.createElement('div');

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,11 +11,17 @@
   <meta name="apple-mobile-web-app-title" content="عمر">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>إضافة هاتف جديد — عمر للاتصالات</title>
+=======
+  <title>إضافة هاتف جديد — بصمة سوداء</title>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<<<<<<< HEAD
   <link href="css/mobile.css" rel="stylesheet">
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <style>
     body { font-family: 'Cairo', sans-serif; background-color: #f8f9fa; padding-top: 70px; }
@@ -29,7 +36,11 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
+<<<<<<< HEAD
       <span class="navbar-brand">عمر للاتصالات</span>
+=======
+      <span class="navbar-brand">بصمة سوداء</span>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -183,7 +194,11 @@
               </div>
 
               <div class="text-center">
+<<<<<<< HEAD
                 <button type="submit" class="btn btn-primary" id="add_phone_btn">إضافة الهاتف الجديد</button>
+=======
+                <button type="submit" class="btn btn-primary">إضافة الهاتف الجديد</button>
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
                 <a href="dashboard.html" class="btn btn-secondary">عودة للوحة التحكم</a>
               </div>
             </form>
@@ -372,13 +387,18 @@
       }catch(e){ console.error(e); alert('❌ حدث خطأ في الحذف.'); }
     }
 
+<<<<<<< HEAD
     /** توليد رقم باركود محلي (للوضع غير المتصل أو عند استخدام localStorage فقط). */
     function generatePhoneNumberLocal(){
+=======
+    function generatePhoneNumber(){
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       let last = localStorage.getItem('lastDeviceNumber')||'0';
       const next = (parseInt(last,10)+1); localStorage.setItem('lastDeviceNumber', String(next));
       return String(next).padStart(6,'0');
     }
 
+<<<<<<< HEAD
     /** الحصول على الرقم التالي الفريد: من Firebase إن وُجد، وإلا من localStorage. */
     async function getNextPhoneNumberForAdd(){
       if (window.firebaseDatabase && window.storage && window.storage.isFirebaseAvailable) {
@@ -410,6 +430,9 @@
         btnRef = { addBtn, originalBtnText };
       }
 
+=======
+    async function savePhoneToFirebase(){
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
       try{
         // Validate customer ID and phone number
         const customerId = document.getElementById('customer_id').value.trim();
@@ -418,6 +441,7 @@
         if (!customerId || customerId.length !== 10 || !/^[0-9]{10}$/.test(customerId)) {
           alert('رقم الهوية/الإقامة مطلوب ويجب أن يكون 10 أرقام');
           document.getElementById('customer_id').focus();
+<<<<<<< HEAD
           isProcessing = false;
           if (btnRef && btnRef.addBtn) {
             btnRef.addBtn.disabled = false;
@@ -426,12 +450,15 @@
             btnRef.addBtn.style.cursor = 'pointer';
             btnRef.addBtn.innerHTML = btnRef.originalBtnText;
           }
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
           return false;
         }
         
         if (!customerPhone || customerPhone.length !== 10 || !/^[0-9]{10}$/.test(customerPhone)) {
           alert('رقم هاتف العميل مطلوب ويجب أن يكون 10 أرقام');
           document.getElementById('customer_phone').focus();
+<<<<<<< HEAD
           isProcessing = false;
           if (btnRef && btnRef.addBtn) {
             btnRef.addBtn.disabled = false;
@@ -444,6 +471,12 @@
         }
 
         const phone_number = await getNextPhoneNumberForAdd();
+=======
+          return false;
+        }
+
+        const phone_number = generatePhoneNumber();
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         const purchase_price = parseArabicNumber(document.getElementById('purchase_price').value);
         const selling_price = parseArabicNumber(document.getElementById('selling_price').value);
 
@@ -497,6 +530,7 @@
           }
           
           if(savedOK){
+<<<<<<< HEAD
             isProcessing = false;
             if (btnRef && btnRef.addBtn) {
               btnRef.addBtn.disabled = false;
@@ -505,6 +539,8 @@
               btnRef.addBtn.style.cursor = 'pointer';
               btnRef.addBtn.innerHTML = btnRef.originalBtnText;
             }
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             showAlert('success', 'تم تحديث الهاتف بنجاح!');
             // إعادة توجيه إلى صفحة البحث
             setTimeout(() => {
@@ -526,6 +562,7 @@
           }
           
           if(savedOK){
+<<<<<<< HEAD
             isProcessing = false;
             if (btnRef && btnRef.addBtn) {
               btnRef.addBtn.disabled = false;
@@ -534,11 +571,14 @@
               btnRef.addBtn.style.cursor = 'pointer';
               btnRef.addBtn.innerHTML = btnRef.originalBtnText;
             }
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             const shouldPrint = confirm('✅ تم إضافة الهاتف!\n\nهل تريد طباعة الباركود؟');
             if(shouldPrint){ window.location.href = `print_barcode.html?phone_number=${encodeURIComponent(phoneData.phone_number)}`; }
             return true;
           }
         }
+<<<<<<< HEAD
         isProcessing = false;
         if (btnRef && btnRef.addBtn) {
           btnRef.addBtn.disabled = false;
@@ -562,6 +602,11 @@
         alert('❌ حدث خطأ في حفظ الهاتف.'); 
         return false; 
       }
+=======
+        alert('❌ تعذّر الحفظ'); return false;
+
+      }catch(err){ console.error(err); alert('❌ حدث خطأ في حفظ الهاتف.'); return false; }
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     }
 
     // Add input validation for customer ID and phone
@@ -628,7 +673,11 @@
           document.getElementById('customer_phone').value = phone.customer_phone || '';
           
           // تحديث عنوان الصفحة
+<<<<<<< HEAD
           document.title = 'تعديل هاتف جديد — عمر للاتصالات';
+=======
+          document.title = 'تعديل هاتف جديد — بصمة سوداء';
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
           document.querySelector('h2').textContent = 'تعديل هاتف جديد';
           
           // حفظ معرف الهاتف للتعديل
@@ -705,6 +754,7 @@
       }
       
       const form = document.querySelector('form');
+<<<<<<< HEAD
       form.addEventListener('submit', async (e)=>{ 
         e.preventDefault(); 
         e.stopPropagation();
@@ -713,6 +763,9 @@
           await populateBrandsFromFirebase(); 
         } 
       });
+=======
+      form.addEventListener('submit', async (e)=>{ e.preventDefault(); if(await savePhoneToFirebase()){ form.reset(); await populateBrandsFromFirebase(); } });
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     });
 
     // ===== إضافة لون مخصص =====

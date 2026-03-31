@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # عمر للاتصالات - نظام إدارة متجر الجوالات
+=======
+# Black Fingerprint - نظام إدارة متجر الجوالات
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
 نظام متكامل لإدارة متجر الهواتف المحمولة الجديدة والمستعملة باللغة العربية.
 
@@ -35,12 +39,21 @@
 2. **اضغط على "New +" ثم "Static Site"**
 3. **اتصل بـ GitHub:**
    - اختر "Build and deploy from a Git repository"
+<<<<<<< HEAD
 - اختر مستودع المشروع
   - اختر الفرع `main`
 
 4. **إعدادات النشر:**
    ```
    Name: omar-telecom
+=======
+   - اختر مستودع `black-fingerprint`
+   - اختر الفرع `main`
+
+4. **إعدادات النشر:**
+   ```
+   Name: black-fingerprint
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
    Branch: main
    Root Directory: ./
    Build Command: (اتركه فارغ)
@@ -56,7 +69,11 @@
 ```yaml
 services:
   - type: static
+<<<<<<< HEAD
     name: omar-telecom
+=======
+    name: black-fingerprint
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     buildCommand: ""
     staticPublishPath: ./
     envVars:
@@ -75,7 +92,11 @@ services:
 
 ### 1. إنشاء مشروع Firebase
 - اذهب إلى [Firebase Console](https://console.firebase.google.com)
+<<<<<<< HEAD
 - أنشئ مشروع جديد باسم `omar-telecom`
+=======
+- أنشئ مشروع جديد باسم `black-fingerprint`
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
 ### 2. تفعيل الخدمات المطلوبة
 - **Firestore Database** - قاعدة البيانات
@@ -142,8 +163,13 @@ services:
 
 ```bash
 # استنساخ المشروع
+<<<<<<< HEAD
 git clone <رابط المستودع>
 cd عمر للاتصالات
+=======
+git clone https://github.com/FLANsa/black-fingerprint.git
+cd black-fingerprint
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
 # تشغيل الخادم المحلي
 python3 -m http.server 8000
@@ -155,7 +181,11 @@ npx http-server -p 8000
 ## 📞 الدعم
 
 للدعم التقني أو الاستفسارات:
+<<<<<<< HEAD
 - **GitHub Issues**: [إنشاء مشكلة](https://github.com)
+=======
+- **GitHub Issues**: [إنشاء مشكلة](https://github.com/FLANsa/black-fingerprint/issues)
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 - **Email**: support@blackfingerprint.com
 
 ## 📄 الترخيص
@@ -164,4 +194,8 @@ npx http-server -p 8000
 
 ---
 
+<<<<<<< HEAD
 **عمر للاتصالات** - رؤيتنا هي تقديم أفضل حلول إدارة متاجر الجوالات في المملكة العربية السعودية.
+=======
+**Black Fingerprint** - رؤيتنا هي تقديم أفضل حلول إدارة متاجر الجوالات في المملكة العربية السعودية.
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9

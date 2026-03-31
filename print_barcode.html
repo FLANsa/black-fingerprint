@@ -3,17 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+<<<<<<< HEAD
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="بصمة سوداء">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   <title>طباعة الباركود — بصمة سوداء</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+<<<<<<< HEAD
   <link href="css/mobile.css" rel="stylesheet">
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -33,6 +39,7 @@
     .card-header h3 { margin:0; font-size:1.1rem; font-weight:700; }
     .card-body { padding:20px; }
     .sticker-preview{ border:2px dashed var(--muted); padding:20px; background:#f9f9f9; border-radius:10px; display:flex; justify-content:center; margin-bottom:18px; }
+<<<<<<< HEAD
     .sticker{ width:6cm; height:3cm; background:#fff; border:1px solid #ddd; box-sizing:border-box; display:flex; flex-direction:column; padding:0.01cm 0.2cm 0.2cm; gap:0.03cm; }
     .row2{ display:flex; flex-direction:column; align-items:center; text-align:center; width:33.333%; line-height:1.1; }
     .label{ color:#222; font-weight:700; font-size:3.0mm; line-height:1.1; text-align:center; }
@@ -41,6 +48,14 @@
     .phone-name{ text-align:center; font-weight:600; font-size:3mm; line-height:1.1; margin:0; color:#333; }
     .rows{ display:flex; flex-direction:row; gap:0.1cm; justify-content:space-between; margin:0; }
     .sticker-barcode{ margin:-0.04cm 0 0 0; }
+=======
+    .sticker{ width:6cm; height:3cm; background:#fff; border:1px solid #ddd; box-sizing:border-box; display:flex; flex-direction:column; padding:0.2cm; gap:0.15cm; }
+    .row2{ display:flex; flex-direction:column; align-items:center; text-align:center; width:33.333%; line-height:1.1; }
+    .label{ color:#222; font-weight:700; font-size:3.0mm; line-height:1.1; text-align:center; }
+    .value{ color:#000; font-weight:800; font-size:4.2mm; line-height:1.05; text-align:center; }
+    .shop{ text-align:center; font-weight:700; font-size:4.5mm; line-height:1.1; margin-bottom:0.1cm; }
+    .rows{ display:flex; flex-direction:row; gap:0.1cm; justify-content:space-between; margin-top:-0.2cm; }
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     .sticker-barcode canvas{ width:100%; height:auto; max-height:1.2cm; image-rendering:crisp-edges; image-rendering:pixelated; display:block; }
     .actions{ display:flex; gap:10px; flex-wrap:wrap; }
     .btn{ appearance:none; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; font-family:inherit; }
@@ -66,7 +81,10 @@
         <div class="sticker-preview">
           <div id="sticker" class="sticker">
             <div class="shop">بصمة سوداء</div>
+<<<<<<< HEAD
             <div class="phone-name" id="phone-name">—</div>
+=======
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
             <div class="sticker-barcode"><canvas id="barcode-canvas"></canvas></div>
             <div class="rows">
               <div class="row2">
@@ -150,11 +168,16 @@
     if(win.document.readyState==='complete'){ onLoad(); } else { win.onload = onLoad; }
   }
 
+<<<<<<< HEAD
   const SHOP_NAME = 'بصمة سوداء';
 
   function valuesFromPhone(phone){
     const phone_number = phone?.phone_number || phone?.barcode || phone?.id || '';
     const phone_name = [phone?.brand, phone?.model].filter(Boolean).join(' ') || '—';
+=======
+  function valuesFromPhone(phone){
+    const phone_number = phone?.phone_number || phone?.barcode || phone?.id || '';
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     const memory = phone?.phone_memory || phone?.memory || phone?.storage || '-';
     // Hide battery for new phones, show for used phones
     let battery = '-';
@@ -165,6 +188,7 @@
     } else if (phone?.age != null) {
       battery = String(phone.age); // تم الحفظ من صفحة المستعمل كـ battery_level أيضاً
     }
+<<<<<<< HEAD
     return { phone_number, phone_name, memory, battery };
   }
 
@@ -177,6 +201,15 @@
     document.getElementById('phone-number').textContent = phone_number || '-';
     document.getElementById('phone-memory').textContent = memory || '-';
 
+=======
+    return { phone_number, memory, battery };
+  }
+
+  function fillSticker({phone_number, memory, battery}){
+    document.getElementById('phone-number').textContent = phone_number || '-';
+    document.getElementById('phone-memory').textContent = memory || '-';
+    
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     // Hide battery level row for new phones (when battery is empty)
     const batteryRow = document.querySelector('.row2:nth-child(2)'); // Second row (battery)
     if (battery === '') {
@@ -185,7 +218,11 @@
       batteryRow.style.display = 'flex';
       document.getElementById('battery-level').textContent = battery || '-';
     }
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
     generateBarcode(phone_number || '-');
   }
 
@@ -248,7 +285,11 @@
         return;
       }else{
         // If not found anywhere, still show the code the user passed
+<<<<<<< HEAD
         fillSticker({ phone_number: pn, phone_name: '—', memory:'-', battery:'-' });
+=======
+        fillSticker({ phone_number: pn, memory:'-', battery:'-' });
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
         alert('لم يتم العثور على بيانات الهاتف في القاعدة، تم استخدام رقم الجهاز فقط.');
         return;
       }
@@ -263,10 +304,20 @@
       }
     }catch{}
 
+<<<<<<< HEAD
     // لا نولّد رقماً جديداً هنا لتجنب فجوات وتداخل مع أرقام الهواتف المسجلة.
     // عرض رسالة توجيهية وملصق placeholder.
     alert('لم يتم تحديد رقم جهاز.\n\nافتح صفحة الطباعة من صفحة الهاتف (إضافة هاتف أو البحث) أو أضِف رقم الجهاز في الرابط:\nprint_barcode.html?phone_number=XXXXXX');
     fillSticker({ phone_number: '—', phone_name: '—', memory: '—', battery: '—' });
+=======
+    // Finally, generate a new label if nothing provided
+    const generated = (() => {
+      let last = localStorage.getItem('lastDeviceNumber')||'0';
+      const next = (parseInt(last,10)+1); localStorage.setItem('lastDeviceNumber', String(next));
+      return String(next).padStart(6,'0');
+    })();
+    fillSticker({ phone_number: generated, memory:'32GB', battery:'100' });
+>>>>>>> 870b4df3505f6b748cf971b7375a655225f85ce9
   }
 
   document.addEventListener('DOMContentLoaded', loadPhoneData);
